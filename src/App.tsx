@@ -3,50 +3,60 @@ import "./App.css";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider, { Settings } from "react-slick";
+import logobutton from "/src/assets/gooddaisy_logo.svg" 
 
 function App() {
-
   return (
     <div>
       <head className="bg-primary px-2  h-7 flex items-center text-white font-light text-sm">
-
         {" "}
         {/* Header */}
-        News outside working hours
+        News outside working
       </head>
       <div>
         <div className="title">Custom Preservation</div> {/* Products */}
         <ProductCarousel />
       </div>
-      <div className="flex bg-gray-300 h-2 my-5"/>
+      <div className="flex bg-gray-300 h-2 my-5" />
       <div>
         <div className="title">On Shelf Product</div>
 
         {/* More products */}
         <ProductCarousel />
       </div>
-     
-
-    
       Footer navigation
       <div className="fixed inset-x-0 bottom-0 bg-white ">
         <ul className="flex justify-around  h-11 my-2 boxShadow">
           <li>
-            <button type="button" className= "bottom-nav"> 
+            <button type="button" className="bottom-nav">
               <i className="fa-solid fa-user fa-xl text-primary "></i>
-              <div className="text-sm text-primary">Member</div> 
-            </button>            
+              <div className="text-sm text-primary">Member</div>
+            </button>
           </li>
-          <li>            
-            <button type="button" className= "bottom-nav"> 
+          <li>
+            <button type="button" className="bottom-nav">
               <i className="fa-solid fa-hand fa-xl text-primary "></i>
-              <div className="text-sm text-primary">Activity</div> 
-            </button>  
-
+              <div className="text-sm text-primary">Activity</div>
+            </button>
           </li>
-          <li>Home</li>
-          <li>Tracking</li>
-          <li>Cart</li>
+          <li>
+            <button type="button" className="bottom-nav">
+              <img src={logobutton} alt="Logo" className="h-6 " />
+              <div className="text-sm text-primary">Home</div>
+            </button>
+          </li>
+          <li>
+            <button type="button" className="bottom-nav">
+              <i className="fa-solid fa-box fa-xl text-primary "></i>  
+              <div className="text-sm text-primary">Tracking</div>
+            </button>
+          </li>
+          <li>
+            <button type="button" className="bottom-nav">
+             <i className="fa-solid fa-cart-shopping fa-xl text-primary "></i> 
+             <div className="text-sm text-primary">Cart</div>
+            </button>
+          </li>
         </ul>
       </div>
     </div>
@@ -60,8 +70,8 @@ const ProductCard: React.FC = () => {
         <div className="h-40 bg-gray-300 mb-1 rounded"></div>{" "}
         {/* Image placeholder */}
         <div className="text-center pb-3">
-        <div className="font-medium ">Hexagon Coaster</div>
-        <div className="text-sm font-light">From 2,500 THB</div>
+          <div className="font-medium ">Hexagon Coaster</div>
+          <div className="text-sm font-light">From 2,500 THB</div>
         </div>
       </div>
     </div>
