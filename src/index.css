@@ -34,5 +34,25 @@
   @apply text-xl font-bold px-2 my-3
 }
 
+.selected {
+  @apply text-secondary 
+}
+
+
+/* Example styles for the "bottom-nav-link" class (optional) */
+.bottom-nav-link {
+  /* Define your normal item styles here */
+  text-decoration: none; /* Remove underline for links */
+  margin: 0 10px; /* Adjust spacing between items */
+}
+
+/* Example styles for the "bottom-nav" class (optional) */
+.bottom-nav {
+  /* Define your button styles here */
+  background: transparent; /* Make the button background transparent */
+  border: none; /* Remove button border */
+  padding: 0; /* Remove button padding */
+  cursor: pointer; /* Add a pointer cursor for better UX */
+}
 
 

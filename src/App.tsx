@@ -1,16 +1,17 @@
 import React from "react";
 import "./App.css";
-import ProductCarousel from "/components/ProductCarousel";
-import FooterNav from "/components/FooterNav"
+import ProductCarousel from "./components/ProductCarousel";
+import FooterNav from "./components/FooterNav"
+import { BrowserRouter as Router } from "react-router-dom";
 
 function App() {
   return (
-    <div>
+    <Router>
       {/* Header */}
-      <head className="bg-primary px-2  h-7 flex items-center text-white font-light text-sm">
+      <header className="bg-primary px-2  h-7 flex items-center text-white font-light text-sm">
         {" "}
         News outside working
-      </head>
+      </header>
       {/* Custom Preservation */}
       <div>
         <div className="title">Custom Preservation</div> 
@@ -26,7 +27,7 @@ function App() {
       {/* Footer navigation */}
       Footer navigation
       <FooterNav />
-    </div>
+    </Router>
   );
 }
 
