@@ -27,13 +27,34 @@ const FooterNavItem: React.FC<FooterNavItemProps> = ({
 
 const FooterNav: React.FC = () => {
   const location = useLocation();
-  const [selectedItem, setSelectedItem] = useState(location.pathname); // State to track the selected menu item
+  const [selectedItem] = useState(location.pathname); // State to track the selected menu item
+  useEffect(() => {
+    const testmap = FOOTER_ITEMS.map((navcomponent, i) => {
+      // console.log(index, menu);
+      const newDetail = `${i + 1} ${navcomponent.text} `;
+      navcomponent.detail = newDetail;
+      if (navcomponent.text.length <= 4){
+        return navcomponent
+      }
+      
+    })
 
- 
+    const testfilter = FOOTER_ITEMS.filter((navcomponent) => {
+      return navcomponent.text.length <= 4 
+    });
+
+    const testfind = FOOTER_ITEMS.find((navcomponent)=>{
+
+      return navcomponent.text.toLowerCase().includes("h")
+    })
+
+    console.log(testmap);
+  }, []);
+
   return (
     <nav className="fixed inset-x-0 bottom-0 bg-white">
       <ul className="flex justify-around h-11 my-2 boxShadow">
-      {FOOTER_ITEMS.map((item, index) => (
+        {FOOTER_ITEMS.map((item, index) => (
           <FooterNavItem
             key={index}
             icon={item.icon}
@@ -42,7 +63,6 @@ const FooterNav: React.FC = () => {
             selected={item.url === selectedItem} // Check if the item's URL matches the selected item
           />
         ))}
-        
       </ul>
     </nav>
   );

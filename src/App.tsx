@@ -1,4 +1,3 @@
-import React from "react";
 import "./App.css";
 import ProductCarousel from "./components/ProductCarousel";
 import FooterNav from "./components/FooterNav"
