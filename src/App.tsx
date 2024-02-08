@@ -1,9 +1,11 @@
 import "./App.css";
 import ProductCarousel from "./components/ProductCarousel";
-import FooterNav from "./components/FooterNav"
+import FooterNav from "./components/FooterNav";
+import Quote from "./components/TestUseeffect";
 import { BrowserRouter as Router } from "react-router-dom";
 
 function App() {
+
   return (
     <Router>
       {/* Header */}
@@ -12,13 +14,14 @@ function App() {
         News outside working
       </header>
       {/* Custom Preservation */}
+      <Quote/>
       <div>
-        <div className="title">Custom Preservation</div> 
+        <div className="title">Shape</div>
         <ProductCarousel />
       </div>
       <div className="flex bg-gray-300 h-2 my-5" /> {/*break*/}
       <div>
-        <div className="title">On Shelf Product</div>
+        <div className="title">Alphabet</div>
 
         {/* On-shelf Product */}
         <ProductCarousel />

@@ -29,26 +29,27 @@ const FooterNav: React.FC = () => {
   const location = useLocation();
   const [selectedItem] = useState(location.pathname); // State to track the selected menu item
   useEffect(() => {
-    const testmap = FOOTER_ITEMS.map((navcomponent, i) => {
+    const testMap = FOOTER_ITEMS.map((navComponent, i) => {
       // console.log(index, menu);
-      const newDetail = `${i + 1} ${navcomponent.text} `;
-      navcomponent.detail = newDetail;
-      if (navcomponent.text.length <= 4){
-        return navcomponent
+      const newDetail = `${i + 1} ${navComponent.text} `;
+      navComponent.detail = newDetail;
+      // cleanup
+      if (navComponent.text.length <= 4){
+        return navComponent
       }
       
     })
 
-    const testfilter = FOOTER_ITEMS.filter((navcomponent) => {
-      return navcomponent.text.length <= 4 
+    const testfilter = FOOTER_ITEMS.filter((navComponent) => {
+      return navComponent.text.length <= 4 
     });
 
-    const testfind = FOOTER_ITEMS.find((navcomponent)=>{
+    const testfind = FOOTER_ITEMS.find((navComponent)=>{
 
-      return navcomponent.text.toLowerCase().includes("h")
+      return navComponent.text.toLowerCase().includes("h")
     })
 
-    console.log(testmap);
+    console.log(testMap);
   }, []);
 
   return (
