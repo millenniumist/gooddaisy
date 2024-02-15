@@ -1,23 +1,20 @@
 import React from "react";
+import { Product } from "../models/product";
 
 interface ProductCardProps {
-  productImage: string;
-  productName: string;
-  price: number;
+  product: Product
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
-  productImage,
-  productName = "Square",
-  price = "2500",
+  product
 }) => {
   return (
     <div className="p-2">
     <div className="bg-white rounded-lg shadow-md">
-      <img src={productImage} alt={productName} className="h-40 bg-gray-300 mb-1 rounded" />
+      <img src={product.images[0]} alt={product.name} className="h-40 bg-gray-300 mb-1 rounded" />
       <div className="text-center pb-3">
-        <div className="font-medium ">{productName}</div>
-        <div className="text-sm font-light">From {price} THB</div>
+        <div className="font-medium ">{product.name}</div>
+        <div className="text-sm font-light">From {product.price} THB</div>
       </div>
     </div>
   </div>

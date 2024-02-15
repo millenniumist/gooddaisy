@@ -31,20 +31,26 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({
 }) => {
   const [renderImages, setRenderImages] = useState([]);
   useEffect(() => {
-    const mappedImages = images.map((image) => {
-      image.originalHeight = 10;
-      image.sizes = 100;
-      image.originalWidth = 50;
-      return image;
-    });
+    const mappedImages = images.map((image) => ({
+      ...image,
+      thumbnailWidth: 1, // Adjust thumbnail width
+      thumbnailHeight: 1, // Adjust thumbnail height
+      sizes: "100vw", // Adjust sizes if needed
+      originalWidth: 50, // Adjust original width
+      showPlayButton: false // Hide play button
+    }));
     setRenderImages(mappedImages);
   }, [images]);
 
+  
+
   return (
     <div className="m-10">
-      <ImageGallery items={renderImages} infinite />
+      <ImageGallery items={renderImages} infinite showPlayButton = {false}  />
     </div>
   );
 };
+
+
 
 export default ProductGallery;

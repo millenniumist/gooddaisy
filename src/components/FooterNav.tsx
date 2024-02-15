@@ -25,7 +25,7 @@ const FooterNav: React.FC = () => {
   const selectedItem = location.pathname; // State to track the selected menu item
 
   return (
-    <nav className="fixed inset-x-0 bottom-0">
+    <nav className="fixed inset-x-0 bottom-0 z-20 bg-white">
       <ul className="flex justify-around h-11 my-2 ">
         {FOOTER_ITEMS.map((item, index) => (
           <FooterNavComponent

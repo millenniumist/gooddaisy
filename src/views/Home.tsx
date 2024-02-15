@@ -1,28 +1,50 @@
 import ProductCarousel from "../components/ProductCarousel";
-import FooterNav from "../components/FooterNav";
+import BaseScreen from "../components/BaseScreen";
+import { useEffect, useState } from "react";
+import PRODUCTS from "../../mock/GetProductList.json";
+import ProductType from "../constants/productCat";
 
 const Home = () => {
+  const [productAlphabets, setProductAlphabets] = useState([]);
+  const [productShapes, setProductShapes] = useState([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await PRODUCTS.data;
+        const dataAlphabets = response.filter((product) => {
+          return product.type === ProductType.Alphabet;
+        });
+        const dataShapes = response.filter((product) => {
+          return product.type === ProductType.Shape;
+        });
+        setProductAlphabets(dataAlphabets);
+        setProductShapes(dataShapes);
+        console.log(productAlphabets);
+        console.log(productShapes);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchProducts();
+  }, []);
+
   return (
-    <div>
+    <BaseScreen>
       <header className="bg-primary px-2  h-7 flex items-center text-white font-light text-sm">
         {" "}
         News outside working
       </header>
       {/* Custom Preservation */}
-      <div>
-        <div className="title">Shape</div>
-        <ProductCarousel />
-      </div>
+      <ProductCarousel products={productShapes} type={ProductType.Shape} />
       <hr className="flex bg-gray-300 h-2 my-5" /> {/*break*/}
-      <div>
-        <div className="title">Alphabet</div>
-
-        {/* On-shelf Product */}
-        <ProductCarousel />
-      </div>
+      {/* On-shelf Product */}
+      <ProductCarousel
+        products={productAlphabets}
+        type={ProductType.Alphabet}
+      />
       {/* Footer navigation */}
-      <FooterNav />
-    </div>
+    </BaseScreen>
   );
 };
 
