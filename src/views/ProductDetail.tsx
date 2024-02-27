@@ -1,7 +1,10 @@
 import ProductGallery from "../components/ProductGallery";
 
 
+
+
 const ProductDetail = () => {
+
   return (
     <div>
       <header className="bg-primary px-2  h-7 flex items-center text-white font-light text-sm">

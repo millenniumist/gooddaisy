@@ -4,6 +4,8 @@ import "slick-carousel/slick/slick-theme.css";
 import "slick-carousel/slick/slick.css";
 import Slider, { Settings } from "react-slick";
 import { Product } from "../models/product";
+import { Link } from 'react-router-dom';
+
 
 interface ProductCarouselProps {
   type: string;
@@ -16,29 +18,27 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({
 }) => {
   const settings: Settings = {
     dots: false,
-    infinite: true,
+    infinite: false,
     speed: 1000,
     slidesToShow: 2,
     slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 5000,
     cssEase: "linear",
-    adaptiveHeight: true,
   };
 
-  return (
+  return (  
     <div>
-       <h1 className="title">{type}</h1>
+      <h1 className="title">{type}</h1>
       <div className="px-2 py-2">
         <Slider {...settings}>
-          {products.map((product)=>{
-            return (
-              <ProductCard product={product} key={product.id}/>
-            )
-          })
-
-          }
-          {/* Add as many ProductCard components as needed */}
+          {products.map((product) => (
+            <div key={product.id}>
+              <Link to={`/product/${product.id}`}>
+                <ProductCard product={product} />
+              </Link>
+            </div>
+          ))}
         </Slider>
       </div>
     </div>

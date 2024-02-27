@@ -20,8 +20,6 @@ const Home = () => {
         });
         setProductAlphabets(dataAlphabets);
         setProductShapes(dataShapes);
-        console.log(productAlphabets);
-        console.log(productShapes);
       } catch (error) {
         console.log(error);
       }
