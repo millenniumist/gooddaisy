@@ -11,11 +11,12 @@ const Home = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await PRODUCTS.data;
-        const dataAlphabets = response.filter((product) => {
+        const response = await fetch("../../mock/GetProductList.json");
+        const products = await response.json();
+        const dataAlphabets = products.data.filter((product) => {
           return product.type === ProductType.Alphabet;
         });
-        const dataShapes = response.filter((product) => {
+        const dataShapes = products.data.filter((product) => {
           return product.type === ProductType.Shape;
         });
         setProductAlphabets(dataAlphabets);
