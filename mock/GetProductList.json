@@ -1,0 +1,114 @@
+{
+  "data": [
+    {
+      "id": 1,
+      "name": "Resin Rose Necklace",
+      "type": "Shape",
+      "price": 24.99,
+      "description": "Handcrafted resin rose pendant necklace.",
+      "images": [
+        "https://source.unsplash.com/random/800x600/?rose",
+        "https://source.unsplash.com/random/800x600/?flower"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Resin Flower Earrings",
+      "type": "Shape",
+      "price": 19.99,
+      "description": "Beautiful resin flower earrings in various colors.",
+      "images": [
+        "https://source.unsplash.com/random/800x600/?flower",
+        "https://source.unsplash.com/random/800x600/?earrings"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Resin Daisy Ring",
+      "type": "Alphabet",
+      "price": 14.99,
+      "description": "Delicate resin daisy ring available in different sizes.",
+      "images": [
+        "https://source.unsplash.com/random/800x600/?daisy",
+        "https://source.unsplash.com/random/800x600/?ring"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Resin Tulip Hair Clip",
+      "type": "Shape",
+      "price": 9.99,
+      "description": "Adorable resin tulip hair clip to accessorize your hair.",
+      "images": [
+        "https://source.unsplash.com/random/800x600/?tulip",
+        "https://source.unsplash.com/random/800x600/?hairclip"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Resin Orchid Brooch",
+      "type": "Alphabet",
+      "price": 12.99,
+      "description": "Elegant resin orchid brooch to adorn your clothing.",
+      "images": [
+        "https://source.unsplash.com/random/800x600/?orchid",
+        "https://source.unsplash.com/random/800x600/?brooch"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Resin Lily Bracelet",
+      "type": "Alphabet",
+      "price": 29.99,
+      "description": "Charming resin lily bracelet to add to your wristwear collection.",
+      "images": [
+        "https://source.unsplash.com/random/800x600/?lily",
+        "https://source.unsplash.com/random/800x600/?bracelet"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Resin Sunflower Keychain",
+      "type": "Alphabet",
+      "price": 8.99,
+      "description": "Cute resin sunflower keychain to carry your keys in style.",
+      "images": [
+        "https://source.unsplash.com/random/800x600/?sunflower",
+        "https://source.unsplash.com/random/800x600/?keychain"
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Resin Daisy Hair Pin Set",
+      "type": "Shape",
+      "price": 16.99,
+      "description": "Set of resin daisy hair pins to adorn your hair.",
+      "images": [
+        "https://source.unsplash.com/random/800x600/?daisy",
+        "https://source.unsplash.com/random/800x600/?hairpin"
+      ]
+    },
+    {
+      "id": 9,
+      "name": "Resin Carnation Necklace",
+      "type": "Alphabet",
+      "price": 34.99,
+      "description": "Stunning resin carnation necklace to enhance your neckline.",
+      "images": [
+        "https://source.unsplash.com/random/800x600/?carnation",
+        "https://source.unsplash.com/random/800x600/?necklace"
+      ]
+    },
+    {
+      "id": 10,
+      "name": "Resin Rose Hair Comb",
+      "type": "Shape",
+      "price": 11.99,
+      "description": "Graceful resin rose hair comb to accentuate your hairstyle.",
+      "images": [
+        "https://source.unsplash.com/random/800x600/?rose",
+        "https://source.unsplash.com/random/800x600/?haircomb"
+      ]
+    }
+  ]
+}

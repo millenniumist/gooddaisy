@@ -1,0 +1,58 @@
+/* @import "~slick-carousel/slick/slick.css";
+@import "~slick-carousel/slick/slick-theme.css"; */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+:root {
+  font-family: Quicksand, sans-serif !important;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: light dark;
+  color: rgba(0, 0, 0, 0.87);
+  background-color: #ffffff;
+}
+
+@media (max-width: 600px) {
+  /* Styles for screens smaller than 600px (typical mobile screens) */
+}
+
+
+.announcement {
+  background-color: #ad8b73;
+  color: #ffffff;
+  display: flex;
+  font-size: small;
+  height: 30px;
+  align-items: center;
+  
+  
+}
+
+.title {
+  @apply text-xl font-bold px-2 my-3
+}
+
+.selected {
+  @apply text-secondary 
+}
+
+
+/* Example styles for the "bottom-nav-link" class (optional) */
+.bottom-nav-link {
+  /* Define your normal item styles here */
+  text-decoration: none; /* Remove underline for links */
+  margin: 0 10px; /* Adjust spacing between items */
+}
+
+/* Example styles for the "bottom-nav" class (optional) */
+.bottom-nav {
+  /* Define your button styles here */
+  background: transparent; /* Make the button background transparent */
+  border: none; /* Remove button border */
+  padding: 0; /* Remove button padding */
+  cursor: pointer; /* Add a pointer cursor for better UX */
+}
+
+
