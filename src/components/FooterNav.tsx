@@ -49,7 +49,6 @@ const FooterNav: React.FC = () => {
       return navComponent.text.toLowerCase().includes("h")
     })
 
-    console.log(testMap);
   }, []);
 
   return (

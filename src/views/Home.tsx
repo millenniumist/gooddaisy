@@ -1,7 +1,6 @@
 import ProductCarousel from "../components/ProductCarousel";
 import BaseScreen from "../components/BaseScreen";
 import { useEffect, useState } from "react";
-import PRODUCTS from "../../mock/GetProductList.json";
 import ProductType from "../constants/productCat";
 
 const Home = () => {
@@ -10,12 +9,14 @@ const Home = () => {
 
   useEffect(() => {
     const fetchProducts = async () => {
+      console.log("Home");
       try {
         const response = await fetch("../../mock/GetProductList.json");
         const products = await response.json();
         const dataAlphabets = products.data.filter((product) => {
           return product.type === ProductType.Alphabet;
         });
+        console.log("PRODUCTS", products.data);
         const dataShapes = products.data.filter((product) => {
           return product.type === ProductType.Shape;
         });
@@ -25,6 +26,7 @@ const Home = () => {
         console.log(error);
       }
     };
+
     fetchProducts();
   }, []);
 
@@ -43,7 +45,6 @@ const Home = () => {
         type={ProductType.Alphabet}
       />
       {/* Footer navigation */}
-
     </BaseScreen>
   );
 };
