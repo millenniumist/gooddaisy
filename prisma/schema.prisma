@@ -24,7 +24,6 @@ model User {
   statusMessage  String?  // User's status message from LINE (optional)
   createdDate    DateTime @default(now())  // Date of user creation
   address        String?  // User's contact address
-
   orders         Order[]  // Relation to Orders
 }
 
@@ -72,17 +71,25 @@ model OrderItem {
 }
 
 model Product {
-  id         Int    @id @default(autoincrement())
+  id         Int      @id @default(autoincrement())
   name       String
   price      Float
-  addOnPrice Float? // Optional addon price
+  images     Image[]  // Relation to Images
 
   // Addons
-  colorRefinement Boolean @default(false)
+  colorRefinement Float? @default(200)
   message         String? // Optional message
   addOnItem       Boolean // Optional addon item
 
   orderItems OrderItem[] // Relation to OrderItems
+}
+
+model Image {
+  id        Int     @id @default(autoincrement())
+  url       String
+  altText   String?
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
 }
 
 model Admin {
