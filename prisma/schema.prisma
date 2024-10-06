@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// Define the data model for the Flower Preservation Store
+// Prisma Schema for Flower Preservation Store
+
+model User {
+  id             Int      @id @default(autoincrement())
+  userId         String   @unique  // Unique ID from LINE authentication
+  displayName    String   // User's display name from LINE
+  pictureUrl     String?  // Profile picture URL from LINE
+  statusMessage  String?  // User's status message from LINE (optional)
+  createdDate    DateTime @default(now())  // Date of user creation
+  address        String?  // User's contact address
+
+  orders         Order[]  // Relation to Orders
+}
+
+
+model Order {
+  id               Int              @id @default(autoincrement())
+  productionStatus ProductionStatus @default(PENDING)
+  paymentStatus    PaymentStatus    @default(HALF_PAID)
+  createdDate      DateTime         @default(now())
+  userId           Int
+  user             User             @relation(fields: [userId], references: [id])
+  orderItems       OrderItem[] // Relation to OrderItems
+}
+
+enum ProductionStatus {
+  PENDING
+  DRIED
+  PATTERN_CONFIRMED
+  RESIN_CURED
+  SHIPPED
+}
+
+enum PaymentStatus {
+  HALF_PAID
+  FULL_PAID
+}
+
+model OrderItem {
+  id     Int              @id @default(autoincrement())
+  name   String
+  status ProductionStatus @default(PENDING) // Can be pending, dried, etc.
+  price  Float
+  note   String?
+
+  // Addons
+  colorRefinement Boolean @default(false)
+  message         String? // Optional message
+  addOnItem       String? // Optional addon item
+
+  orderId Int
+  order   Order @relation(fields: [orderId], references: [id])
+
+  productId Int
+  product   Product @relation(fields: [productId], references: [id]) // Relationship with Product
+}
+
+model Product {
+  id         Int    @id @default(autoincrement())
+  name       String
+  price      Float
+  addOnPrice Float? // Optional addon price
+
+  // Addons
+  colorRefinement Boolean @default(false)
+  message         String? // Optional message
+  addOnItem       Boolean // Optional addon item
+
+  orderItems OrderItem[] // Relation to OrderItems
+}
+
+model Admin {
+  id       Int    @id @default(autoincrement())
+  username String @unique
+  password String
+}
