@@ -7,13 +7,14 @@
     id: number;
     name: string;
     price: number;
-    images: string[];
+    images: { url: string }[];
   }
 
   export default function Product({ id, name, price, images }: ProductProps) {
     return (
       <Card key={id}>
         <CardHeader>
+          {/* <pre>{JSON.stringify({ id, name, price, images }, null, 2)}</pre> */}
           <CardTitle>{name}</CardTitle>
         </CardHeader>
         <CardContent className="relative">
@@ -22,7 +23,7 @@
               {images.map((image, index) => (
                 <CarouselItem key={index}>
                   <Image
-                    src={image}
+                    src={image.url}
                     alt={`${name} - Image ${index + 1}`}
                     width={300}
                     height={300}

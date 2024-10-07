@@ -29,10 +29,18 @@ export default function ProductCustomization({ params }: { params: { productId: 
 
     fetchProduct();
   }, [params.productId]);
+  const handleAddToCart = async () => {
+    const data = {colorRefinement:colorRefinement, addOnItem:attachedItem, message:customText, productId: Number(params.productId), price:product.price, name:product.name, userId:1};
+    // console.log(data);
+    await axios.post(`http://localhost:3000/api/product/${params.productId}`, data);
+
+    alert("Added to cart");
+  };
 
   const handleColorRefinementChange = (checked: boolean) => setColorRefinement(checked);
   const handleItemAttach = (checked: boolean) => setAttachedItem(checked);
-  const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => setCustomText(e.target.value);
+  const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setCustomText(e.target.value);
 
   // Ensure product data has been loaded before rendering
   if (!product) return <div>Loading...</div>;
@@ -41,7 +49,12 @@ export default function ProductCustomization({ params }: { params: { productId: 
     <div className="container mx-auto py-8">
       <h1 className="text-3xl font-bold mb-6 text-center">Customize Your Product</h1>
       {/* <pre>{JSON.stringify(product, null, 2)}</pre> */}
-      <Product id={product.id} name={product.name} price={product.price} images={product.images.map((image: any) => image.url)} />
+      <Product
+        id={product.id}
+        name={product.name}
+        price={product.price}
+        images={product.images.map((image: any, index: number) => ({ key: index, url: image.url }))}
+      />
       <Card>
         <CardHeader>
           <CardTitle>Product Customization</CardTitle>
@@ -78,7 +91,10 @@ export default function ProductCustomization({ params }: { params: { productId: 
           </div>
         </CardContent>
         <CardFooter>
-          <Button className="w-full">Save Customization</Button>
+          <div className="flex flex-col w-full gap-4">
+            <Button className="bg-slate-500" onClick={handleAddToCart}>Add to Cart</Button>
+            <Button >Check Out</Button>
+          </div>
         </CardFooter>
       </Card>
     </div>

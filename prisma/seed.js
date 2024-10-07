@@ -76,19 +76,6 @@
         userId: user1.id,
         productionStatus: 'DRIED',
         paymentStatus: 'HALF_PAID',
-        orderItems: {
-          create: [
-            {
-              name: 'Preserved Rose Bouquet',
-              status: 'DRIED',
-              price: 59.99,
-              colorRefinement: true,
-              message: 'Happy Anniversary!',
-              addOnItem: 'Gift Box',
-              productId: product1.id,
-            },
-          ],
-        },
       },
     });
 
@@ -97,18 +84,34 @@
         userId: user2.id,
         productionStatus: 'PATTERN_CONFIRMED',
         paymentStatus: 'FULL_PAID',
-        orderItems: {
-          create: [
-            {
-              name: 'Sunflower Frame',
-              status: 'PATTERN_CONFIRMED',
-              price: 39.99,
-              colorRefinement: false,
-              addOnItem: 'Stand',
-              productId: product2.id,
-            },
-          ],
-        },
+      },
+    });
+
+    // Seed OrderItems
+    const orderItem1 = await prisma.orderItem.create({
+      data: {
+        name: 'Preserved Rose Bouquet',
+        status: 'DRIED',
+        price: 59.99,
+        colorRefinement: true,
+        message: 'Happy Anniversary!',
+        addOnItem: true,
+        productId: product1.id,
+        userId: user1.id,
+        orderId: order1.id
+      },
+    });
+
+    const orderItem2 = await prisma.orderItem.create({
+      data: {
+        name: 'Sunflower Frame',
+        status: 'PATTERN_CONFIRMED',
+        price: 39.99,
+        colorRefinement: false,
+        addOnItem: true,
+        productId: product2.id,
+        userId: user2.id,
+        orderId: order2.id
       },
     });
 

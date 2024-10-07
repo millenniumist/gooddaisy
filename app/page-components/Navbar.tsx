@@ -13,6 +13,7 @@ const Navbar = () => {
   const navItems = [
     { label: 'Home', href: '/' },
     { label: 'Login', href: '/login' },
+    { label: 'Cart', href: '/cart' },
     { label: 'Contact Us', href: '/contact' },
   ];
 

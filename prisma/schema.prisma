@@ -17,28 +17,29 @@ datasource db {
 // Prisma Schema for Flower Preservation Store
 
 model User {
-  id             Int      @id @default(autoincrement())
-  userId         String   @unique  // Unique ID from LINE authentication
-  displayName    String   // User's display name from LINE
-  pictureUrl     String?  // Profile picture URL from LINE
-  statusMessage  String?  // User's status message from LINE (optional)
-  createdDate    DateTime @default(now())  // Date of user creation
-  address        String?  // User's contact address
-  orders         Order[]  // Relation to Orders
+  id            Int         @id @default(autoincrement())
+  userId        String      @unique // Unique ID from LINE authentication
+  displayName   String // User's display name from LINE
+  pictureUrl    String? // Profile picture URL from LINE
+  statusMessage String? // User's status message from LINE (optional)
+  createdDate   DateTime    @default(now()) // Date of user creation
+  address       String? // User's contact address
+  orders        Order[] // Relation to Orders
+  orderItem     OrderItem[]
 }
-
 
 model Order {
   id               Int              @id @default(autoincrement())
-  productionStatus ProductionStatus @default(PENDING)
-  paymentStatus    PaymentStatus    @default(HALF_PAID)
+  productionStatus ProductionStatus @default(CART)
+  paymentStatus    PaymentStatus    @default(UNPAID)
   createdDate      DateTime         @default(now())
   userId           Int
   user             User             @relation(fields: [userId], references: [id])
-  orderItems       OrderItem[] // Relation to OrderItems
+  orderItems       OrderItem[]
 }
 
 enum ProductionStatus {
+  CART
   PENDING
   DRIED
   PATTERN_CONFIRMED
@@ -47,6 +48,7 @@ enum ProductionStatus {
 }
 
 enum PaymentStatus {
+  UNPAID
   HALF_PAID
   FULL_PAID
 }
@@ -54,30 +56,32 @@ enum PaymentStatus {
 model OrderItem {
   id     Int              @id @default(autoincrement())
   name   String
-  status ProductionStatus @default(PENDING) // Can be pending, dried, etc.
+  status ProductionStatus @default(CART) // Can be pending, dried, etc.
   price  Float
   note   String?
 
   // Addons
   colorRefinement Boolean @default(false)
   message         String? // Optional message
-  addOnItem       String? // Optional addon item
+  addOnItem       Boolean // Optional addon item
 
-  orderId Int
-  order   Order @relation(fields: [orderId], references: [id])
-
+  orderId   Int?
   productId Int
   product   Product @relation(fields: [productId], references: [id]) // Relationship with Product
+
+  userId Int
+  user   User   @relation(fields: [userId], references: [id]) // Relationship with User
+  order Order?  @relation(fields: [orderId], references: [id])
 }
 
 model Product {
-  id         Int      @id @default(autoincrement())
-  name       String
-  price      Float
-  images     Image[]  // Relation to Images
+  id     Int     @id @default(autoincrement())
+  name   String
+  price  Float
+  images Image[] // Relation to Images
 
   // Addons
-  colorRefinement Float? @default(200)
+  colorRefinement Float?  @default(200)
   message         String? // Optional message
   addOnItem       Boolean // Optional addon item
 
