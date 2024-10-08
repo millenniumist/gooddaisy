@@ -9,12 +9,16 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import Product from "@/app/page-components/Product";
 import axios from "axios";
+import { useRouter } from "next/navigation";
+
 
 export default function ProductCustomization({ params }: { params: { productId: string } }) {
   const [colorRefinement, setColorRefinement] = useState(false);
   const [attachedItem, setAttachedItem] = useState(false);
+  const[addedToCart, setAddedToCart] = useState(false);
   const [customText, setCustomText] = useState("");
   const [product, setProduct] = useState<any>(null);
+  const router = useRouter();
 
   // Fetch product data when the component mounts
   useEffect(() => {
@@ -34,9 +38,22 @@ export default function ProductCustomization({ params }: { params: { productId: 
     // console.log(data);
     await axios.post(`http://localhost:3000/api/product/${params.productId}`, data);
 
-    alert("Added to cart");
+    setAddedToCart(true);
   };
+  const handleCheckout = async () => {
+    try {
+      if(addedToCart) return router.push("/cart");
+      const data = {colorRefinement:colorRefinement, addOnItem:attachedItem, message:customText, productId: Number(params.productId), price:product.price, name:product.name, userId:1};
+      // console.log(data);
+      await axios.post(`http://localhost:3000/api/product/${params.productId}`, data);
 
+      router.push("/cart")
+      
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  
   const handleColorRefinementChange = (checked: boolean) => setColorRefinement(checked);
   const handleItemAttach = (checked: boolean) => setAttachedItem(checked);
   const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -92,8 +109,8 @@ export default function ProductCustomization({ params }: { params: { productId: 
         </CardContent>
         <CardFooter>
           <div className="flex flex-col w-full gap-4">
-            <Button className="bg-slate-500" onClick={handleAddToCart}>Add to Cart</Button>
-            <Button >Check Out</Button>
+            <Button className="bg-slate-500" onClick={handleAddToCart} disabled={addedToCart} style={{ opacity: addedToCart ? 0.5 : 1 }}>Add to Cart</Button>
+            <Button onClick={handleCheckout}>Check Out</Button>
           </div>
         </CardFooter>
       </Card>

@@ -34,6 +34,7 @@ model Order {
   paymentStatus    PaymentStatus    @default(UNPAID)
   createdDate      DateTime         @default(now())
   userId           Int
+  totalPrice       Float            @default(0)
   user             User             @relation(fields: [userId], references: [id])
   orderItems       OrderItem[]
 }

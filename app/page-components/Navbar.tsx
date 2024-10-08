@@ -1,56 +1,92 @@
+  "use client";
+  import React, { useState, useEffect, useRef } from 'react';
+  import Link from 'next/link';
+  import { Button } from "@/components/ui/button";
+  import { Menu, X } from "lucide-react";
+  import axios from 'axios';
+  import { useMainStorage } from '@/store/mainStorage';
 
-import React from 'react';
-import Link from 'next/link';
-import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { Menu } from "lucide-react";
+  const Navbar = () => {
 
-const Navbar = () => {
-  const navItems = [
-    { label: 'Home', href: '/' },
-    { label: 'Login', href: '/login' },
-    { label: 'Cart', href: '/cart' },
-    { label: 'Contact Us', href: '/contact' },
-  ];
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const navRef = useRef<HTMLDivElement>(null);
+    const [navItems, setNavItems] = useState([
+      { label: 'Home', href: '/' },
+      { label: 'Login', href: '/login' },
+      { label: 'Cart', href: '/cart' },
+      { label: 'Contact Us', href: '/contact' }
+    ]);
+    const { checkOutAlready } = useMainStorage();
 
-  return (
-    <nav className="flex items-center justify-between p-4 bg-white shadow-md">
-      <div className="flex items-center">
-        <Link href="/">
-          <span className="text-xl font-bold">Logo</span>
-        </Link>
-      </div>
-      <div className="hidden md:flex space-x-4">
-        {navItems.map((item) => (
-          <Link key={item.label} href={item.href}>
-            <Button variant="ghost">{item.label}</Button>
+    useEffect(() => {
+      if (checkOutAlready) {
+        setNavItems(prevItems => {
+          if (!prevItems.some(item => item.label === 'Checkout')) {
+            return [...prevItems, { label: 'Checkout', href: '/checkout' }];
+          }
+          return prevItems;
+        });
+      } else {
+        setNavItems(prevItems => prevItems.filter(item => item.label !== 'Checkout'));
+      }
+    }, [checkOutAlready]);
+
+    const getCheckout = async () => {
+      try {
+        const checkoutExist = await axios.get("http://localhost:3000/api/checkout/")
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    useEffect(() => {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }, []);
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (navRef.current && !navRef.current.contains(event.target as any)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    return (
+      <nav className="flex items-center justify-between p-4 bg-white shadow-md">
+        <div className="flex items-center">
+          <Link href="/">
+            <span className="text-xl font-bold">Logo</span>
           </Link>
-        ))}
-      </div>
-      <Sheet>
-        <SheetTrigger asChild className="md:hidden">
-          <Button variant="outline" size="icon">
-            <Menu className="h-6 w-6" />
+        </div>
+        <div className="hidden md:flex space-x-4">
+          {navItems.map((item) => (
+            <Link key={item.label} href={item.href}>
+              <Button variant="ghost">{item.label}</Button>
+            </Link>
+          ))}
+        </div>
+        <div className="md:hidden">
+          <Button variant="outline" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </Button>
-        </SheetTrigger>
-        <SheetContent side="right">
-          <nav className="flex flex-col space-y-4 mt-4">
+        </div>
+        <div ref={navRef} className={`fixed inset-y-0 right-0 z-50 w-64 bg-white shadow-lg p-4 transition-all transform ease-in-out duration-300 md:hidden ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+          <Button variant="outline" size="icon" className="absolute top-4 right-4" onClick={() => setIsMenuOpen(false)}>
+            <X className="h-6 w-6" />
+          </Button>
+          <nav className="flex flex-col space-y-4 mt-16">
             {navItems.map((item) => (
               <Link key={item.label} href={item.href}>
-                <Button variant="ghost" className="w-full justify-start">
+                <Button variant="ghost" className="w-full justify-start" onClick={() => setIsMenuOpen(false)}>
                   {item.label}
                 </Button>
               </Link>
             ))}
           </nav>
-        </SheetContent>
-      </Sheet>
-    </nav>
-  );
-};
+        </div>
+      </nav>
+    );
+  };
 
-export default Navbar;
+  export default Navbar;
