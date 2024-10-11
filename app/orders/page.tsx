@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client';
 import OrderList from './OrderList';
-
-const prisma = new PrismaClient();
+import prisma from '@/config/prisma';
 
 async function getOrders() {
   const orders = await prisma.order.findMany({
@@ -9,13 +7,18 @@ async function getOrders() {
       user: true,
       orderItems: {
         include: {
-          product: true,
+          product: {
+            include: {
+              images: true,
+            },
+          },
         },
       },
     },
   });
   return orders;
 }
+
 
 export default async function OrdersPage() {
   const orders = await getOrders();

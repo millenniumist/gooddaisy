@@ -10,7 +10,7 @@
   const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const navRef = useRef<HTMLDivElement>(null);
-    const { user, isLoggedIn, checkOutAlready, setLogout } = useMainStorage();
+    const { user, isLoggedIn, checkOutAlready, setLogout, isAdmin } = useMainStorage();
     const [navItems, setNavItems] = useState([
       { label: 'Home', href: '/' },
       { label: 'Cart', href: '/cart' },
@@ -26,11 +26,12 @@
           setLogout();
           window.location.href = '/login';
         }} : { label: 'Login', href: '/login' },
-        checkOutAlready ? { label: 'Checkout', href: '/checkout' } : null
+        checkOutAlready ? { label: 'Checkout', href: '/checkout' } : null,
+        isAdmin ? { label: 'Orders', href: '/orders' } : null
       ].filter(Boolean);
 
       setNavItems(updatedNavItems);
-    }, [isLoggedIn, checkOutAlready, setLogout]);
+    }, [isLoggedIn, checkOutAlready, setLogout, isAdmin]);
 
     useEffect(() => {
       document.addEventListener('mousedown', handleClickOutside);

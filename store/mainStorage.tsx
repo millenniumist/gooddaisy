@@ -14,10 +14,10 @@ interface Store {
     user: any;
     token: string;
     setToken: (value: string) => void;
-    userAdmin: boolean;
+    isAdmin: boolean;
     isLoggedIn: boolean;
     setIsLoggedIn: (value: boolean) => void;
-    setUserAdmin: (value: boolean) => void;
+    setIsAdmin: (value: boolean) => void;
     setUser: (value: any) => void;
     checkOutAlready: boolean;
     setCheckOutAlready: (value: boolean) => void;
@@ -32,15 +32,15 @@ const store1 = (set: any) => ({
     set((state: Store) => ({ token: value }));
     console.log("Token set:", value);
   },
-  userAdmin: false,
+  isAdmin: false,
   isLoggedIn: false,
   setIsLoggedIn: (value: boolean) => {
     set((state: Store) => ({ isLoggedIn: value }));
     console.log("IsLoggedIn set:", value);
   },
-  setUserAdmin: (value: boolean) => {
-    set((state: Store) => ({ userAdmin: value }));
-    console.log("UserAdmin set:", value);
+  setIsAdmin: (value: boolean) => {
+    set((state: Store) => ({ isAdmin: value }));
+    console.log("isAdmin set:", value);
   },
   setUser: (value: any) => {
     set((state: Store) => ({ user: value }));
@@ -52,7 +52,7 @@ const store1 = (set: any) => ({
     console.log("CheckOutAlready set:", value);
   },
   setLogout: () => {
-    set({ user: null, token: "", isLoggedIn: false, userAdmin: false, checkOutAlready: false });
+    set({ user: null, token: "", isLoggedIn: false, isAdmin: false, checkOutAlready: false });
     console.log("Logout executed");
   }
 });

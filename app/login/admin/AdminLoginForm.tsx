@@ -13,7 +13,7 @@ export default function AdminLoginForm() {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const router = useRouter()
-  const { setToken, setUser, setUserAdmin, setIsLoggedIn } = useMainStorage()
+  const { setToken, setUser, setIsAdmin, setIsLoggedIn } = useMainStorage()
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -25,7 +25,7 @@ export default function AdminLoginForm() {
       setToken(res.data.token)
       document.cookie = `token=${res.data.token}`
       setUser(res.data.newUser)
-      setUserAdmin(true)
+      setIsAdmin(true)
       setIsLoggedIn(true)
       if (res.data.token) {
         router.push('/')
