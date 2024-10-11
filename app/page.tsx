@@ -4,8 +4,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import prisma from '@/config/prisma';
 
-//ngrok http --domain=calm-sunny-griffon.ngrok-free.app 3000
-
+//ngrok http --domain=choice-arriving-drake.ngrok-free.app 3000
 async function ProductList() {
   const productList = await prisma.product.findMany({
     include: {

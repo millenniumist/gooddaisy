@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import crypto from "crypto";
 import axios from "axios";
 import liff from '@line/liff';
 import { useMainStorage } from "@/store/mainStorage";
@@ -42,31 +41,7 @@ export default function Home() {
     }
   }
 
-  const generateRandomState = () => {
-    const buffer = crypto.randomBytes(32);
-    return buffer.toString('base64')
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=/g, '');
-  }
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    try {
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_URL}api/login`, {
-        username,
-        password
-      });
-      console.log(res.data.newUser);
-      setToken(res.data.token)
-      setUser(res.data.newUser)
-      if (res.data.token) {
-        router.push('/');
-      }
-    } catch (error) {
-      console.error("Login failed:", error);
-    }
-  };
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24 bg-gray-100">

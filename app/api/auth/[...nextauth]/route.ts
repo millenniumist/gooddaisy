@@ -62,7 +62,7 @@ export async function GET(request: NextApiRequest) {
         // cookieStore.delete('line_auth_state')
 
         // Redirect to home page after successful authentication
-        return NextResponse.redirect(new URL(process.env.LINE_REDIRECT_URI as string))
+        return NextResponse.redirect(new URL(process.env.LINE_REDIRECT_URI  as string))
     } catch (error) {
         console.error('Error during LINE authentication:', error)
         return NextResponse.json({ success: false, message: 'Authentication failed' }, { status: 500 })

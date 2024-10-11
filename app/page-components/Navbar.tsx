@@ -3,45 +3,34 @@
   import Link from 'next/link';
   import { Button } from "@/components/ui/button";
   import { Menu, X } from "lucide-react";
-  import axios from 'axios';
   import { useMainStorage } from '@/store/mainStorage';
-import { json } from 'stream/consumers';
-import { Avatar } from '@/components/ui/avatar';
-import { AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
-import { Title } from '@radix-ui/react-dialog';
+  import { Avatar } from '@/components/ui/avatar';
+  import { AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
 
   const Navbar = () => {
-
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const navRef = useRef<HTMLDivElement>(null);
+    const { user, isLoggedIn, checkOutAlready, setLogout } = useMainStorage();
     const [navItems, setNavItems] = useState([
       { label: 'Home', href: '/' },
-      { label: 'Login', href: '/login' },
       { label: 'Cart', href: '/cart' },
       { label: 'Contact Us', href: '/contact' }
     ]);
-    const { user,checkOutAlready } = useMainStorage();
 
     useEffect(() => {
-      if (checkOutAlready) {
-        setNavItems(prevItems => {
-          if (!prevItems.some(item => item.label === 'Checkout')) {
-            return [...prevItems, { label: 'Checkout', href: '/checkout' }];
-          }
-          return prevItems;
-        });
-      } else {
-        setNavItems(prevItems => prevItems.filter(item => item.label !== 'Checkout'));
-      }
-    }, [checkOutAlready]);
+      const updatedNavItems = [
+        { label: 'Home', href: '/' },
+        { label: 'Cart', href: '/cart' },
+        { label: 'Contact Us', href: '/contact' },
+        isLoggedIn ? { label: 'Logout', href: '#', onClick: () => {
+          setLogout();
+          window.location.href = '/login';
+        }} : { label: 'Login', href: '/login' },
+        checkOutAlready ? { label: 'Checkout', href: '/checkout' } : null
+      ].filter(Boolean);
 
-    const getCheckout = async () => {
-      try {
-        const checkoutExist = await axios.get(`${process.env.NEXT_PUBLIC_URL}api/checkout/`)
-      } catch (error) {
-        console.log(error)
-      }
-    }
+      setNavItems(updatedNavItems);
+    }, [isLoggedIn, checkOutAlready, setLogout]);
 
     useEffect(() => {
       document.addEventListener('mousedown', handleClickOutside);
@@ -51,7 +40,7 @@ import { Title } from '@radix-ui/react-dialog';
     }, []);
 
     const handleClickOutside = (event: MouseEvent) => {
-      if (navRef.current && !navRef.current.contains(event.target as any)) {
+      if (navRef.current && !navRef.current.contains(event.target as Node)) {
         setIsMenuOpen(false);
       }
     };
@@ -62,14 +51,14 @@ import { Title } from '@radix-ui/react-dialog';
           <Link href="/">
             <span className="text-xl font-bold">Logo</span>
           </Link>
-                  <Avatar>
-                    <AvatarImage src={user?.pictureUrl} alt="User avatar" />
-                  </Avatar>
-                  <h2>Welcome {user?.displayName || "Guest"}</h2>
+          <Avatar>
+            <AvatarImage src={user?.pictureUrl} alt="User avatar" />
+          </Avatar>
+          <h2>Welcome {user?.displayName || "Guest"}</h2>
         </div>
-                <div className="hidden md:flex space-x-4">
+        <div className="hidden md:flex space-x-4">
           {navItems.map((item) => (
-            <Link key={item.label} href={item.href}>
+            <Link key={item.label} href={item.href} onClick={item.onClick}>
               <Button variant="ghost">{item.label}</Button>
             </Link>
           ))}
@@ -86,7 +75,10 @@ import { Title } from '@radix-ui/react-dialog';
           <nav className="flex flex-col space-y-4 mt-16">
             {navItems.map((item) => (
               <Link key={item.label} href={item.href}>
-                <Button variant="ghost" className="w-full justify-start" onClick={() => setIsMenuOpen(false)}>
+                <Button variant="ghost" className="w-full justify-start" onClick={() => {
+                  setIsMenuOpen(false);
+                  item.onClick && item.onClick();
+                }}>
                   {item.label}
                 </Button>
               </Link>
