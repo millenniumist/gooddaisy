@@ -23,12 +23,16 @@ export async function POST(request: Request) {
         
         // Generate JWT token
         const token = jwt.sign(
-            { userId: user.id, username: user.username },
+            { userId: user.id},
             process.env.JWT_SECRET || 'your-secret-key',
             { expiresIn: '1h' }
         );
 
-        return NextResponse.json({ user, token });
+        const newUser = {
+            id: user.id,
+            displayName: user.username,
+        };
+        return NextResponse.json({ newUser, token });
     } catch (error) {
         console.error("Login error:", error);
         return NextResponse.json({ error: "An error occurred during login" }, { status: 500 });

@@ -5,6 +5,10 @@
   import { Menu, X } from "lucide-react";
   import axios from 'axios';
   import { useMainStorage } from '@/store/mainStorage';
+import { json } from 'stream/consumers';
+import { Avatar } from '@/components/ui/avatar';
+import { AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
+import { Title } from '@radix-ui/react-dialog';
 
   const Navbar = () => {
 
@@ -16,7 +20,7 @@
       { label: 'Cart', href: '/cart' },
       { label: 'Contact Us', href: '/contact' }
     ]);
-    const { checkOutAlready } = useMainStorage();
+    const { user,checkOutAlready } = useMainStorage();
 
     useEffect(() => {
       if (checkOutAlready) {
@@ -33,7 +37,7 @@
 
     const getCheckout = async () => {
       try {
-        const checkoutExist = await axios.get("http://localhost:3000/api/checkout/")
+        const checkoutExist = await axios.get(`${process.env.NEXT_PUBLIC_URL}api/checkout/`)
       } catch (error) {
         console.log(error)
       }
@@ -54,12 +58,16 @@
 
     return (
       <nav className="flex items-center justify-between p-4 bg-white shadow-md">
-        <div className="flex items-center">
+        <div className="flex items-center gap-4">
           <Link href="/">
             <span className="text-xl font-bold">Logo</span>
           </Link>
+                  <Avatar>
+                    <AvatarImage src={user?.pictureUrl} alt="User avatar" />
+                  </Avatar>
+                  <h2>Welcome {user?.displayName || "Guest"}</h2>
         </div>
-        <div className="hidden md:flex space-x-4">
+                <div className="hidden md:flex space-x-4">
           {navItems.map((item) => (
             <Link key={item.label} href={item.href}>
               <Button variant="ghost">{item.label}</Button>

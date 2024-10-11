@@ -36,10 +36,12 @@ export default function CartPage() {
   const router = useRouter();
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [editMode, setEditMode] = useState(false);
-  const {setCheckOutAlready} = useMainStorage()
+  const {setCheckOutAlready,user} = useMainStorage()
   const checkout = async () => {
     try {
-      await axios.post("http://localhost:3000/api/cart/");
+      await axios.post(`${process.env.NEXT_PUBLIC_URL}api/cart/`, {
+        userId: user.id,
+      });
       setCheckOutAlready(true)
       router.push("/checkout");
     } catch (error) {
@@ -48,7 +50,7 @@ export default function CartPage() {
   };
 
   const getData = async () => {
-    const response = await axios.get<{ cartItems: CartItem[] }>("http://localhost:3000/api/cart");
+    const response = await axios.get<{ cartItems: CartItem[] }>(`${process.env.NEXT_PUBLIC_URL}api/cart/${user.id}`);
     setCartItems(response.data.cartItems);
 
   };
@@ -59,7 +61,7 @@ export default function CartPage() {
 
   const handleDelete = async (id: number) => {
     try {
-      await axios.delete(`http://localhost:3000/api/cart/${id}`);
+      await axios.delete(`${process.env.NEXT_PUBLIC_URL}api/cart/${id}`);
       setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
     } catch (error) {
       console.error("Error deleting item:", error);

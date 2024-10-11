@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import {
   Carousel,
   CarouselContent,
@@ -20,7 +19,6 @@ export default function Product({ id, name, price, images }: ProductProps) {
   return (
     <Card key={id} className="rounded-xl border bg-card text-card-foreground shadow" >
       <CardHeader>
-        {/* <pre>{JSON.stringify({ id, name, price, images }, null, 2)}</pre> */}
         <CardTitle>{name}</CardTitle>
       </CardHeader>
       <CardContent className="relative ">

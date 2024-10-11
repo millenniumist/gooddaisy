@@ -22,13 +22,13 @@ export default function CartPage() {
   }, [])
 
   const getTotalPrice = async()=> {
-    const totalPrice = await axios.get("http://localhost:3000/api/checkout/")
+    const totalPrice = await axios.get(`${process.env.NEXT_PUBLIC_URL}api/checkout/`)
     console.log(totalPrice.data?.totalPrice)
     setTotal(+totalPrice.data?.totalPrice)
   }
   const confirmPayment = async()=> {
     try {
-      const res = await axios.post("http://localhost:3000/api/checkout/")
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_URL}api/checkout/`)
       console.log(res.data)
       setCheckOutAlready(false)
       setTotal(0)

@@ -1,28 +1,41 @@
 import CartPage from "@/app/cart/page";
+import axios from "axios";
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 interface CartItem {
-    // Define the structure of your cart item here
-    // For example:
     id: string;
     name: string;
     price: number;
-    // Add other properties as needed
 }
 
 interface Store {
-    cartItems: CartItem[];
-    setCartItems: (item: CartItem) => void;
+    state: string;
+    setState: (value: string) => void;
+    user: any
 }
 
 const store1 = (set: any) => ({
-    checkOutAlready: false,
-    setCheckOutAlready: (value: boolean) => set((state: Store) => ({ checkOutAlready: value })),
-    cartItems: [] as CartItem[],
-    setCartItems: (item: CartItem) => set((state: Store) => ({
-      cartItems: [...state.cartItems, item]
-    })),
-});
+  user: null,
+  token: "",
+  setToken: (value: string) => {
+    // console.log("token" ,value)
+    set((state: Store) => ({ token: value }))
+  },
+  userAdmin: null,
+  setUserAdmin: (value: any) => set((state: Store) => ({ userAdmin: value })),
+  setUser: (value: any) => set((state: Store) => ({ user: value })),
+  checkOutAlready:false,
+  setCheckOutAlready: (value: boolean) => set((state: Store) => ({ checkOutAlready: value })),
+  })
 
-export const useMainStorage = create(persist<Store>(store1, { name: "mainStorage" }));
+
+const store2 = (set: any) => ({
+  state: "",
+  setState: (value: string) => set((state: Store) => ({ state: value })),
+})
+
+
+
+export const useMainStorage = create(persist<Store>(store1, { name: "mainStorage", storage: createJSONStorage(() => sessionStorage) }));
+export const useStateStorage = create(persist<Store>(store2, { name: "stateStorage", storage: createJSONStorage(() => sessionStorage) }));

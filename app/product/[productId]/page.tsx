@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import Product from "@/app/page-components/Product";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { useMainStorage } from "@/store/mainStorage";
 
 
 export default function ProductCustomization({ params }: { params: { productId: string } }) {
@@ -18,14 +19,18 @@ export default function ProductCustomization({ params }: { params: { productId: 
   const[addedToCart, setAddedToCart] = useState(false);
   const [customText, setCustomText] = useState("");
   const [product, setProduct] = useState<any>(null);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const { user } = useMainStorage();
   const router = useRouter();
 
   // Fetch product data when the component mounts
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/api/product/${params.productId}`);
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_URL}api/product/${params.productId}`);
         setProduct(response.data);
+        setTotalPrice(response.data.price);
+        // console.log(response.data);
       } catch (error) {
         console.error("Error fetching product data:", error);
       }
@@ -34,18 +39,18 @@ export default function ProductCustomization({ params }: { params: { productId: 
     fetchProduct();
   }, [params.productId]);
   const handleAddToCart = async () => {
-    const data = {colorRefinement:colorRefinement, addOnItem:attachedItem, message:customText, productId: Number(params.productId), price:product.price, name:product.name, userId:1};
-    // console.log(data);
-    await axios.post(`http://localhost:3000/api/product/${params.productId}`, data);
+    const data = {colorRefinement:colorRefinement, addOnItem:attachedItem, message:customText, productId: Number(params.productId), price:totalPrice, name:product.name, userId:user.id};
+    console.log(data);
+    await axios.post(`${process.env.NEXT_PUBLIC_URL}api/product/${params.productId}`, data);
 
     setAddedToCart(true);
   };
   const handleCheckout = async () => {
     try {
       if(addedToCart) return router.push("/cart");
-      const data = {colorRefinement:colorRefinement, addOnItem:attachedItem, message:customText, productId: Number(params.productId), price:product.price, name:product.name, userId:1};
+      const data = {colorRefinement:colorRefinement, addOnItem:attachedItem, message:customText, productId: Number(params.productId), price:totalPrice, name:product.name, userId:user.id};
       // console.log(data);
-      await axios.post(`http://localhost:3000/api/product/${params.productId}`, data);
+      await axios.post(`${process.env.NEXT_PUBLIC_URL}api/product/${params.productId}`, data);
 
       router.push("/cart")
       
@@ -54,7 +59,12 @@ export default function ProductCustomization({ params }: { params: { productId: 
     }
   }
   
-  const handleColorRefinementChange = (checked: boolean) => setColorRefinement(checked);
+  const updateTotalPrice = (addition: number) => setTotalPrice((prevTotal) => prevTotal + addition);
+  const handleColorRefinementChange = (isChecked: boolean) => {
+    const newColorRefinement = !colorRefinement;
+    updateTotalPrice(newColorRefinement ? Number(product.colorRefinement) : -Number(product.colorRefinement));
+    setColorRefinement(newColorRefinement);
+  };
   const handleItemAttach = (checked: boolean) => setAttachedItem(checked);
   const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setCustomText(e.target.value);
@@ -78,7 +88,7 @@ export default function ProductCustomization({ params }: { params: { productId: 
         </CardHeader>
         <CardContent className="space-y-6">
           <div>
-            <h2 className="text-xl font-semibold mb-2">1. Color Refinement</h2>
+            <h2 className="text-xl font-semibold mb-2">1. Color Refinement: <span className="text-sm"> {`(+฿${product.colorRefinement})`}</span></h2>
             <div className="flex items-center space-x-2">
               <Switch
                 id="color-refinement"
@@ -108,9 +118,11 @@ export default function ProductCustomization({ params }: { params: { productId: 
           </div>
         </CardContent>
         <CardFooter>
-          <div className="flex flex-col w-full gap-4">
-            <Button className="bg-slate-500" onClick={handleAddToCart} disabled={addedToCart} style={{ opacity: addedToCart ? 0.5 : 1 }}>Add to Cart</Button>
-            <Button onClick={handleCheckout}>Check Out</Button>
+          <div className="flex w-full gap-2">
+            <Button className="bg-slate-500 min-h-12 flex-grow-[1]" onClick={handleAddToCart} disabled={addedToCart} style={{ opacity: addedToCart ? 0.5 : 1 }}>Add to Cart</Button>
+            <Button  onClick={handleCheckout} className="flex flex-col min-h-12 flex-grow-[2]"><p>Check Out</p>
+            <p>฿{totalPrice}</p>
+            </Button>
           </div>
         </CardFooter>
       </Card>
