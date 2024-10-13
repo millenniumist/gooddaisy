@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation";
 import { useMainStorage } from "@/store/mainStorage";
 
 
-export default function ProductCustomization({ params }: { params: { productId: string } }) {
+export default function ProductCustomization({ params }: { params: { productId: number } }) {
   const [colorRefinement, setColorRefinement] = useState(false);
   const [attachedItem, setAttachedItem] = useState(false);
   const[addedToCart, setAddedToCart] = useState(false);

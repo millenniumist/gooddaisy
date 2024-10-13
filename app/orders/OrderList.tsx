@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Order, User, OrderItem, Product } from "@prisma/client";
+import { Order, User, OrderItem, Product, ProductionStatus, PaymentStatus } from "@prisma/client";
 import axios from "axios";
 import OrderCard from "./OrderCard";
 
@@ -13,10 +13,11 @@ type OrderListProps = {
   orders: OrderWithRelations[];
 };
 
-export default function OrderList({ orders: initialOrders, productionStatuses, paymentStatuses }: OrderListProps) {
+export default function OrderList({ orders: initialOrders}: OrderListProps) {
   const [orders, setOrders] = useState(initialOrders);
-
-  const handleUpdate = async (orderId: string, field: string, value: string) => {
+  const productionStatuses = Object.values(ProductionStatus);
+  const paymentStatuses = Object.values(PaymentStatus);
+  const handleUpdate = async (orderId: number, field: string, value: string) => {
     try {
       const response = await axios.put(`/api/orders/${orderId}`, { [field]: value });
       if (response.status === 200) {
@@ -29,7 +30,7 @@ export default function OrderList({ orders: initialOrders, productionStatuses, p
     }
   };
 
-  const handleItemUpdate = async (orderId: string, itemId: string, field: string, value: any) => {
+  const handleItemUpdate = async (orderId: number, itemId: number, field: string, value: any) => {
     try {
       const order = orders.find((o) => o.id === orderId);
       const item = order?.orderItems.find((i) => i.id === itemId);

@@ -8,11 +8,11 @@ type OrderItemWithProduct = OrderItem & { product: Product };
 
 type OrderItemCardProps = {
   item: OrderItemWithProduct;
-  orderId: string;
+  orderId: number;
   editMode: boolean;
   expanded: boolean;
   onToggleExpand: () => void;
-  onUpdate: (orderId: string, itemId: string, field: string, value: any) => void;
+  onUpdate: (orderId: number, itemId: number, field: string, value: any) => void;
 };
 
 export default function OrderItemCard({
@@ -37,7 +37,7 @@ export default function OrderItemCard({
         <div className="mt-2 pl-4">
           <p>Status: {item.status}</p>
           <p>Color Refinement: {item.colorRefinement ? "Yes" : "No"}</p>
-          <p>Message: {item.message || "None"}</p>
+          <p>Message: {item.message || ""}</p>
           <p>Add-on Item: {item.addOnItem ? "Yes" : "No"}</p>
         </div>
       )}

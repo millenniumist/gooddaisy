@@ -3,14 +3,14 @@ import prisma from '@/config/prisma';
 
 export async function PUT(
     request: Request, 
-    { params }: { params: { orderId: string, itemId: string } }
+    { params }: { params: { orderId: number, itemId: number } }
   ) {
     const { orderId, itemId } = params;
     const body = await request.json();
   
     try {
       const orderItem = await prisma.orderItem.findUnique({
-        where: { id: parseInt(itemId, 10) },
+        where: { id: itemId },
         include: { product: true },
       });
   
@@ -24,7 +24,7 @@ export async function PUT(
       // Remove any price calculation for addOnItem
   
       const updatedOrderItem = await prisma.orderItem.update({
-        where: { id: parseInt(itemId, 10) },
+        where: { id: itemId },
         data: {
           status: body.status,
           price: newPrice,
@@ -39,7 +39,7 @@ export async function PUT(
   
       // Update order total price
       const order = await prisma.order.findUnique({
-        where: { id: parseInt(orderId, 10) },
+        where: { id: orderId },
         include: { orderItems: true },
       });
   
@@ -49,7 +49,7 @@ export async function PUT(
         );
   
         await prisma.order.update({
-          where: { id: parseInt(orderId, 10) },
+          where: { id: orderId },
           data: { totalPrice: newTotalPrice },
         });
       }

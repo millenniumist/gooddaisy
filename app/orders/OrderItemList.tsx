@@ -8,17 +8,17 @@ type OrderItemWithProduct = OrderItem & { product: Product };
 
 type OrderItemListProps = {
   orderItems: OrderItemWithProduct[];
-  orderId: string;
+  orderId: number;
   editMode: boolean;
-  onItemUpdate: (orderId: string, itemId: string, field: string, value: any) => void;
+  onItemUpdate: (orderId: number, itemId: number, field: string, value: any) => void;
 };
 
 export default function OrderItemList({ orderItems, orderId, editMode, onItemUpdate }: OrderItemListProps) {
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
 
-  const toggleItemExpand = (itemId: string) => {
+  const toggleItemExpand = (itemId: number) => {
     setExpandedItems((prev) => ({
-      ...prev,
+      ...prev, 
       [itemId]: !prev[itemId],
     }));
   };

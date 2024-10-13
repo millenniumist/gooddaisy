@@ -6,17 +6,17 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import OrderItemList from "./OrderItemList";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-type OrderWithRelations = Order & {
-  user: User;
-  orderItems: (OrderItem & { product: Product })[];
-};
 
 type OrderCardProps = {
   order: OrderWithRelations;
-  onUpdate: (orderId: string, field: string, value: string) => void;
-  onItemUpdate: (orderId: string, itemId: string, field: string, value: any) => void;
+  onUpdate: (orderId: number, field: string, value: string) => void;
+  onItemUpdate: (orderId: number, itemId: number, field: string, value: any) => void;
   productionStatuses: string[]; 
   paymentStatuses: string[];
+};
+type OrderWithRelations = Order & {
+  user: User;
+  orderItems: (OrderItem & { product: Product })[];
 };
 
 export default function OrderCard({ order, onUpdate, onItemUpdate, productionStatuses, paymentStatuses }: OrderCardProps) {
