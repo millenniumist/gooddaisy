@@ -34,7 +34,7 @@ model Order {
   paymentStatus    PaymentStatus    @default(UNPAID)
   createdDate      DateTime         @default(now())
   userId           Int
-  totalPrice       Float            @default(0)
+  totalPrice       Decimal          @default(0) @db.Decimal(10, 2)
   user             User             @relation(fields: [userId], references: [id])
   orderItems       OrderItem[]
 }
@@ -72,19 +72,19 @@ model OrderItem {
 
   userId Int
   user   User   @relation(fields: [userId], references: [id]) // Relationship with User
-  order Order?  @relation(fields: [orderId], references: [id])
+  order  Order? @relation(fields: [orderId], references: [id])
 }
 
 model Product {
   id     Int     @id @default(autoincrement())
   name   String
-  price  Float
+  price  Decimal @db.Decimal(10, 2)
   images Image[] // Relation to Images
 
   // Addons
-  colorRefinement Float?  @default(200)
-  message         Float?  @default(0)
-  addOnItem       Float? @default(0)
+  colorRefinement Decimal? @default(200) @db.Decimal(10, 2)
+  message         Decimal? @default(0) @db.Decimal(10, 2)
+  addOnItem       Decimal? @default(0) @db.Decimal(10, 2)
 
   orderItems OrderItem[] // Relation to OrderItems
 }
@@ -94,7 +94,7 @@ model Image {
   url       String
   altText   String?
   productId Int
-  product   Product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 model Admin {

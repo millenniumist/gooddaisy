@@ -27,7 +27,9 @@
           window.location.href = '/login';
         }} : { label: 'Login', href: '/login' },
         checkOutAlready ? { label: 'Checkout', href: '/checkout' } : null,
-        isAdmin ? { label: 'Orders', href: '/orders' } : null
+        isAdmin ? { label: 'Orders', href: '/orders' } : null,
+        isAdmin ? { label: 'Add Product', href: '/add-product' } : null,
+        isAdmin ? { label: 'Delete Product', href: '/del-product' } : null
       ].filter(Boolean);
 
       setNavItems(updatedNavItems);

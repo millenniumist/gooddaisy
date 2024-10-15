@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE `product` MODIFY `colorRefinement` DECIMAL(10, 2) NULL DEFAULT 200,
+    MODIFY `message` DECIMAL(10, 2) NULL DEFAULT 0,
+    MODIFY `addOnItem` DECIMAL(10, 2) NULL DEFAULT 0;
