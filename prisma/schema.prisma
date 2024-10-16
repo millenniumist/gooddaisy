@@ -77,7 +77,7 @@ model OrderItem {
 
 model Product {
   id     Int     @id @default(autoincrement())
-  name   String
+  name   String  
   price  Decimal @db.Decimal(10, 2)
   images Image[] // Relation to Images
 

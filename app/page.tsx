@@ -3,7 +3,6 @@ import Product from "./page-components/Product";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import prisma from '@/config/prisma';
-
 //ngrok http --domain=choice-arriving-drake.ngrok-free.app 3000
 async function ProductList() {
   const productList = await prisma.product.findMany({
@@ -26,7 +25,7 @@ async function ProductList() {
             }))}
           />
           <CardFooter className="flex justify-between items-center pt-4">
-            <span className="text-lg font-semibold">${product.price.toFixed(2)}</span>
+            <span className="text-lg font-semibold">${product.price.toString()}</span>
             <Button className="min-w-[100px]">
               <Link href={`/product/${product.id}`}>Select</Link>
             </Button>
