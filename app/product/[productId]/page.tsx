@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -29,7 +28,7 @@ export default function ProductCustomization({ params }: { params: { productId: 
       try {
         const response = await axios.get(`${process.env.NEXT_PUBLIC_URL}api/product/${params.productId}`);
         setProduct(response.data);
-        setTotalPrice(response.data.price);
+        setTotalPrice(Number(response.data.price));
         // console.log(response.data);
       } catch (error) {
         console.error("Error fetching product data:", error);
@@ -39,7 +38,7 @@ export default function ProductCustomization({ params }: { params: { productId: 
     fetchProduct();
   }, [params.productId]);
   const handleAddToCart = async () => {
-    const data = {colorRefinement:colorRefinement, addOnItem:attachedItem, message:customText, productId: Number(params.productId), price:totalPrice, name:product.name, userId:user.id};
+    const data = {colorRefinement:colorRefinement, addOnItem:attachedItem, message:customText, productId: Number(params.productId), price:Number(totalPrice), name:product.name, userId:user.id};
     console.log(data);
     await axios.post(`${process.env.NEXT_PUBLIC_URL}api/product/${params.productId}`, data);
 
@@ -48,7 +47,7 @@ export default function ProductCustomization({ params }: { params: { productId: 
   const handleCheckout = async () => {
     try {
       if(addedToCart) return router.push("/cart");
-      const data = {colorRefinement:colorRefinement, addOnItem:attachedItem, message:customText, productId: Number(params.productId), price:totalPrice, name:product.name, userId:user.id};
+      const data = {colorRefinement:colorRefinement, addOnItem:attachedItem, message:customText, productId: Number(params.productId), price:Number(totalPrice), name:product.name, userId:user.id};
       // console.log(data);
       await axios.post(`${process.env.NEXT_PUBLIC_URL}api/product/${params.productId}`, data);
 

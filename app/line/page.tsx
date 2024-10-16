@@ -26,12 +26,13 @@ console.log("object")
     try {
       const userProfile = await liff.getProfile();
       const response = await axios.post(`${process.env.NEXT_PUBLIC_URL}api/line/`,{userProfile})
+      console.log(response)
       setUser(response.data.user)
       setToken(response.data.token)
       document.cookie = `token=${response.data.token}`;
-      console.log(response.data)
+      console.log(response.data) 
       if (response.data.success) {
-        // router.push('/')
+        router.push('/')
       } else {
         console.error('API request failed:', response.data.message)
         // Handle the error, maybe show a message to the user

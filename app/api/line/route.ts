@@ -20,7 +20,7 @@ export async function POST(request: NextApiRequest) {
                 statusMessage: userProfile.statusMessage
             }
         })
-        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET as string, { expiresIn: "20000" })
+        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET as string, { expiresIn: "30d" })
         console.log(user,token)
         return NextResponse.json({ success: true, user,token }, { status: 200 })
     } catch (error) {

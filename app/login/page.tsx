@@ -27,6 +27,7 @@ export default function Home() {
 
   const hdlLineLogin = () => {
     try {
+    console.log('hdlLineLogin')
       if (liff.isInClient()) {
         liff.getProfile().then((profile) => {
         }).catch((err) => {

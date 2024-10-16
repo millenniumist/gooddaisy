@@ -43,7 +43,7 @@ export default function CartPage() {
         userId: user.id,
       });
       setCheckOutAlready(true)
-      router.push("/checkout");
+      router.push("/cart/address");
     } catch (error) {
       console.log(error);
     }

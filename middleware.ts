@@ -10,7 +10,7 @@ export async function middleware(request: NextRequest) {
     }
 
     try {
-        const secret = new TextEncoder().encode(process.env.JWT_SECRET)
+        const secret = new TextEncoder().encode(process.env.JWT_SECRET as string)
         await jose.jwtVerify(token, secret)
         return NextResponse.next()
     } catch (error) {

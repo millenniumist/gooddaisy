@@ -2,11 +2,14 @@ import { ToastWrapper } from "@/components/ui/ToastWrapper";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { revalidatePath } from 'next/cache';
 import { v2 as cloudinary } from 'cloudinary';
 import prisma from "@/config/prisma";
-
+cloudinary.config({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+  api_secret: process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET
+});
 interface Product {
   id: number;
   name: string;
@@ -44,6 +47,7 @@ async function deleteProduct(formData: FormData) {
 
     await prisma.$transaction([
       prisma.image.deleteMany({ where: { productId: Number(productId) } }),
+      prisma.orderItem.deleteMany({ where: { productId: Number(productId) } }),
       prisma.product.delete({ where: { id: Number(productId) } }),
     ]);
 
@@ -59,8 +63,6 @@ async function deleteProduct(formData: FormData) {
   }
 }
 
-
-
 export default async function DeleteProductPage() {
   const products = await getProducts();
 
@@ -71,37 +73,21 @@ export default async function DeleteProductPage() {
         <CardDescription>Select a product to delete</CardDescription>
       </CardHeader>
       <CardContent>
-        <form action={deleteProduct}>
-          <Select name="productId">
-            <SelectTrigger className="w-full mb-4">
-              <SelectValue placeholder="Select a product" />
-            </SelectTrigger>
-            <SelectContent>
-              {products.map((product) => (
-                <SelectItem key={product.id} value={product.id.toString()}>
-                  {product.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button type="button" className="w-full">Delete Product</Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete the product and its associated images.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction type="submit">Continue</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </form>
+        <ToastWrapper onSubmit={deleteProduct}>
+            <Select name="productId">
+              <SelectTrigger className="w-full mb-4">
+                <SelectValue placeholder="Select a product" />
+              </SelectTrigger>
+              <SelectContent>
+                {products.map((product) => (
+                  <SelectItem key={product.id} value={product.id.toString()}>
+                    {product.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button type="submit" className="w-full">Delete Product</Button>
+        </ToastWrapper>
       </CardContent>
     </Card>
   );
