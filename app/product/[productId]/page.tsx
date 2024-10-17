@@ -19,7 +19,7 @@ export default function ProductCustomization({ params }: { params: { productId: 
   const [customText, setCustomText] = useState("");
   const [product, setProduct] = useState<any>(null);
   const [totalPrice, setTotalPrice] = useState(0);
-  const { user } = useMainStorage();
+  const { user,isLoggedIn } = useMainStorage();
   const router = useRouter();
 
   // Fetch product data when the component mounts

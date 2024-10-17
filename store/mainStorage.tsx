@@ -1,29 +1,28 @@
+import { clear } from "console";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-
 interface CartItem {
-    id: string;
-    name: string;
-    price: number;
+  id: string;
+  name: string;
+  price: number;
 }
 
 interface Store {
-    state: string;
-    setState: (value: string) => void;
-    user: any;
-    token: string;
-    setToken: (value: string) => void;
-    isAdmin: boolean;
-    isLoggedIn: boolean;
-    setIsLoggedIn: (value: boolean) => void;
-    setIsAdmin: (value: boolean) => void;
-    setUser: (value: any) => void;
-    checkOutAlready: boolean;
-    setCheckOutAlready: (value: boolean) => void;
-    setLogout: () => void;
+  state: string;
+  setState: (value: string) => void;
+  user: any;
+  token: string;
+  setToken: (value: string) => void;
+  isAdmin: boolean;
+  isLoggedIn: boolean;
+  setIsLoggedIn: (value: boolean) => void;
+  setIsAdmin: (value: boolean) => void;
+  setUser: (value: any) => void;
+  checkOutAlready: boolean;
+  setCheckOutAlready: (value: boolean) => void;
+  setLogout: () => void;
 }
-
 
 const store1 = (set: any) => ({
   user: null,
@@ -53,8 +52,14 @@ const store1 = (set: any) => ({
   },
   setLogout: () => {
     set({ user: null, token: "", isLoggedIn: false, isAdmin: false, checkOutAlready: false });
-    console.log("Logout executed");
-  }
+    document.cookie.split(";").forEach((cookie) => {
+      const trimmedCookie = cookie.replace(/^ +/, "");
+      const cookieName = trimmedCookie.split("=")[0];
+      document.cookie = `${cookieName}=;expires=${new Date(0).toUTCString()};path=/`;
+    })
+    sessionStorage.clear();
+    console.log("Logged out");
+  },
 });
 
 const store2 = (set: any) => ({
@@ -65,5 +70,15 @@ const store2 = (set: any) => ({
   },
 });
 
-export const useMainStorage = create(persist<Store>((set) => ({ ...store1(set), state: "", setState: store2(set).setState }), { name: "mainStorage", storage: createJSONStorage(() => sessionStorage) }));
-export const useStateStorage = create(persist<Store>((set) => ({ ...store2(set), ...store1(set) }), { name: "stateStorage", storage: createJSONStorage(() => sessionStorage) }));
+export const useMainStorage = create(
+  persist<Store>((set) => ({ ...store1(set), state: "", setState: store2(set).setState }), {
+    name: "mainStorage",
+    storage: createJSONStorage(() => sessionStorage),
+  })
+);
+export const useStateStorage = create(
+  persist<Store>((set) => ({ ...store2(set), ...store1(set) }), {
+    name: "stateStorage",
+    storage: createJSONStorage(() => sessionStorage),
+  })
+);

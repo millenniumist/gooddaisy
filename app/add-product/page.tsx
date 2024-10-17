@@ -11,59 +11,49 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 export default function AddProduct() {
-  const [product, setProduct] = useState({
+  const [formData, setFormData] = useState({
     name: "",
     price: 0,
     colorRefinement: 200,
     message: 0,
     addOnItem: 0,
-    images: [],
   });
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const router = useRouter();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setProduct((prev) => ({
+    const { name, value, type } = e.target;
+    setFormData(prev => ({
       ...prev,
-      [name]:
-        name === "price" || name === "colorRefinement" || name === "message" || name === "addOnItem"
-          ? parseFloat(value)
-          : value,
+      [name]: type === 'number' ? Number(value) : value,
     }));
   };
 
   const handleUploadSuccess = (result: any) => {
-    setUploadedImages((prev) => [...prev, result.info.secure_url]);
+    setUploadedImages(prev => [...prev, result.info.secure_url]);
   };
 
   const removeImage = (index: number) => {
-    setUploadedImages((prev) => prev.filter((_, i) => i !== index));
+    setUploadedImages(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!/^[a-zA-Z0-9\s]+$/.test(formData.name.trim())) {
+      alert("Product name cannot be empty and should only contain letters, numbers, and spaces.");
+      return;
+    }
     try {
-      const formData = new FormData();
-      formData.append('name', product.name);
-      formData.append('price', product.price as unknown as string);
-      formData.append('colorRefinement', product.colorRefinement as unknown as string);
-      formData.append('message', product.message as unknown as string);
-      formData.append('addOnItem', product.addOnItem as unknown as string);
-      uploadedImages.forEach((image, index) => {
-        formData.append(`images`, image);
+      const productData = { ...formData, images: uploadedImages };
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_URL}api/product`, productData, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
       });
-      console.log("Uploaded images before sending:", uploadedImages);
-      await axios.post(`${process.env.NEXT_PUBLIC_URL}api/product`, formData)
-        .then(response => {
-          console.log("Product added successfully:", response.data);
-          router.push("/");
-        })
-        .catch(error => {
-          console.error("Error adding product:", error.response?.data || error.message);
-        });
+      console.log("Product added successfully:", response.data);
+      router.push("/");
     } catch (error) {
-      console.error("Error submitting form:", error);
+      console.error("Error adding product:", error);
     }
   };
   
@@ -77,57 +67,21 @@ export default function AddProduct() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="name">Product Name</Label>
-              <Input
-                id="name"
-                name="name"
-                value={product.name}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="price">Price</Label>
-              <Input
-                id="price"
-                name="price"
-                type="number"
-                value={product.price}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="colorRefinement">Color Refinement Price</Label>
-              <Input
-                id="colorRefinement"
-                name="colorRefinement"
-                type="number"
-                value={product.colorRefinement}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div>
-              <Label htmlFor="message">Message Price</Label>
-              <Input
-                id="message"
-                name="message"
-                type="number"
-                value={product.message}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div>
-              <Label htmlFor="addOnItem">Add-On Item Price</Label>
-              <Input
-                id="addOnItem"
-                name="addOnItem"
-                type="number"
-                value={product.addOnItem}
-                onChange={handleInputChange}
-              />
-            </div>
+            {Object.entries(formData).map(([key, value]) => (
+              <div key={key}>
+                <Label htmlFor={key}>{key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}</Label>
+                <Input
+                  id={key}
+                  name={key}
+                  type={key === 'name' ? 'text' : 'number'}
+                  value={value}
+                  onChange={handleInputChange}
+                  required
+                  pattern={key === 'name' ? "^[a-zA-Z0-9\\s]+$" : undefined}
+                  title={key === 'name' ? "Product name should only contain letters, numbers, and spaces" : undefined}
+                />
+              </div>
+            ))}
             <div>
               <Label htmlFor="images">Images</Label>
               <CldUploadWidget uploadPreset="ml_default" onSuccess={handleUploadSuccess}>
@@ -141,7 +95,7 @@ export default function AddProduct() {
                 {uploadedImages.map((url, index) => (
                   <div key={index} className="flex items-center space-x-2">
                     <Image src={url} alt={`Uploaded ${index + 1}`} width={200} height={100} />
-                    <Button type="button" onClick={() => removeImage(index)}>
+                    <Button type="button" variant="destructive" onClick={() => removeImage(index)}>
                       Remove
                     </Button>
                   </div>
