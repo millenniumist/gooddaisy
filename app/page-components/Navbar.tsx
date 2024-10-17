@@ -64,7 +64,9 @@ const Navbar = () => {
   return (
     <nav className="flex items-center justify-between p-4 bg-white shadow-md">
       <Link href="/">
-        <span className="text-xl font-bold">Logo</span>
+      <Avatar>
+            <AvatarImage src="https://res.cloudinary.com/ddcjkc1ns/image/upload/v1729156722/logo_qcsnl6.jpg" alt="Good Daisy" />
+          </Avatar>
       </Link>
       <Link href="/profile">
         <div className="flex items-center gap-4 cursor-pointer">

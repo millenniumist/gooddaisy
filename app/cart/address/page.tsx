@@ -88,11 +88,11 @@ export default async function AddressPage({
               <p className="mb-4">{user?.address || 'No address provided'}</p>
               <form action="/cart/address">
                 <input type="hidden" name="edit" value="true" />
-                <div className='flex justify-between'>
-                <Button type="submit" className='px-8 min-w-48'>Edit Address</Button>
-                <Link href="/checkout">
-              <Button type="button" className='px-8 min-w-48'>Checkout</Button>
-                </Link>
+                <div className="flex justify-between">
+                  <Button type="submit" className="w-24">Edit Address</Button>
+                  <Link href="/checkout">
+                    <Button type="button" className="w-24">Checkout</Button>
+                  </Link>
                 </div>
               </form>
             </div>

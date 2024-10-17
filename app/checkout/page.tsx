@@ -6,13 +6,17 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import axios from "axios"
 import { useMainStorage } from "@/store/mainStorage"
+import { Input } from "@/components/ui/input"
+import { useRouter } from 'next/navigation'
 
-export default function CartPage() {
+export default function CheckoutPage() {
+  const router = useRouter()
   const [timeLeft, setTimeLeft] = useState(900) // 15 minutes in seconds
   const [total, setTotal] = useState(0)
-  const {setCheckOutAlready} = useMainStorage()
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null)
+  const { setCheckOutAlready } = useMainStorage()
+
   useEffect(() => {
-    // Simulating total fetch, replace with actual data fetching logic
     getTotalPrice()
     const timer = setInterval(() => {
       setTimeLeft((prevTime) => (prevTime > 0 ? prevTime - 1 : 0))
@@ -21,24 +25,65 @@ export default function CartPage() {
     return () => clearInterval(timer)
   }, [])
 
-  const getTotalPrice = async()=> {
+  const getTotalPrice = async () => {
     const totalPrice = await axios.get(`${process.env.NEXT_PUBLIC_URL}api/checkout/`)
-    console.log(totalPrice.data?.totalPrice)
     setTotal(+totalPrice.data?.totalPrice)
   }
-  const confirmPayment = async()=> {
+
+  const confirmPayment = async () => {
     try {
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_URL}api/checkout/`)
-      console.log(res.data)
+      if (!uploadedImage) {
+        alert("Please upload a payment slip before confirming.")
+        return
+      }
+
+      // Upload image to Cloudinary
+      const formData = new FormData()
+      formData.append('file', uploadedImage)
+      formData.append('upload_preset', 'ml_default')
+      formData.append('api_key', process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY as string)
+
+      const cloudinaryResponse = await axios.post(
+        'https://api.cloudinary.com/v1_1/your_cloud_name/image/upload',
+        formData
+      )
+
+      // Proceed with payment confirmation
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_URL}api/checkout/`, {
+        paymentProofUrl: cloudinaryResponse.data.secure_url
+      })
+
       setCheckOutAlready(false)
       setTotal(0)
-      alert("Payment successful")
-      // Remove all items from cartItems
       localStorage.setItem("mainStorage", JSON.stringify([]))
+      alert("Payment successful")
+      
+      // Redirect to home page
+      router.push('/')
     } catch (error) {
-      console.log(error)
+      console.error(error)
+      alert("Payment failed. Please try again.")
     }
   }
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      try {
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_URL}api/upload-slip`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        })
+        setUploadedImage(response.data.url)
+      } catch (error) {
+        console.error('Error uploading image:', error)
+        alert('Failed to upload image')
+      }
+    }
+  }
+
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60)
     const remainingSeconds = seconds % 60
@@ -52,11 +97,15 @@ export default function CartPage() {
         <p className="text-sm text-muted-foreground">Time left to pay: {formatTime(timeLeft)}</p>
       </CardHeader>
       <CardContent className="flex flex-col items-center">
-        <Image src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://example.com/mockup-qr-code
-" alt="QR Code" width={300} height={300} />
+        {uploadedImage ? (
+          <Image src={uploadedImage} alt="Uploaded payment proof" width={300} height={300} />
+        ) : (
+          <Image src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://example.com/mockup-qr-code" alt="QR Code" width={300} height={300} />
+        )}
         <p className="text-2xl font-bold mt-4">Total: ${total.toFixed(2)}</p>
+        <Input type="file" accept="image/*" onChange={handleImageUpload} className="mt-4" />
+        <Button onClick={confirmPayment} className="mt-4">Confirm Payment</Button>
       </CardContent>
-      <Button onClick={confirmPayment}>Confirm Payment</Button>
     </Card>
   )
 }
