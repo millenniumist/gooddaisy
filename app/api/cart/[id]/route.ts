@@ -35,7 +35,7 @@ export async function DELETE(request: Request, {params}: {params: {id: string}})
         }
   
       });
-  
+      console.log(cartItems)
       if (!cartItems) {
         return NextResponse.json({ error: 'Cart items not found' }, { status: 200 });
       }

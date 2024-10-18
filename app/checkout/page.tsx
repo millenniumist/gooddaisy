@@ -8,6 +8,7 @@ import axios from "axios"
 import { useMainStorage } from "@/store/mainStorage"
 import { Input } from "@/components/ui/input"
 import { useRouter } from 'next/navigation'
+// import { headers } from "next/headers"
 
 export default function CheckoutPage() {
   const router = useRouter()
@@ -26,7 +27,8 @@ export default function CheckoutPage() {
   }, [])
 
   const getTotalPrice = async () => {
-    const totalPrice = await axios.get(`${process.env.NEXT_PUBLIC_URL}api/checkout/`)
+    // const header = headers().get('X-User-ID')
+    const totalPrice = await axios.get(`${process.env.NEXT_PUBLIC_URL}api/checkout`)
     setTotal(+totalPrice.data?.totalPrice)
   }
 
@@ -37,20 +39,10 @@ export default function CheckoutPage() {
         return
       }
 
-      // Upload image to Cloudinary
-      const formData = new FormData()
-      formData.append('file', uploadedImage)
-      formData.append('upload_preset', 'ml_default')
-      formData.append('api_key', process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY as string)
-
-      const cloudinaryResponse = await axios.post(
-        'https://api.cloudinary.com/v1_1/your_cloud_name/image/upload',
-        formData
-      )
+ 
 
       // Proceed with payment confirmation
       const res = await axios.post(`${process.env.NEXT_PUBLIC_URL}api/checkout/`, {
-        paymentProofUrl: cloudinaryResponse.data.secure_url
       })
 
       setCheckOutAlready(false)
@@ -103,7 +95,7 @@ export default function CheckoutPage() {
           <Image src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://example.com/mockup-qr-code" alt="QR Code" width={300} height={300} />
         )}
         <p className="text-2xl font-bold mt-4">Total: ${total.toFixed(2)}</p>
-        <Input type="file" accept="image/*" onChange={handleImageUpload} className="mt-4" />
+        <Input type="file" accept="image/*" onChange={handleImageUpload} className="mt-4 cursor-pointer" />
         <Button onClick={confirmPayment} className="mt-4">Confirm Payment</Button>
       </CardContent>
     </Card>

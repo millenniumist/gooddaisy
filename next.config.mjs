@@ -1,21 +1,37 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    images: {
-        remotePatterns: [
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "*",
+      },
+    ],
+  },
+  compiler: {
+    // Suppress the warning
+    reactRemoveProperties: {
+      properties: ["^data-new-gr-c-s-check-loaded$", "^data-gr-ext-installed$"],
+    },
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  headers: async () => {
+    return [
+      {
+        source: "/checkout",
+        headers: [
           {
-            protocol: 'https',
-            hostname: '*',
+            key: "X-User-ID",
+            value: "test",
           },
         ],
       },
-      compiler: {
-        // Suppress the warning
-        reactRemoveProperties: { properties: ['^data-new-gr-c-s-check-loaded$', '^data-gr-ext-installed$'] }},
-        eslint: {
-          ignoreDuringBuilds: true,
-        },
-        typescript: {
-          ignoreBuildErrors: true,
-        },
-      }
+    ];
+  },
+};
 export default nextConfig;
