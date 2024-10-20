@@ -1,35 +1,33 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
-
+import prisma from '@/config/prisma';
 export async function POST(request: Request) {
   try {
-    const formData = await request.formData();
-    console.log("Received formData:", Object.fromEntries(formData));
-    
-    const name = formData.get('name') as string;
-    const price = Number(formData.get('price'));
-    const colorRefinement = Number(formData.get('colorRefinement'));
-    const message = Number(formData.get('message'));
-    const addOnItem = Number(formData.get('addOnItem'));
-    const allowColorRefinement = formData.get('allowColorRefinement') === 'true';
-    const allowMessage = formData.get('allowMessage') === 'true';
-    const allowAddOnItem = formData.get('allowAddOnItem') === 'true';
-    const images = formData.getAll('images').map(item => item.toString());
+    const { 
+      name, 
+      price, 
+      colorRefinement, 
+      message, 
+      addOnItem, 
+      allowColorRefinement, 
+      allowMessage, 
+      allowAddOnItem, 
+      images,
+      subProduct 
+    } = await request.json();
 
     const product = await prisma.product.create({
       data: {
         name,
-        price,
-        colorRefinement,
-        message,
-        addOnItem,
+        price: Number(price),
+        colorRefinement: Number(colorRefinement),
+        message: Number(message),
+        addOnItem: Number(addOnItem),
         allowColorRefinement,
         allowMessage,
         allowAddOnItem,
+        subProduct,
         images: {
-          create: images.map(url => ({
+          create: images.map((url: string) => ({
             url,
             altText: `Image for ${name}`
           }))
@@ -46,3 +44,4 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Error creating product' }, { status: 500 });
   }
 }
+

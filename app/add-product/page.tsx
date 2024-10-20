@@ -22,6 +22,7 @@ export default function AddProduct() {
   const [allowMessage, setAllowMessage] = useState(true);
   const [allowAddOnItem, setAllowAddOnItem] = useState(true);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [subProduct, setSubProduct] = useState(false);
   const router = useRouter();
 
   const handleUploadSuccess = (result: any) => {
@@ -48,13 +49,10 @@ export default function AddProduct() {
         allowColorRefinement,
         allowMessage,
         allowAddOnItem,
-        images: uploadedImages
+        images: uploadedImages,
+        subProduct
       };
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_URL}api/product`, productData, {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        }
-      });
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_URL}api/product`, productData);
       console.log("Product added successfully:", response.data);
       router.push("/");
     } catch (error) {
@@ -93,8 +91,16 @@ export default function AddProduct() {
         required
       />
     </div>
-            
+    <div className="flex items-center space-x-2">
+  <Switch
+    id="subProduct"
+    checked={subProduct}
+    onCheckedChange={setSubProduct}
+  />
+  <Label htmlFor="subProduct">Sub Product</Label>
+</div>
             <div className="space-y-4">
+
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <Switch

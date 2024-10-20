@@ -82,6 +82,7 @@ model Product {
   name   String
   price  Decimal @db.Decimal(10, 2)
   images Image[] // Relation to Images
+  subProduct Boolean @default(false)
 
   allowColorRefinement Boolean  @default(true)
   allowMessage         Boolean  @default(true)
