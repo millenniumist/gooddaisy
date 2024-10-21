@@ -16,12 +16,14 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useMainStorage } from "@/store/mainStorage";
+import SubProductList from "../page-components/map-components/SubProductList";
 
 interface CartItem {
   id: number;
   product: {
     name: string;
     images?: { url: string }[];
+    subProduct: boolean;
   };
   colorRefinement?: boolean;
   message?: string;
@@ -30,30 +32,42 @@ interface CartItem {
 }
 
 export default function CartPage() {
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const { setCheckOutAlready, user } = useMainStorage();
+  const getData = async () => {
+    if (user?.id) {
+      try {
+        const response = await axios.get<{ cartItems: CartItem[] }>(
+          `${process.env.NEXT_PUBLIC_URL}api/cart/${user.id}`
+        );
+        setCartItems(response.data.cartItems);
+      } catch (error) {
+        console.error("Error fetching cart items:", error);
+      }
+    } else {
+      console.log("User ID not available");
+    }}
+
   useEffect(() => {
-    getData();
+      getData();
+      fetchProductList();
   }, []);
   const router = useRouter();
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [editMode, setEditMode] = useState(false);
-  const {setCheckOutAlready,user} = useMainStorage()
+  const [productList, setProductList] = useState([]);
   const checkout = async () => {
     try {
       await axios.post(`${process.env.NEXT_PUBLIC_URL}api/cart/`, {
         userId: user.id,
       });
-      setCheckOutAlready(true)
+      setCheckOutAlready(true);
       router.push("/cart/address");
     } catch (error) {
       console.log(error);
     }
   };
 
-  const getData = async () => {
-    const response = await axios.get<{ cartItems: CartItem[] }>(`${process.env.NEXT_PUBLIC_URL}api/cart/${user.id}`);
-    setCartItems(response.data.cartItems);
 
-  };
 
   const calculateTotal = () => {
     return cartItems.reduce((total, item) => total + item.price, 0).toFixed(2);
@@ -62,9 +76,25 @@ export default function CartPage() {
   const handleDelete = async (id: number) => {
     try {
       await axios.delete(`${process.env.NEXT_PUBLIC_URL}api/cart/${id}`);
-      setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
+      if(cartItems.filter((item)=>!item.product.subProduct).length>1){
+        setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
+        console.log("still has main")
+        return
+      }
+      else{
+        await axios.delete(`${process.env.NEXT_PUBLIC_URL}api/cart/`);
+        setCartItems([]);
+      }
     } catch (error) {
       console.error("Error deleting item:", error);
+    }
+  };
+  const fetchProductList = async () => {
+    try {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_URL}api/product`);
+      setProductList(response.data.products);
+    } catch (error) {
+      console.error("Error fetching product list:", error);
     }
   };
 
@@ -93,13 +123,16 @@ export default function CartPage() {
                   {!editMode ? (
                     <p className="w-4">{index + 1}</p>
                   ) : (
-                    <Trash2 className="text-red-500 w-4 cursor-pointer" onClick={() => handleDelete(item.id)} />
+                    <Trash2
+                      className="text-red-500 w-4 cursor-pointer"
+                      onClick={() => handleDelete(item.id)}
+                    />
                   )}
                 </TableCell>
                 <TableCell className="flex items-center gap-3">
                   {item.product.images && (
                     <Image
-                      src={item.product.images[0].url}
+                      src={item.product.images[0]?.url}
                       alt={item.product.name}
                       width={50}
                       height={50}
@@ -134,6 +167,12 @@ export default function CartPage() {
         </div>
         <Button onClick={checkout}>Checkout</Button>
       </CardFooter>
+      {cartItems.length !== 0 && (
+        <>
+          <CardTitle className="p-4">You're eligible to buy these special product!</CardTitle>
+          <SubProductList productList={productList}  />
+        </>
+      )}
     </Card>
   );
 }

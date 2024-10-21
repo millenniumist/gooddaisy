@@ -17,6 +17,7 @@ export default function ProductCustomization({ params }: { params: { productId: 
   const [customText, setCustomText] = useState("");
   const [product, setProduct] = useState<any>(null);
   const [totalPrice, setTotalPrice] = useState(0);
+  const [addedToCart, setAddedToCart] = useState(false);
   const { user, isLoggedIn } = useMainStorage();
   const router = useRouter();
 
@@ -45,16 +46,30 @@ export default function ProductCustomization({ params }: { params: { productId: 
       userId: user.id
     };
     await axios.post(`${process.env.NEXT_PUBLIC_URL}api/product/${params.productId}`, data);
-    router.push("/cart");
+    setAddedToCart(true);
   };
+  const handleCheckout = async () => {
+    try {
+      if(addedToCart) return router.push("/cart");
+      const data = {colorRefinement:colorRefinement, addOnItem:attachedItem, message:customText, productId: Number(params.productId), price:Number(totalPrice), name:product.name, userId:user.id};
+      // console.log(data);
+      await axios.post(`${process.env.NEXT_PUBLIC_URL}api/product/${params.productId}`, data);
 
-  const updateTotalPrice = (addition: number) => setTotalPrice((prevTotal) => prevTotal + addition);
+      router.push("/cart")
+      
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  const updateTotalPrice = (addition: number) => setTotalPrice((prevTotal) => Number((prevTotal + addition).toFixed(2)));
 
   const handleColorRefinementChange = (isChecked: boolean) => {
     const newColorRefinement = !colorRefinement;
     updateTotalPrice(newColorRefinement ? Number(product.colorRefinement) : -Number(product.colorRefinement));
     setColorRefinement(newColorRefinement);
   };
+  const handleItemAttach = (checked: boolean) => setAttachedItem(checked);
+
 
   if (!product) return <div>Loading...</div>;
 
@@ -90,7 +105,7 @@ export default function ProductCustomization({ params }: { params: { productId: 
             <div>
               <h2 className="text-xl font-semibold mb-2">Attach Item</h2>
               <div className="flex items-center space-x-2">
-                <Switch id="attach-item" checked={attachedItem} onCheckedChange={setAttachedItem} />
+                <Switch id="attach-item" checked={attachedItem} onCheckedChange={handleItemAttach} />
                 <Label htmlFor="attach-item">Attach Item</Label>
               </div>
             </div>
@@ -109,9 +124,12 @@ export default function ProductCustomization({ params }: { params: { productId: 
           )}
         </CardContent>
         <CardFooter>
-          <Button onClick={handleAddToCart} className="w-full">
-            Add to Cart - ฿{totalPrice}
-          </Button>
+        <div className="flex w-full gap-2">
+            <Button className="bg-slate-500 min-h-12 flex-grow-[1]" onClick={handleAddToCart} disabled={addedToCart} style={{ opacity: addedToCart ? 0.5 : 1 }}>Add to Cart</Button>
+            <Button  onClick={handleCheckout} className="flex flex-col min-h-12 flex-grow-[2]"><p>Check Out</p>
+            <p>฿{totalPrice}</p>
+            </Button>
+          </div>
         </CardFooter>
       </Card>
     </div>

@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 import prisma, { user } from '@/config/prisma';
 import { useParams } from 'next/navigation';
+import { cookies } from 'next/headers';
 
 
 
@@ -55,4 +56,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Failed to create order' }, { status: 500 });
   }
 }
+
+export async function DELETE(req:Request) {
+  const userId = Number(cookies().get('userId')?.value)
+  await prisma.orderItem.deleteMany({
+    where: {
+      userId,
+      status: 'CART'
+    }
+  });
+  return NextResponse.json({ message: 'Cart cleared successfully' }, { status: 200 });
+}
+
 

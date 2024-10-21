@@ -1,12 +1,6 @@
-import { clear } from "console";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-
-interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-}
+import Cookies from "js-cookie";
 
 interface Store {
   state: string;
@@ -52,12 +46,11 @@ const store1 = (set: any) => ({
   },
   setLogout: () => {
     set({ user: null, token: "", isLoggedIn: false, isAdmin: false, checkOutAlready: false });
-    document.cookie.split(";").forEach((cookie) => {
-      const trimmedCookie = cookie.replace(/^ +/, "");
-      const cookieName = trimmedCookie.split("=")[0];
-      document.cookie = `${cookieName}=;expires=${new Date(0).toUTCString()};path=/`;
-    })
+    Object.keys(Cookies.get()).forEach(cookieName => {
+      Cookies.remove(cookieName);
+    });
     sessionStorage.clear();
+    localStorage.clear();
     console.log("Logged out");
   },
 });
@@ -76,6 +69,7 @@ export const useMainStorage = create(
     storage: createJSONStorage(() => sessionStorage),
   })
 );
+
 export const useStateStorage = create(
   persist<Store>((set) => ({ ...store2(set), ...store1(set) }), {
     name: "stateStorage",

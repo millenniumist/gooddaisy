@@ -4,23 +4,27 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { useMainStorage } from "@/store/mainStorage";
-import { Avatar } from "@/components/ui/avatar";
-import { AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-import { redirect } from "next/navigation";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
+interface NavItem {
+  label: string;
+  href: string;
+  onClick?: () => void;
+}
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navRef = useRef<HTMLDivElement>(null);
   const { user, isLoggedIn, checkOutAlready, setLogout, isAdmin } = useMainStorage();
-  const [navItems, setNavItems] = useState([
+  const [navItems, setNavItems] = useState<NavItem[]>([
     { label: "Home", href: "/" },
     { label: "Cart", href: "/cart" },
     { label: "Contact Us", href: "/contact" },
   ]);
-  const [authItem, setAuthItem] = useState(null);
+  const [authItem, setAuthItem] = useState<NavItem | null>(null);
 
   useEffect(() => {
-    const updatedNavItems = [
+    const updatedNavItems: NavItem[] = [
       { label: "Home", href: "/" },
       { label: "Cart", href: "/cart" },
       { label: "Contact Us", href: "/contact" },
@@ -30,7 +34,7 @@ const Navbar = () => {
       isAdmin ? { label: "Print Order", href: "/print" } : null,
       isAdmin ? { label: "Add Product", href: "/add-product" } : null,
       isAdmin ? { label: "Delete Product", href: "/del-product" } : null,
-    ].filter(Boolean);
+    ].filter((item): item is NavItem => item !== null);
 
     setNavItems(updatedNavItems);
 
@@ -63,15 +67,17 @@ const Navbar = () => {
 
   return (
     <nav className="flex items-center justify-between p-4 bg-white shadow-md">
-      <Link href="/">
-      <Avatar>
-            <AvatarImage src="https://res.cloudinary.com/ddcjkc1ns/image/upload/v1729156722/logo_qcsnl6.jpg" alt="Good Daisy" />
-          </Avatar>
+      <Link href="/" >
+        <Avatar>
+          <AvatarImage src="https://res.cloudinary.com/ddcjkc1ns/image/upload/v1729156722/logo_qcsnl6.jpg" alt="Good Daisy Logo" />
+          <AvatarFallback>GD</AvatarFallback>
+        </Avatar>
       </Link>
       <Link href="/profile">
         <div className="flex items-center gap-4 cursor-pointer">
           <Avatar>
             <AvatarImage src={user?.pictureUrl} alt="User avatar" />
+            <AvatarFallback>{user?.displayName?.[0] || 'G'}</AvatarFallback>
           </Avatar>
           <h2>Welcome {user?.displayName || "Guest"}</h2>
         </div>

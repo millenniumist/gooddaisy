@@ -24,7 +24,7 @@ export async function GET(
 
 export async function POST(req: Request) {
   const { colorRefinement, addOnItem, message, productId, price, name, userId } = await req.json()
-  console.log(colorRefinement, addOnItem, message, productId, price, name)
+  // console.log(colorRefinement, addOnItem, message, productId, price, name)
   try {
     const newOrderItem = await prisma.orderItem.create({
       data: {

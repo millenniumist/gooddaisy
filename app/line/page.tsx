@@ -30,6 +30,7 @@ console.log("object")
       setUser(response.data.user)
       setToken(response.data.token)
       document.cookie = `token=${response.data.token}`;
+      document.cookie = `token=${response.data.user.id}`;
       console.log(response.data) 
       if (response.data.success) {
         router.push('/')

@@ -12,12 +12,6 @@ import { useMainStorage } from "@/store/mainStorage";
 import Link from "next/link";
 
 export default function Home() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const router = useRouter();
-  const [state, setState] = useState("");
-  const [loginStatus, setLoginStatus] = useState("");
-  const { setToken, token, setUser } = useMainStorage()
 
   useEffect(() => {
     liff.init({

@@ -7,7 +7,7 @@ export async function middleware(request: NextRequest) {
     if (!token) {
         return NextResponse.redirect(new URL('/login', request.url))
     }
-
+    
     try {
         const secret = new TextEncoder().encode(process.env.JWT_SECRET as string | undefined)
         const { payload } = await jose.jwtVerify(token, secret)
@@ -15,7 +15,6 @@ export async function middleware(request: NextRequest) {
 
         // Create a response and set the userId cookie
         const response = NextResponse.next()
-        response.cookies.set('userId', userId)
         
         return response
     } catch (error) {

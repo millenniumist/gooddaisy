@@ -1,20 +1,14 @@
 import { CardFooter } from "@/components/ui/card";
-import Product from "./page-components/Product";
+import Product from "../Product";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import prisma from '@/config/prisma';
+import { ProductList } from "@/app/types";
 
-
-export default async function SubProductList() {
-    const productList = await prisma.product.findMany({
-      include: {
-        images: true,
-      },
-    });
+export default async function MainProductList({productList }: {productList: ProductList}) {
   
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {productList.filter((product) => product.subProduct).map((product) => (
+        {productList.filter((product) => !product.subProduct).map((product) => (
           <div key={product.id} className="bg-white rounded-lg shadow-md ">
             <Product
               id={product.id}

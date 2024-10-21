@@ -43,9 +43,13 @@ const OrdersPage = () => {
     const MonthsAgo = subMonths(new Date(), 6);
     const filtered = allOrders.filter(order => {
       const orderDate = new Date(order.createdDate);
+      const customOrderId = formatOrderId(order);
       return (
         orderDate >= MonthsAgo &&
-        (searchTerm === '' || order.id.toString().includes(searchTerm) || order.user.displayName.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        (searchTerm === '' || 
+         order.id.toString().includes(searchTerm) || 
+         customOrderId.includes(searchTerm) ||  // Add this line
+         order.user.displayName.toLowerCase().includes(searchTerm.toLowerCase())) &&
         (statusFilter === 'ALL' || order.productionStatus === statusFilter) &&
         (paymentFilter === 'ALL' || order.paymentStatus === paymentFilter)
       );
@@ -53,6 +57,7 @@ const OrdersPage = () => {
     setFilteredOrders(filtered);
     setTotalPages(Math.ceil(filtered.length / 20));
   };
+  
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
