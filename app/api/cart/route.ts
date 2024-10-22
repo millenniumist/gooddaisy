@@ -1,6 +1,6 @@
 
 import { NextResponse } from 'next/server';
-import prisma, { user } from '@/config/prisma';
+import prisma from '@/config/prisma';
 import { useParams } from 'next/navigation';
 import { cookies } from 'next/headers';
 

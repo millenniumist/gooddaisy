@@ -31,8 +31,8 @@ console.log("object")
       setUser(response.data.user)
       setToken(response.data.token)
       setIsLoggedIn(true)
-      document.cookie = `token=${response.data.token}`;
-      document.cookie = `userId=${response.data.user.id}`;
+      // document.cookie = `token=${response.data.token}`;
+      // document.cookie = `userId=${response.data.user.id}`;
       console.log(response.data) 
       if (response.data.success) {
         window.location.href = "/";

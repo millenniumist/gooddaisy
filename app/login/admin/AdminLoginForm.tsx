@@ -24,8 +24,8 @@ export default function AdminLoginForm() {
       })
       console.log(process.env.NEXT_PUBLIC_URL)
       setToken(res.data.token)
-      document.cookie = `token=${res.data.token}`
-      document.cookie = `userId=${res.data.newUser.id}`
+      // document.cookie = `token=${res.data.token}`
+      // document.cookie = `userId=${res.data.newUser.id}`
       setUser(res.data.newUser)
       setIsAdmin(true)
       setIsLoggedIn(true)

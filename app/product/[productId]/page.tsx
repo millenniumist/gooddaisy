@@ -10,6 +10,8 @@ import Product from "@/app/page-components/Product";
 import axios from "axios";  
 import { useRouter } from "next/navigation";
 import { useMainStorage } from "@/store/mainStorage";
+import Skeleton from "react-loading-skeleton";
+import 'react-loading-skeleton/dist/skeleton.css';
 
 export default function ProductCustomization({ params }: { params: { productId: number } }) {
   const [colorRefinement, setColorRefinement] = useState(false);
@@ -20,6 +22,9 @@ export default function ProductCustomization({ params }: { params: { productId: 
   const [addedToCart, setAddedToCart] = useState(false);
   const { user, isLoggedIn } = useMainStorage();
   const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [addingToCart, setAddingToCart] = useState(false);
+  const [checkingOut, setCheckingOut] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -29,6 +34,8 @@ export default function ProductCustomization({ params }: { params: { productId: 
         setTotalPrice(Number(response.data.price));
       } catch (error) {
         console.error("Error fetching product data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -36,31 +43,51 @@ export default function ProductCustomization({ params }: { params: { productId: 
   }, [params.productId]);
 
   const handleAddToCart = async () => {
-    const data = {
-      colorRefinement: product.allowColorRefinement ? colorRefinement : false,
-      addOnItem: product.allowAddOnItem ? attachedItem : false,
-      message: product.allowMessage ? customText : "",
-      productId: Number(params.productId),
-      price: Number(totalPrice),
-      name: product.name,
-      userId: user.id
-    };
-    await axios.post(`${process.env.NEXT_PUBLIC_URL}api/product/${params.productId}`, data);
-    setAddedToCart(true);
-  };
-  const handleCheckout = async () => {
+    setAddingToCart(true);
     try {
-      if(addedToCart) return router.push("/cart");
-      const data = {colorRefinement:colorRefinement, addOnItem:attachedItem, message:customText, productId: Number(params.productId), price:Number(totalPrice), name:product.name, userId:user.id};
-      // console.log(data);
+      const data = {
+        colorRefinement: product.allowColorRefinement ? colorRefinement : false,
+        addOnItem: product.allowAddOnItem ? attachedItem : false,
+        message: product.allowMessage ? customText : "",
+        productId: Number(params.productId),
+        price: Number(totalPrice),
+        name: product.name,
+        userId: user.id
+      };
       await axios.post(`${process.env.NEXT_PUBLIC_URL}api/product/${params.productId}`, data);
-
-      router.push("/cart")
-      
+      setAddedToCart(true);
     } catch (error) {
-      console.log(error)
+      console.error("Error adding to cart:", error);
+    } finally {
+      setAddingToCart(false);
+    }
+  };
+
+  const handleCheckout = async () => {
+    setCheckingOut(true);
+    try {
+      if(addedToCart) {
+        router.push("/cart");
+        return;
+      }
+      const data = {
+        colorRefinement: colorRefinement,
+        addOnItem: attachedItem,
+        message: customText,
+        productId: Number(params.productId),
+        price: Number(totalPrice),
+        name: product.name,
+        userId: user.id
+      };
+      await axios.post(`${process.env.NEXT_PUBLIC_URL}api/product/${params.productId}`, data);
+      router.push("/cart");
+    } catch (error) {
+      console.error("Error during checkout:", error);
+    } finally {
+      setCheckingOut(false);
     }
   }
+
   const updateTotalPrice = (addition: number) => setTotalPrice((prevTotal) => Number((prevTotal + addition).toFixed(2)));
 
   const handleColorRefinementChange = (isChecked: boolean) => {
@@ -68,10 +95,20 @@ export default function ProductCustomization({ params }: { params: { productId: 
     updateTotalPrice(newColorRefinement ? Number(product.colorRefinement) : -Number(product.colorRefinement));
     setColorRefinement(newColorRefinement);
   };
+
   const handleItemAttach = (checked: boolean) => setAttachedItem(checked);
 
+  if (loading) {
+    return (
+      <div className="container mx-auto py-8">
+        <Skeleton height={300} className="mb-6" />
+        <Skeleton height={50} className="mb-4" />
+        <Skeleton height={100} count={3} className="mb-4" />
+      </div>
+    );
+  }
 
-  if (!product) return <div>Loading...</div>;
+  if (!product) return <div>Product not found</div>;
 
   return (
     <div className="container mx-auto py-8">
@@ -124,10 +161,21 @@ export default function ProductCustomization({ params }: { params: { productId: 
           )}
         </CardContent>
         <CardFooter>
-        <div className="flex w-full gap-2">
-            <Button className="bg-slate-500 min-h-12 flex-grow-[1]" onClick={handleAddToCart} disabled={addedToCart} style={{ opacity: addedToCart ? 0.5 : 1 }}>Add to Cart</Button>
-            <Button  onClick={handleCheckout} className="flex flex-col min-h-12 flex-grow-[2]"><p>Check Out</p>
-            <p>฿{totalPrice}</p>
+          <div className="flex w-full gap-2">
+            <Button 
+              className="bg-slate-500 min-h-12 flex-grow-[1]" 
+              onClick={handleAddToCart} 
+              disabled={addingToCart || addedToCart}
+            >
+              {addingToCart ? "Adding..." : addedToCart ? "Added to Cart" : "Add to Cart"}
+            </Button>
+            <Button  
+              onClick={handleCheckout} 
+              className="flex flex-col min-h-12 flex-grow-[2]"
+              disabled={checkingOut}
+            >
+              <p>{checkingOut ? "Processing..." : "Check Out"}</p>
+              <p>฿{totalPrice}</p>
             </Button>
           </div>
         </CardFooter>

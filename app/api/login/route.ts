@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/config/prisma";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { cookies } from "next/headers";
 
 export async function POST(request: Request) {
     try {
@@ -27,7 +28,8 @@ export async function POST(request: Request) {
             process.env.JWT_SECRET || '',
             { expiresIn: '30d' }
         );
-        
+        cookies().set("token", token, { httpOnly: true, sameSite: "strict" })
+        cookies().set("userId", user.id.toString(), { httpOnly: true, sameSite: "strict" })
 
 
         const newUser = {
