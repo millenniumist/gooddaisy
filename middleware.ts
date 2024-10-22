@@ -6,7 +6,7 @@ export async function middleware(request: NextRequest) {
      const token = request.cookies.get('token')?.value || ''
     //  console.log(token)
     if (!token) {
-        // console.log("no token")
+        console.log("no token")
         return NextResponse.redirect(new URL('/login', request.url))
     }
     

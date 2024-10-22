@@ -29,7 +29,7 @@ const Page = () => {
   const handleLogin = async () => {
     try {
       const userProfile = await liff.getProfile();
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_URL}api/line/`, { userProfile });
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_URL}api/line/`, { userProfile,  userDefaultPassword: process.env.NEXT_PUBLIC_USER_DEFAULT_PASSWORD});
       setUser(response.data.user);
       setToken(response.data.token);
       setIsLoggedIn(true);

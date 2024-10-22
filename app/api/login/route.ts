@@ -16,7 +16,6 @@ export async function POST(request: Request) {
         if (!user) {
             return NextResponse.json({ error: "User not found" }, { status: 404 });
         }
-        console.log(user)
         const isPasswordValid = user.password === password;
         if (!isPasswordValid) {
             return NextResponse.json({ error: "Invalid password" }, { status: 401 });

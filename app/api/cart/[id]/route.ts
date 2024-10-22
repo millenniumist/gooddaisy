@@ -26,7 +26,11 @@ export async function GET(request: Request, { params }: { params: { id: string }
         status: 'CART'
       },
       include: {
-        product: true
+        product: {
+          include: {
+            images: true,
+          }
+        }
       }
     }
 

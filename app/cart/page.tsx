@@ -110,7 +110,7 @@ export default function CartPage() {
       console.error("Error fetching product list:", error);
     }
   };
-
+  console.log(cartItems)
   return (
     <Card className="w-full max-w-3xl mx-auto">
       <CardHeader>
