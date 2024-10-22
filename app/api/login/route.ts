@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import prisma from "@/config/prisma";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -16,8 +15,7 @@ export async function POST(request: Request) {
         if (!user) {
             return NextResponse.json({ error: "User not found" }, { status: 404 });
         }
-
-        const isPasswordValid = await bcrypt.compare(password, user.password);
+        const isPasswordValid = await bcrypt.compare(password, user.password || "");
         if (!isPasswordValid) {
             return NextResponse.json({ error: "Invalid password" }, { status: 401 });
         }
@@ -28,7 +26,7 @@ export async function POST(request: Request) {
             process.env.JWT_SECRET || '',
             { expiresIn: '30d' }
         );
-
+        
 
 
         const newUser = {

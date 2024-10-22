@@ -22,15 +22,16 @@ export default function AdminLoginForm() {
         username,
         password
       })
+      console.log(process.env.NEXT_PUBLIC_URL)
       setToken(res.data.token)
       document.cookie = `token=${res.data.token}`
       document.cookie = `userId=${res.data.newUser.id}`
       setUser(res.data.newUser)
       setIsAdmin(true)
       setIsLoggedIn(true)
-      if (res.data.token) {
-        router.push('/')
-      }
+      // if (res.data.token) {
+        window.location.href = "/"
+      // }
     } catch (error) {
       console.error("Login failed:", error)
     }
