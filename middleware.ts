@@ -20,7 +20,7 @@ export async function middleware(request: NextRequest) {
         
         return response
     } catch (error) {
-        console.log("middleware error")
+        console.log(error)
         return NextResponse.redirect(new URL('/login', request.url))
     }
 }

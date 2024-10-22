@@ -32,7 +32,7 @@ console.log("object")
       setToken(response.data.token)
       setIsLoggedIn(true)
       document.cookie = `token=${response.data.token}`;
-      document.cookie = `token=${response.data.user.id}`;
+      document.cookie = `userId=${response.data.user.id}`;
       console.log(response.data) 
       if (response.data.success) {
         router.push('/')
