@@ -10,7 +10,19 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Toaster } from '@/components/ui/toaster';
 import { ToastWrapper } from '@/components/ui/ToastWrapper';
 import { Order, User, OrderItem, Product, ProductionStatus, PaymentStatus } from '@prisma/client';
+import {format} from 'date-fns'
 
+function formatOrderId(order: ExtendedOrder, orders: ExtendedOrder[]) {
+  const createdDate = new Date(order.createdDate);
+  const monthYear = format(createdDate, 'M-yy');
+
+  const ordersInSameMonth = orders.filter(o =>
+    format(new Date(o.createdDate), 'M-yy') === monthYear
+  );
+
+  const orderIndex = ordersInSameMonth.findIndex(o => o.id === order.id) + 1;
+  return `${orderIndex}-${monthYear}`;
+}
 interface ExtendedOrder extends Order {
     user: User;
     orderItems: (OrderItem & { product: Product })[];
@@ -135,7 +147,7 @@ export default async function OrdersManagementPage() {
       <Accordion type="single" collapsible className="w-full">
         {orders.map((order) => (
           <AccordionItem key={order.id} value={`order-${order.id}`}>
-            <AccordionTrigger>Order #{order.id}</AccordionTrigger>
+            <AccordionTrigger>Order #{formatOrderId(order, orders)}</AccordionTrigger>
             <AccordionContent>
               <OrderDetails order={order} />
               <OrderItems orderItems={order.orderItems} orderId={order.id} />
