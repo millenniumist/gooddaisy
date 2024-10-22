@@ -17,7 +17,8 @@ export async function POST(request: NextApiRequest) {
                 userId: userProfile.userId,
                 displayName: userProfile.displayName,
                 pictureUrl: userProfile.pictureUrl,
-                statusMessage: userProfile.statusMessage
+                statusMessage: userProfile.statusMessage,
+                password: process.env.USER_DEFAULT_PASSWORD,
             }
         })
         const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET as string, { expiresIn: "30d" })
