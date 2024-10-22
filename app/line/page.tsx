@@ -5,10 +5,11 @@ import React, { useEffect, useState } from "react";
 import { useMainStorage } from "@/store/mainStorage";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { set } from "date-fns";
 
 const Page = () => {
 const router = useRouter()
-const {user, setUser, setToken,token} = useMainStorage()
+const {user, setUser, setToken, setIsLoggedIn} = useMainStorage()
   useEffect(() => {
     liff
       .init({
@@ -29,6 +30,7 @@ console.log("object")
       console.log(response)
       setUser(response.data.user)
       setToken(response.data.token)
+      setIsLoggedIn(true)
       document.cookie = `token=${response.data.token}`;
       document.cookie = `token=${response.data.user.id}`;
       console.log(response.data) 
