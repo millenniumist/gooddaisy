@@ -7,6 +7,7 @@ import * as jose from 'jose'
 import { cookies } from 'next/headers'
 import prisma from '@/config/prisma'
 import Link from 'next/link'
+import { Suspense } from 'react'
 
 async function getUser(id: number) {
   return await prisma.user.findUnique({
@@ -33,23 +34,21 @@ async function updateAddress(formData: FormData) {
   redirect('/cart/address')
 }
 
-export default async function AddressPage({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | string[] | undefined }
-}) {
-  const token = cookies().get('token')?.value || ''
-  const secret = new TextEncoder().encode(process.env.JWT_SECRET)
-  const { payload } = await jose.jwtVerify(token, secret)
-  const id = payload.userId as number
+function AddressSkeleton() {
+  return (
+    <div className="animate-pulse">
+      <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
+      <div className="h-32 bg-gray-200 rounded mb-4"></div>
+      <div className="h-10 bg-gray-200 rounded w-1/2"></div>
+    </div>
+  )
+}
 
+async function AddressContent({ id, isEditing }: { id: number, isEditing: boolean }) {
   const user = await getUser(id)
-  const isEditing = searchParams.edit === 'true'
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6">Your Profile</h1>
-
+    <>
       <Card className="mb-6">
         <CardHeader>
           <CardTitle>User Information</CardTitle>
@@ -99,6 +98,29 @@ export default async function AddressPage({
           )}
         </CardContent>
       </Card>
+    </>
+  )
+}
+
+export default async function AddressPage({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined }
+}) {
+  const token = cookies().get('token')?.value || ''
+  const secret = new TextEncoder().encode(process.env.JWT_SECRET)
+  const { payload } = await jose.jwtVerify(token, secret)
+  const id = payload.userId as number
+
+  const isEditing = searchParams.edit === 'true'
+
+  return (
+    <div className="container mx-auto p-4">
+      <h1 className="text-3xl font-bold mb-6">Your Profile</h1>
+
+      <Suspense fallback={<AddressSkeleton />}>
+        <AddressContent id={id} isEditing={isEditing} />
+      </Suspense>
     </div>
   )
 }

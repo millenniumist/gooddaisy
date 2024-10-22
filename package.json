@@ -53,6 +53,7 @@
     "puppeteer": "^23.5.3",
     "react": "^18",
     "react-dom": "^18",
+    "react-loading-skeleton": "^3.5.0",
     "tailwind-merge": "^2.5.3",
     "tailwindcss-animate": "^1.0.7",
     "zustand": "^5.0.0-rc.2"
