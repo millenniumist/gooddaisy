@@ -1,13 +1,11 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import * as jose from 'jose'
 import { cookies } from 'next/headers'
 import prisma from '@/config/prisma'
-import Link from 'next/link'
 import { Suspense } from 'react'
+import AddressContent from './AddressContent'
+import Loading from './loading'
 
 async function getUser(id: number) {
   return await prisma.user.findUnique({
@@ -34,74 +32,6 @@ async function updateAddress(formData: FormData) {
   redirect('/cart/address')
 }
 
-function AddressSkeleton() {
-  return (
-    <div className="animate-pulse">
-      <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
-      <div className="h-32 bg-gray-200 rounded mb-4"></div>
-      <div className="h-10 bg-gray-200 rounded w-1/2"></div>
-    </div>
-  )
-}
-
-async function AddressContent({ id, isEditing }: { id: number, isEditing: boolean }) {
-  const user = await getUser(id)
-
-  return (
-    <>
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>User Information</CardTitle>
-        </CardHeader>
-        <CardContent className="flex items-center">
-          {user?.pictureUrl && (
-            <img src={user.pictureUrl} alt={user.displayName} className="w-16 h-16 rounded-full mr-4" />
-          )}
-          <div>
-            <h2 className="text-xl font-semibold">{user?.displayName}</h2>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Name & Address</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isEditing ? (
-            <form action={updateAddress}>
-              <Textarea
-                name="address"
-                className="mb-4"
-                placeholder="Enter your address"
-                defaultValue={user?.address || ''}
-                required
-              />
-              <div className="flex space-x-2">
-                <Button type="submit">Save Address</Button>
-                <Button variant="outline" formAction="/cart/address">Cancel</Button>
-              </div>
-            </form>
-          ) : (
-            <div>
-              <p className="mb-4">{user?.address || 'No address provided'}</p>
-              <form action="/cart/address">
-                <input type="hidden" name="edit" value="true" />
-                <div className="flex justify-between">
-                  <Button type="submit" className="w-24">Edit Address</Button>
-                  <Link href="/checkout">
-                    <Button type="button" className="w-24">Checkout</Button>
-                  </Link>
-                </div>
-              </form>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </>
-  )
-}
-
 export default async function AddressPage({
   searchParams,
 }: {
@@ -113,13 +43,13 @@ export default async function AddressPage({
   const id = payload.userId as number
 
   const isEditing = searchParams.edit === 'true'
+  const user = await getUser(id)
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6">Your Profile</h1>
-
-      <Suspense fallback={<AddressSkeleton />}>
-        <AddressContent id={id} isEditing={isEditing} />
+      <Suspense fallback={<Loading />}>
+        <AddressContent user={user} isEditing={isEditing} updateAddress={updateAddress} />
       </Suspense>
     </div>
   )
