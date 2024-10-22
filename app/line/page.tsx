@@ -35,7 +35,7 @@ console.log("object")
       document.cookie = `userId=${response.data.user.id}`;
       console.log(response.data) 
       if (response.data.success) {
-        router.push('/')
+        window.location.href = "/";
       } else {
         console.error('API request failed:', response.data.message)
         // Handle the error, maybe show a message to the user
