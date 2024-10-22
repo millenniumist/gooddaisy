@@ -29,10 +29,9 @@ export default function AddressContent({ user, isEditing, updateAddress }: { use
     const formData = new FormData(event.currentTarget)
     try {
       await updateAddress(formData)
-      router.push('/cart/address')
+      router.refresh() 
     } catch (error) {
       console.error('Error updating address:', error)
-      // Optionally, display an error message to the user
     } finally {
       setIsPending(false)
     }
