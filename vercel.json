@@ -1,8 +1,15 @@
 {
-    "functions": {
-      "api/**/*.js": {
-        "regions": ["sfo1"]
+    "regions": ["sfo1"],
+    "headers": [
+      {
+        "source": "/(.*)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=31536000, immutable"
+          }
+        ]
       }
-    }
+    ]
   }
   
