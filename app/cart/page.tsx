@@ -1,5 +1,5 @@
 "use client";
-export const dynamic = 'force-dynamic';
+export const revalidate = 0
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { SquarePen, Trash2 } from "lucide-react";
@@ -43,7 +43,14 @@ export default function CartPage() {
     if (user?.id) {
       try {
         const response = await axios.get<{ cartItems: CartItem[] }>(
-          `${process.env.NEXT_PUBLIC_URL}api/cart/${user.id}`
+          `${process.env.NEXT_PUBLIC_URL}api/cart/${user.id}`,
+          {
+            headers: {
+              'Cache-Control': 'no-cache',
+              'Pragma': 'no-cache',
+              'Expires': '0',
+            }
+          }
         );
         setCartItems(response.data.cartItems);
       } catch (error) {
