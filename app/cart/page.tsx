@@ -58,9 +58,11 @@ export default function CartPage() {
   };
 
   useEffect(() => {
-    getData();
-    fetchProductList();
-  }, []);
+    if (user?.id) {
+      getData();
+      fetchProductList();
+    }
+  }, [user?.id]);
 
   const router = useRouter();
   const [editMode, setEditMode] = useState(false);
@@ -110,6 +112,7 @@ export default function CartPage() {
       console.error("Error fetching product list:", error);
     }
   };
+  console.log(cartItems)
   return (
     <Card className="w-full max-w-3xl mx-auto">
       <CardHeader>
