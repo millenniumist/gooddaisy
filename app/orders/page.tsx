@@ -1,16 +1,10 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { format, subMonths } from "date-fns";
+import debounce from "lodash/debounce";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   Accordion,
   AccordionContent,
@@ -28,9 +22,6 @@ import {
   PaymentStatus,
   OrderStatus,
 } from "@prisma/client";
-import { format } from "date-fns";
-import { useEffect, useState } from "react";
-import debounce from "lodash/debounce";
 
 interface ExtendedOrder extends Order {
   user: User;
@@ -53,10 +44,12 @@ export default function OrdersManagementPage() {
   const [orders, setOrders] = useState<ExtendedOrder[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<ExtendedOrder[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const fetchOrders = async () => {
-      const response = await fetch("/api/orders");
+      const sixMonthsAgo = subMonths(new Date(), 6);
+      const response = await fetch(`/api/orders?startDate=${sixMonthsAgo.toISOString()}`);
       const data = await response.json();
       setOrders(data);
       setFilteredOrders(data);
@@ -66,12 +59,8 @@ export default function OrdersManagementPage() {
 
   const handleSearch = debounce((term: string) => {
     setSearchTerm(term);
-    const filtered = orders.filter(
-      (order) =>
-        order.user.displayName.toLowerCase().includes(term.toLowerCase()) ||
-        order.orderItems.some((item) =>
-          item.product.name.toLowerCase().includes(term.toLowerCase())
-        )
+    const filtered = orders.filter((order) =>
+      formatOrderId(order, orders).includes(term)
     );
     setFilteredOrders(filtered);
   }, 300);
@@ -82,7 +71,6 @@ export default function OrdersManagementPage() {
       body: formData,
     });
     const data = await response.json();
-    // Refresh orders after update
     const updatedOrders = await fetch("/api/orders").then((res) => res.json());
     setOrders(updatedOrders);
     setFilteredOrders(updatedOrders);
@@ -95,26 +83,32 @@ export default function OrdersManagementPage() {
       body: formData,
     });
     const data = await response.json();
-    // Refresh orders after update
     const updatedOrders = await fetch("/api/orders").then((res) => res.json());
     setOrders(updatedOrders);
     setFilteredOrders(updatedOrders);
     return data;
   };
 
+  const paginatedOrders = filteredOrders.slice(
+    (currentPage - 1) * 50,
+    currentPage * 50
+  );
+
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Orders Management</h1>
       <Input
         type="search"
-        placeholder="Search orders..."
+        placeholder="Search orders by custom ID..."
         onChange={(e) => handleSearch(e.target.value)}
         className="max-w-sm mb-4"
       />
       <Accordion type="single" collapsible className="w-full">
-        {filteredOrders.map((order) => (
+        {paginatedOrders.map((order) => (
           <AccordionItem key={order.id} value={`order-${order.id}`}>
-            <AccordionTrigger>Order #{formatOrderId(order, filteredOrders)}</AccordionTrigger>
+            <AccordionTrigger>
+              Order #{formatOrderId(order, filteredOrders)}
+            </AccordionTrigger>
             <AccordionContent>
               <OrderDetails order={order} onSubmit={handleOrderUpdate} />
               <OrderItems
@@ -126,6 +120,25 @@ export default function OrdersManagementPage() {
           </AccordionItem>
         ))}
       </Accordion>
+      <div className="flex justify-between mt-4">
+        <Button
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+        >
+          Previous
+        </Button>
+        <span>Page {currentPage}</span>
+        <Button
+          onClick={() =>
+            setCurrentPage((prev) =>
+              prev * 50 < filteredOrders.length ? prev + 1 : prev
+            )
+          }
+          disabled={currentPage * 50 >= filteredOrders.length}
+        >
+          Next
+        </Button>
+      </div>
       <Toaster />
     </div>
   );
