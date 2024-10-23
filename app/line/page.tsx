@@ -34,7 +34,8 @@ const Page = () => {
       setToken(response.data.token);
       setIsLoggedIn(true);
       if (response.data.success) {
-        window.location.href = "/";
+        setTimeout(()=> {
+        window.location.href = "/";},200)
       } else {
         console.error('API request failed:', response.data.message);
         setLoading(false);
