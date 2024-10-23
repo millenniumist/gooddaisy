@@ -45,6 +45,7 @@ model Order {
   orderItems       OrderItem[]
 }
 enum OrderStatus {
+  PENDING
   INPROCESS
   SHIPPED
 }

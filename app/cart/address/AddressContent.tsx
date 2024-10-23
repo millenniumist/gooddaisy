@@ -5,11 +5,13 @@ import { useRouter } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import Link from 'next/link'
+import axios from 'axios'
+import { useMainStorage } from '@/store/mainStorage'
 
 export default function AddressContent({ user, isEditing, updateAddress }: { user: any, isEditing: boolean, updateAddress: (formData: FormData) => Promise<void> }) {
   const router = useRouter()
   const [isPending, setIsPending] = useState(false)
+  const { setCheckOutAlready } = useMainStorage()
 
   const handleEdit = () => {
     router.push('/cart/address?edit=true')
@@ -19,7 +21,12 @@ export default function AddressContent({ user, isEditing, updateAddress }: { use
     router.push('/cart/address')
   }
 
-  const handleCheckout = () => {
+  const handleCheckout = async() => {
+    console.log("working")
+    await axios.post(`${process.env.NEXT_PUBLIC_URL}api/cart/`, {
+      userId: user.id,
+    });
+    setCheckOutAlready(true);
     router.push('/checkout')
   }
 

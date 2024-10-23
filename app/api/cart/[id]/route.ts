@@ -23,7 +23,8 @@ export async function GET(request: Request, { params }: { params: { id: string }
     const cartItems = await prisma.orderItem.findMany({
       where: {
         userId: Number(userId),
-        status: 'CART'
+        status: 'CART',
+        orderId:  null,
       },
       include: {
         product: {

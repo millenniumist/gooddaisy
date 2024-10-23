@@ -1,5 +1,5 @@
 "use client";
-
+export const dynamic = 'force-dynamic';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { SquarePen, Trash2 } from "lucide-react";
@@ -37,7 +37,7 @@ export default function CartPage() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true); // State for loading data
   const [checkoutLoading, setCheckoutLoading] = useState(false); // State for checkout loading
-  const { setCheckOutAlready, user } = useMainStorage();
+  const {  user } = useMainStorage();
   
   const getData = async () => {
     if (user?.id) {
@@ -71,10 +71,7 @@ export default function CartPage() {
   const checkout = async () => {
     setCheckoutLoading(true); // Start checkout loading
     try {
-      await axios.post(`${process.env.NEXT_PUBLIC_URL}api/cart/`, {
-        userId: user.id,
-      });
-      setCheckOutAlready(true);
+
       router.push("/cart/address");
     } catch (error) {
       console.log(error);

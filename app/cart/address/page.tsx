@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Pen } from 'lucide-react';
+import { useMainStorage } from '@/store/mainStorage';
+import axios from 'axios';
 
 const AddressPage = () => {
   const [name, setName] = useState('');
@@ -17,6 +19,7 @@ const AddressPage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
+  const {setCheckOutAlready,user} = useMainStorage()
 
   useEffect(() => {
     const fetchAddressInfo = async () => {
@@ -36,7 +39,14 @@ const AddressPage = () => {
 
     fetchAddressInfo();
   }, []);
-
+  const handleCheckout = async() => {
+    console.log("working")
+    await axios.post(`${process.env.NEXT_PUBLIC_URL}api/cart/`, {
+      userId: user.id,
+    });
+    setCheckOutAlready(true);
+    router.push('/checkout')
+  }
   const validateInputs = () => {
     if (!name.trim() || !phone.trim() || !address.trim()) {
       setError('All fields are required');
@@ -137,7 +147,7 @@ const AddressPage = () => {
         )}
         <Button
           type="button"
-          onClick={() => router.push('/checkout')}
+          onClick={handleCheckout}
           className="w-full"
         >
           Proceed to Checkout

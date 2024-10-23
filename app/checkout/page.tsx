@@ -8,13 +8,14 @@ import axios from "axios"
 import { useMainStorage } from "@/store/mainStorage"
 import { Input } from "@/components/ui/input"
 import { useRouter } from 'next/navigation'
-// import { headers } from "next/headers"
+import { Loader2 } from "lucide-react"
 
 export default function CheckoutPage() {
   const router = useRouter()
-  const [timeLeft, setTimeLeft] = useState(900) // 15 minutes in seconds
+  const [timeLeft, setTimeLeft] = useState(900)
   const [total, setTotal] = useState(0)
   const [uploadedImage, setUploadedImage] = useState<string | null>(null)
+  const [isUploading, setIsUploading] = useState(false)
   const { setCheckOutAlready } = useMainStorage()
 
   useEffect(() => {
@@ -27,7 +28,6 @@ export default function CheckoutPage() {
   }, [])
 
   const getTotalPrice = async () => {
-    // const header = headers().get('X-User-ID')
     const totalPrice = await axios.get(`${process.env.NEXT_PUBLIC_URL}api/checkout`)
     setTotal(+totalPrice.data?.totalPrice)
   }
@@ -39,18 +39,12 @@ export default function CheckoutPage() {
         return
       }
 
- 
-
-      // Proceed with payment confirmation
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_URL}api/checkout/`, {
-      })
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_URL}api/checkout/`, {})
 
       setCheckOutAlready(false)
       setTotal(0)
       localStorage.setItem("mainStorage", JSON.stringify([]))
       alert("Payment successful")
-      
-      // Redirect to home page
       router.push('/')
     } catch (error) {
       console.error(error)
@@ -61,6 +55,7 @@ export default function CheckoutPage() {
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
+      setIsUploading(true)
       const formData = new FormData()
       formData.append('file', file)
 
@@ -72,6 +67,8 @@ export default function CheckoutPage() {
       } catch (error) {
         console.error('Error uploading image:', error)
         alert('Failed to upload image')
+      } finally {
+        setIsUploading(false)
       }
     }
   }
@@ -89,14 +86,31 @@ export default function CheckoutPage() {
         <p className="text-sm text-muted-foreground">Time left to pay: {formatTime(timeLeft)}</p>
       </CardHeader>
       <CardContent className="flex flex-col items-center">
-        {uploadedImage ? (
+        {isUploading ? (
+          <div className="flex flex-col items-center gap-2">
+            <Loader2 className="h-32 w-32 animate-spin text-primary" />
+            <p className="text-sm text-muted-foreground">Uploading payment slip...</p>
+          </div>
+        ) : uploadedImage ? (
           <Image src={uploadedImage} alt="Uploaded payment proof" width={300} height={300} />
         ) : (
           <Image src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://example.com/mockup-qr-code" alt="QR Code" width={300} height={300} />
         )}
         <p className="text-2xl font-bold mt-4">Total: ${total.toFixed(2)}</p>
-        <Input type="file" accept="image/*" onChange={handleImageUpload} className="mt-4 cursor-pointer" />
-        <Button onClick={confirmPayment} className="mt-4">Confirm Payment</Button>
+        <Input 
+          type="file" 
+          accept="image/*" 
+          onChange={handleImageUpload} 
+          className="mt-4 cursor-pointer"
+          disabled={isUploading}
+        />
+        <Button 
+          onClick={confirmPayment} 
+          className="mt-4"
+          disabled={isUploading || !uploadedImage}
+        >
+          Confirm Payment
+        </Button>
       </CardContent>
     </Card>
   )
