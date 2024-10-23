@@ -1,10 +1,10 @@
+export const revalidate = 0;
 import MainProductList from "./page-components/map-components/MainProductList";
 import SubProductList from "./page-components/map-components/SubProductList";
 import prisma from "@/config/prisma";
 import { cookies } from "next/headers";
 import { Decimal } from "@prisma/client/runtime/library";
 import { ProductList } from "./types";
-import { unstable_cache } from "next/cache";
 
 function convertDecimalToNumber<T extends Record<string, any>>(obj: T): T {
   return Object.fromEntries(
@@ -16,14 +16,14 @@ function convertDecimalToNumber<T extends Record<string, any>>(obj: T): T {
 }
 
 export default async function ProductShowcase() {
-  const getProduct = unstable_cache(async() => {
-    return await prisma.product.findMany({
+  
+  const productList = await prisma.product.findMany({
       include: {
         images: true,
       },
     });
-  },["product-list"], {revalidate: 30,tags:["product-list"]});
-  const productList = await getProduct()
+  
+
   
   const convertedProductList: ProductList = productList.map((product) =>
     convertDecimalToNumber({

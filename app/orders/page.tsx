@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import prisma from '@/config/prisma';
 import { revalidatePath } from 'next/cache';
 import { Decimal } from '@prisma/client/runtime/library';

@@ -6,7 +6,6 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -54,6 +53,7 @@ export default function AddProduct() {
       };
       const response = await axios.post(`${process.env.NEXT_PUBLIC_URL}api/product`, productData);
       console.log("Product added successfully:", response.data);
+      router.refresh()
       router.push("/");
     } catch (error) {
       console.error("Error adding product:", error);
