@@ -1,5 +1,5 @@
 "use client";
-export const revalidate = 0
+export const revalidate: number = 0
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { SquarePen, Trash2 } from "lucide-react";
