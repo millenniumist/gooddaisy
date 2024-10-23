@@ -5,6 +5,15 @@ import { format, subMonths } from "date-fns";
 import debounce from "lodash/debounce";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Accordion,
   AccordionContent,
@@ -60,9 +69,10 @@ export default function OrdersManagementPage() {
   const handleSearch = debounce((term: string) => {
     setSearchTerm(term);
     const filtered = orders.filter((order) =>
-      formatOrderId(order, orders).includes(term)
+      formatOrderId(order, orders).toLowerCase().includes(term.toLowerCase())
     );
     setFilteredOrders(filtered);
+    setCurrentPage(1);
   }, 300);
 
   const handleOrderUpdate = async (formData: FormData) => {
@@ -94,15 +104,22 @@ export default function OrdersManagementPage() {
     currentPage * 50
   );
 
+  const totalPages = Math.ceil(filteredOrders.length / 50);
+
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Orders Management</h1>
-      <Input
-        type="search"
-        placeholder="Search orders by custom ID..."
-        onChange={(e) => handleSearch(e.target.value)}
-        className="max-w-sm mb-4"
-      />
+      <div className="flex items-center gap-4 mb-4">
+        <Input
+          type="search"
+          placeholder="Search orders by ID (e.g., 1-12-23)"
+          onChange={(e) => handleSearch(e.target.value)}
+          className="max-w-sm"
+        />
+        <span className="text-sm text-gray-500">
+          Showing {filteredOrders.length} orders
+        </span>
+      </div>
       <Accordion type="single" collapsible className="w-full">
         {paginatedOrders.map((order) => (
           <AccordionItem key={order.id} value={`order-${order.id}`}>
@@ -120,21 +137,21 @@ export default function OrdersManagementPage() {
           </AccordionItem>
         ))}
       </Accordion>
-      <div className="flex justify-between mt-4">
+      <div className="flex justify-between items-center mt-4">
         <Button
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
           disabled={currentPage === 1}
         >
           Previous
         </Button>
-        <span>Page {currentPage}</span>
+        <span>
+          Page {currentPage} of {totalPages}
+        </span>
         <Button
           onClick={() =>
-            setCurrentPage((prev) =>
-              prev * 50 < filteredOrders.length ? prev + 1 : prev
-            )
+            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
           }
-          disabled={currentPage * 50 >= filteredOrders.length}
+          disabled={currentPage === totalPages}
         >
           Next
         </Button>
@@ -180,7 +197,7 @@ function OrderItems({
   orderId,
   onSubmit,
 }: {
-  orderItems: any[];
+  orderItems: (OrderItem & { product: Product })[];
   orderId: number;
   onSubmit: (formData: FormData) => Promise<any>;
 }) {
@@ -199,7 +216,7 @@ function OrderItemForm({
   orderId,
   onSubmit,
 }: {
-  item: any;
+  item: OrderItem & { product: Product };
   orderId: number;
   onSubmit: (formData: FormData) => Promise<any>;
 }) {
