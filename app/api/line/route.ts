@@ -6,60 +6,61 @@ import { cookies } from "next/headers"
 export async function POST(request: Request) {
     try {
         console.log(process.env.USER_DEFAULT_PASSWORD)
-        const { userProfile, userDefaultPassword } = await request.json()
+        const { userProfile, userDefaultPassword } = await request.json();
+
+        // Check if the provided password matches the environment variable
         if (userDefaultPassword !== process.env.USER_DEFAULT_PASSWORD) {
-            console.log("front-back not match")
             return NextResponse.json({
                 success: false,
-                message: "front-back not match"
-            })
+                message: "Password mismatch"
+            }, { status: 401 });
         }
+
+        // Find user in the database
         let user = await prisma.user.findUnique({
             where: {
                 userId: userProfile.userId
             }
-        })
+        });
 
         if (user) {
-            // EXISTING USER
-            // console.log("existing user")
-
-            //Make sure Current user is from our backend by env.
+            // Existing user validation
             if (user.password !== process.env.USER_DEFAULT_PASSWORD) {
-                return NextResponse.json({ success: false, error: "Invalid User" }, { status: 401 })
-
-            } else {
-                const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET as string, { expiresIn: "30d" })
-                cookies().set("token", token, { httpOnly: true, sameSite: "strict" })
-                cookies().set("userId", user.id.toString(), { httpOnly: true, sameSite: "strict" })
-                user = await prisma.user.update({
-                    where: { userId: userProfile.userId },
-                    data: {
-                        displayName: userProfile.displayName,
-                        pictureUrl: userProfile.pictureUrl,
-                        statusMessage: userProfile.statusMessage,
-                    }
-                })
-                return NextResponse.json({ success: true, user, token }, { status: 200 })
+                return NextResponse.json({ success: false, error: "Invalid User" }, { status: 401 });
             }
+
+            // Update user information
+            user = await prisma.user.update({
+                where: { userId: userProfile.userId },
+                data: {
+                    displayName: userProfile.displayName,
+                    pictureUrl: userProfile.pictureUrl,
+                    statusMessage: userProfile.statusMessage,
+                }
+            });
         } else {
-            // NEW USER
+            // Create new user
             user = await prisma.user.create({
                 data: {
                     userId: userProfile.userId,
                     displayName: userProfile.displayName,
                     pictureUrl: userProfile.pictureUrl,
                     statusMessage: userProfile.statusMessage,
+                    password: process.env.USER_DEFAULT_PASSWORD,
                     isAdmin: false,
                     createdDate: new Date(),
                 }
-            })
+            });
         }
 
-        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET as string, { expiresIn: "30d" })
-        cookies().set("token", token, { httpOnly: true, sameSite: "strict" })
-        cookies().set("userId", user.id.toString(), { httpOnly: true, sameSite: "strict" })
+        // Generate JWT token
+        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET as string, { expiresIn: "30d" });
 
+        // Set cookies
+        cookies().set("token", token, { httpOnly: true, sameSite: "strict" });
+        cookies().set("userId", user.id.toString(), { httpOnly: true, sameSite: "strict" });
+
+        // Prepare user response
         const userResponse = {
             id: user.id,
             userId: user.userId,
@@ -70,10 +71,10 @@ export async function POST(request: Request) {
             createdDate: user.createdDate
         };
 
-        return NextResponse.json({ success: true, user: userResponse, token }, { status: 200 })
+        return NextResponse.json({ success: true, user: userResponse, token }, { status: 200 });
 
     } catch (error) {
-        console.error("Error in LINE authentication:", error)
-        return NextResponse.json({ success: false, error: "An error occurred during authentication" }, { status: 500 })
+        console.error("Error in LINE authentication:", error);
+        return NextResponse.json({ success: false, error: "An error occurred during authentication" }, { status: 500 });
     }
 }

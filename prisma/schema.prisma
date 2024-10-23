@@ -22,7 +22,7 @@ datasource db {
 model User {
   id            Int         @id @default(autoincrement())
   userId        String      @unique // Unique ID from LINE authentication
-  password      String      @default("MG!13072021lil")
+  password      String?      
   isAdmin       Boolean     @default(false) // Flag to indicate if the user is an admin
   displayName   String // User's display name from LINE
   pictureUrl    String? // Profile picture URL from LINE
