@@ -1,16 +1,18 @@
 import { CardFooter } from "@/components/ui/card";
-import Product from "../Product";
+import ProductCard from "../Product";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ProductList } from "@/app/types";
+import { Product } from "@prisma/client";
 
-export default async function MainProductList({productList }: {productList: ProductList}) {
-  
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {productList.filter((product) => !product.subProduct).map((product) => (
+export default async function MainProductList({ productList,}: { productList: (Product & { images: any[] })[];
+}) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {productList
+        .filter((product) => !product.subProduct)
+        .map((product) => (
           <div key={product.id} className="bg-white rounded-lg shadow-md ">
-            <Product
+            <ProductCard
               id={product.id}
               name={product.name}
               price={product.price}
@@ -27,6 +29,6 @@ export default async function MainProductList({productList }: {productList: Prod
             </CardFooter>
           </div>
         ))}
-      </div>
-    );
-  }
+    </div>
+  );
+}

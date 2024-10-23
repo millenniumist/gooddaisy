@@ -15,7 +15,7 @@ export async function GET(request: Request) {
         const totalPrice = await prisma.order.findFirst({
             where: {
                 userId: Number(userId),
-                productionStatus: "CART"
+                paymentStatus: 'UNPAID'
             },
             orderBy: {
                 id: 'desc'
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
         const order = await prisma.order.findFirst({
             where: {
                 userId: Number(userId),
-                productionStatus: "CART"
+                paymentStatus: "UNPAID"
             },
             select: {
                 id: true,
@@ -59,9 +59,20 @@ export async function POST(request: Request) {
                 id: order.id
             },
             data: {
-                productionStatus: "PENDING"
+                paymentStatus: "PENDING",
+                orderItems: {
+                    updateMany: {
+                        where: {
+                            orderId: order.id
+                        },
+                        data: {
+                            status: "PENDING"
+                        }
+                    }
+                }
             }
-        });
+        })
+   
         return NextResponse.json({message:`Updated orderId ${order.id}`});
     } catch (error) {
         console.log(error);

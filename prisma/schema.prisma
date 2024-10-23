@@ -35,15 +35,18 @@ model User {
 
 model Order {
   id               Int              @id @default(autoincrement())
-  productionStatus ProductionStatus @default(CART)
+  productionStatus OrderStatus @default(INPROCESS)
   paymentStatus    PaymentStatus    @default(UNPAID)
   createdDate      DateTime         @default(now())
   userId           Int
-  totalPrice       Decimal          @default(0) @db.Decimal(10, 2)
+  totalPrice       Float          @default(0) 
   user             User             @relation(fields: [userId], references: [id])
   orderItems       OrderItem[]
 }
-
+enum OrderStatus {
+  INPROCESS
+  SHIPPED
+}
 enum ProductionStatus {
   CART
   PENDING
@@ -55,6 +58,7 @@ enum ProductionStatus {
 
 enum PaymentStatus {
   UNPAID
+  PENDING
   HALF_PAID
   FULL_PAID
 }
@@ -83,7 +87,7 @@ model OrderItem {
 model Product {
   id     Int     @id @default(autoincrement())
   name   String
-  price  Decimal @db.Decimal(10, 2)
+  price  Float 
   images Image[] // Relation to Images
   subProduct Boolean @default(false)
 
@@ -91,9 +95,9 @@ model Product {
   allowMessage         Boolean  @default(true)
   allowAddOnItem       Boolean  @default(true)
   // Addons
-  colorRefinement      Decimal? @default(200) @db.Decimal(10, 2)
-  message              Decimal? @default(0) @db.Decimal(10, 2)
-  addOnItem            Decimal? @default(0) @db.Decimal(10, 2)
+  colorRefinement      Float? @default(200) 
+  message              Float? @default(0) 
+  addOnItem            Float? @default(0) 
 
   orderItems OrderItem[] // Relation to OrderItems
 }

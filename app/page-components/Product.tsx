@@ -7,12 +7,11 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Decimal } from "@prisma/client/runtime/library";
 
 interface ProductProps {
   id: number;
   name: string;
-  price: Decimal;
+  price: number;
   images: { url: string }[];
 }
 
