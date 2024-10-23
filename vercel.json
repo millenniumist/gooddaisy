@@ -1,0 +1,8 @@
+{
+    "functions": {
+      "api/**/*.js": {
+        "regions": ["sfo1"]
+      }
+    }
+  }
+  
