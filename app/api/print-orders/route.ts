@@ -36,17 +36,26 @@ export async function GET(request: Request) {
         const orderIndex = ordersInSameMonth.findIndex(o => o.id === order.id) + 1;
         return `${orderIndex}-${monthYear}`;
       };
+      // const browser = await puppeteer.launch({
+      //   args: ['--hide-scrollbars', '--disable-web-security'],
+      //   executablePath: process.env.NODE_ENV === 'development' 
+      //     ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'  // Local Chrome path
+      //     : await chromium.executablePath('/tmp/chromium'),
+      //   headless: "new",
+      //   ignoreHTTPSErrors: true,
+      // });
       const browser = await puppeteer.launch({
-        args: ['--hide-scrollbars', '--disable-web-security'],
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
         executablePath: process.env.NODE_ENV === 'development' 
-          ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'  // Local Chrome path
+          ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
           : await chromium.executablePath('/tmp/chromium'),
-        headless: "new",
-        ignoreHTTPSErrors: true,
+        headless: true, // Changed from "new" to true for better compatibility
+        defaultViewport: { width: 1920, height: 1080 }
       });
       
+      
 
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 200));
       const page = await browser.newPage();
 
       try {
