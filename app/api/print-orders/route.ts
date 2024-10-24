@@ -52,7 +52,9 @@ export async function GET(request: Request) {
       //   headless: true, // Changed from "new" to true for better compatibility
       //   defaultViewport: { width: 1920, height: 1080 }
       // });
-      const browser = await puppeteer.launch({ headless: true });
+      const browser = await puppeteer.launch({ headless: true, executablePath: process.env.NODE_ENV === 'development' 
+            ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
+            : "/home/sbx_user1051/.cache/puppeteer" });
 
 
 
