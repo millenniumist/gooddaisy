@@ -31,19 +31,20 @@ export async function GET(request: Request) {
       const formatOrderId = (order) => {
         const createdDate = new Date(order.createdDate);
         const monthYear = format(createdDate, 'M-yy');
-        const ordersInSameMonth = orders.filter(o => 
+        const ordersInSameMonth = orders.filter(o =>
           format(new Date(o.createdDate), 'M-yy') === monthYear
         );
         const orderIndex = ordersInSameMonth.findIndex(o => o.id === order.id) + 1;
         return `${orderIndex}-${monthYear}`;
       };
-      const browser = await puppeteer.launch({
-        args:chromium.args,
-        defaultViewport: chromium.defaultViewport,
-        executablePath: await chromium.executablePath,
-        headless: true,
-        // ignoreHTTPSErrors: true,
-      });
+      // const browser = await puppeteer.launch({
+      //   args:chromium.args,
+      //   defaultViewport: chromium.defaultViewport,
+      //   executablePath: await chromium.executablePath,
+      //   headless: true,
+      //   // ignoreHTTPSErrors: true,
+      // });
+      const browser = await puppeteer.launch();
       // const browser = await puppeteer.launch({
       //   args: ['--no-sandbox', '--disable-setuid-sandbox'],
       //   executablePath: process.env.NODE_ENV === 'development' 
@@ -52,8 +53,8 @@ export async function GET(request: Request) {
       //   headless: true, // Changed from "new" to true for better compatibility
       //   defaultViewport: { width: 1920, height: 1080 }
       // });
-      
-      
+
+
 
       await new Promise(resolve => setTimeout(resolve, 400));
       const page = await browser.newPage();
