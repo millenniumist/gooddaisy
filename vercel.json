@@ -10,5 +10,15 @@
         }
       ]
     }
-  ]
+  ],
+  "buildCommand": "npm run build",
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "env": {
+    "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD": "true"
+  }
 }

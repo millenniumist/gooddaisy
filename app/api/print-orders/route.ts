@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import puppeteer from 'puppeteer';
+import chromium from '@sparticuz/chromium';
+import puppeteer from 'puppeteer-core';
 import prisma from '@/config/prisma';
 import { subMonths, format } from 'date-fns';
 
@@ -35,70 +36,82 @@ export async function GET(request: Request) {
         const orderIndex = ordersInSameMonth.findIndex(o => o.id === order.id) + 1;
         return `${orderIndex}-${monthYear}`;
       };
+      const browser = await puppeteer.launch({
+        args: ['--hide-scrollbars', '--disable-web-security'],
+        executablePath: process.env.NODE_ENV === 'development' 
+          ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'  // Local Chrome path
+          : await chromium.executablePath(),
+        headless: "new",
+        ignoreHTTPSErrors: true,
+      });
+      
 
-      const browser = await puppeteer.launch();
+      await new Promise(resolve => setTimeout(resolve, 1000));
       const page = await browser.newPage();
 
-      const htmlContent = `
-      <html>
-        <head>
-          <style>
-            body { font-family: Arial, sans-serif; }
-            table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-            th { background-color: #f2f2f2; }
-          </style>
-        </head>
-        <body>
-          ${orders.map(order => `
-            <h1>Order #${formatOrderId(order)}  </h1>
-            <p>Customer: ${order.user.displayName} </p>
-            <p> Address: ${order.user.address}</p>
-            <p>Payment: ${order.paymentStatus}</p>
-            <h2>Order Items</h2>
-            <table>
-              <thead>
-                <tr>
-                  <th>Product</th>
-                  <th>Price</th>
-                  <th>Status</th>
-                  <th>Color Refinement</th>
-                  <th>Message</th>
-                  <th>Add-On Item</th>
-                  <th>Note</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${order.orderItems.map(item => `
-                  <tr>
-                    <td>${item.product.name}</td>
-                    <td>${item.price.toFixed(2)}</td>
-                    <td>${item.status}</td>
-                    <td>${item.colorRefinement ? 'Yes' : 'No'}</td>
-                    <td>${item.message || 'N/A'}</td>
-                    <td>${item.addOnItem ? 'Yes' : 'No'}</td>
-                    <td>${item.note || 'N/A'}</td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-            <h3>Total Price: ${order.totalPrice.toFixed(2)}</h3>
-          `).join('<div style="page-break-after: always;"></div>')}
-        </body>
-      </html>
-    `;
+      try {
+        const htmlContent = `
+          <html>
+            <head>
+              <style>
+                body { font-family: Arial, sans-serif; }
+                table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background-color: #f2f2f2; }
+              </style>
+            </head>
+            <body>
+              ${orders.map(order => `
+                <h1>Order #${formatOrderId(order)}  </h1>
+                <p>Customer: ${order.user.displayName} </p>
+                <p> Address: ${order.user.address}</p>
+                <p>Payment: ${order.paymentStatus}</p>
+                <h2>Order Items</h2>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Product</th>
+                      <th>Price</th>
+                      <th>Status</th>
+                      <th>Color Refinement</th>
+                      <th>Message</th>
+                      <th>Add-On Item</th>
+                      <th>Note</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${order.orderItems.map(item => `
+                      <tr>
+                        <td>${item.product.name}</td>
+                        <td>${item.price.toFixed(2)}</td>
+                        <td>${item.status}</td>
+                        <td>${item.colorRefinement ? 'Yes' : 'No'}</td>
+                        <td>${item.message || 'N/A'}</td>
+                        <td>${item.addOnItem ? 'Yes' : 'No'}</td>
+                        <td>${item.note || 'N/A'}</td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+                <h3>Total Price: ${order.totalPrice.toFixed(2)}</h3>
+              `).join('<div style="page-break-after: always;"></div>')}
+            </body>
+          </html>
+        `;
 
-      await page.setContent(htmlContent);
-      const pdf = await page.pdf({ format: 'A4' });
+        await page.setContent(htmlContent);
+        const pdf = await page.pdf({ format: 'A4' });
 
-      await browser.close();
-
-      return new NextResponse(pdf, {
-        headers: {
-          'Content-Type': 'application/pdf',
-          'Content-Disposition': `attachment; filename="filtered-orders.pdf"`,
-        },
-      });
+        return new NextResponse(pdf, {
+          headers: {
+            'Content-Type': 'application/pdf',
+            'Content-Disposition': `attachment; filename="filtered-orders.pdf"`,
+          },
+        });
+      } finally {
+        if (page) await page.close();
+        if (browser) await browser.close();
+      }
     } catch (error) {
       console.error('Error generating PDF:', error);
       return NextResponse.json({ error: 'Failed to generate PDF' }, { status: 500 });
