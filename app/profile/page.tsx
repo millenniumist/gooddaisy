@@ -40,7 +40,7 @@ async function updateAddress(formData: FormData) {
   const address = formData.get('address') as string
   const phone = formData.get('phone') as string
 
-  const combinedAddress = `${name}|${address}|${phone}`
+  const combinedAddress = `${name}|${phone}|${address}`
 
   await prisma.user.update({
     where: { id },
@@ -64,7 +64,7 @@ export default async function ProfilePage({
   const user = await getUser(id)
   const isEditing = searchParams.edit === 'true'
 
-  const [name = '', address = '', phone = ''] = user?.address?.split('|') || ['', '', '']
+  const [name = '', phone = '', address = ''] = user?.address?.split('|') || ['', '', '']
 
   return (
     <div className="container mx-auto p-4">
