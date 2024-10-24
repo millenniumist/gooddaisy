@@ -1,8 +1,16 @@
 import prisma from '@/config/prisma'
 import { NextResponse } from 'next/server'
 
-export async function GET() {
+export async function GET(request: Request) {
+  const url = new URL(request.url);
+  const startDate = url.searchParams.get('startDate');
+
   const orders = await prisma.order.findMany({
+    where: {
+      createdDate: {
+        gte: startDate ? new Date(startDate) : undefined,
+      },
+    },
     include: {
       user: true,
       orderItems: {
@@ -11,6 +19,7 @@ export async function GET() {
         },
       },
     },
-  })
-  return NextResponse.json(orders)
+  });
+
+  return NextResponse.json(orders);
 }

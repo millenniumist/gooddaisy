@@ -59,3 +59,26 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Failed to create order' }, { status: 500 });
   }
 }
+
+
+export async function DELETE() {
+  try {
+    const cookieStore = cookies();
+    const userId = cookieStore.get('userId');
+    console.log("Delete is working",userId)
+    if (!userId) {
+      return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
+    }
+    const deleteItem = await prisma.orderItem.deleteMany({
+      where: {
+        userId: Number(userId.value),
+        status: 'CART',
+        orderId: null,
+      }
+    });
+    return NextResponse.json({ deleteItem }, { status: 200 });
+} catch (error) {
+  console.error('Failed to delete order:', error);
+  return NextResponse.json({ error: 'Failed to delete order' }, { status: 500 });
+}
+}

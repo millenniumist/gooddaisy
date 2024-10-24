@@ -43,15 +43,7 @@ export default function CartPage() {
     if (user?.id) {
       try {
         const response = await axios.get<{ cartItems: CartItem[] }>(
-          `${process.env.NEXT_PUBLIC_URL}api/cart/${user.id}`,
-          {
-            headers: {
-              'Cache-Control': 'no-cache',
-              'Pragma': 'no-cache',
-              'Expires': '0',
-            }
-          }
-        );
+          `${process.env.NEXT_PUBLIC_URL}api/cart/${user.id}`);
         setCartItems(response.data.cartItems);
       } catch (error) {
         console.error("Error fetching cart items:", error);
@@ -93,8 +85,8 @@ export default function CartPage() {
 
   const handleDelete = async (id: number) => {
     try {
-      await axios.delete(`${process.env.NEXT_PUBLIC_URL}api/cart/${id}`);
       if(cartItems.filter((item)=>!item.product.subProduct).length>1){
+        await axios.delete(`${process.env.NEXT_PUBLIC_URL}api/cart/${id}`);
         setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
         console.log("still has main")
         return

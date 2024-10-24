@@ -96,7 +96,7 @@ const OrdersPage = () => {
   const formatOrderId = (order: Order) => {
     const createdDate = new Date(order.createdDate);
     const monthYear = format(createdDate, 'M-yy');
-    const ordersInSameMonth = allOrders.filter(o => 
+    const ordersInSameMonth = allOrders?.filter(o => 
       format(new Date(o.createdDate), 'M-yy') === monthYear
     );
     const orderIndex = ordersInSameMonth.findIndex(o => o.id === order.id) + 1;

@@ -177,7 +177,7 @@ function OrderDetails({
         name="productionStatus"
         label="Production Status"
         defaultValue={order.productionStatus}
-        options={OrderStatus}
+        options={ProductionStatus}
       />
       <StatusSelect
         name="paymentStatus"
