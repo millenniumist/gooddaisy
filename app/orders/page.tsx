@@ -174,9 +174,9 @@ function OrderDetails({
       <p>User: {order.user.displayName}</p>
       <p>Total Price: ${order.totalPrice.toFixed(2)}</p>
       <StatusSelect
-        name="productionStatus"
+        name="orderStatus"
         label="Production Status"
-        defaultValue={order.productionStatus}
+        defaultValue={order.orderStatus}
         options={OrderStatus}
       />
       <StatusSelect

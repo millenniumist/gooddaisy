@@ -100,7 +100,7 @@ async function main() {
   const order1 = await prisma.order.create({
     data: {
       userId: user1.id,
-      productionStatus: 'DRIED',
+      orderStatus: 'DRIED',
       paymentStatus: 'HALF_PAID',
       totalPrice: 59.99,
     },
@@ -109,7 +109,7 @@ async function main() {
   const order2 = await prisma.order.create({
     data: {
       userId: user2.id,
-      productionStatus: 'PATTERN_CONFIRMED',
+      orderStatus: 'PATTERN_CONFIRMED',
       paymentStatus: 'FULL_PAID',
       totalPrice: 39.99,
     },

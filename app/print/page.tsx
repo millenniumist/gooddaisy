@@ -50,7 +50,7 @@ const OrdersPage = () => {
          order.id.toString().includes(searchTerm) || 
          customOrderId.includes(searchTerm) ||  // Add this line
          order.user.displayName.toLowerCase().includes(searchTerm.toLowerCase())) &&
-        (statusFilter === 'ALL' || order.productionStatus === statusFilter) &&
+        (statusFilter === 'ALL' || order.orderStatus === statusFilter) &&
         (paymentFilter === 'ALL' || order.paymentStatus === paymentFilter)
       );
     });
@@ -153,7 +153,7 @@ const OrdersPage = () => {
           {filteredOrders.slice((currentPage - 1) * 20, currentPage * 20).map(order => (
             <TableRow key={order.id}>
               <TableCell className='text-nowrap'>{formatOrderId(order)}</TableCell>
-              <TableCell className='text-nowrap'>{order.productionStatus}</TableCell>
+              <TableCell className='text-nowrap'>{order.orderStatus}</TableCell>
               <TableCell className='text-nowrap'>{order.paymentStatus}</TableCell>
               <TableCell className='text-nowrap'>${Number(order.totalPrice).toFixed(2)}</TableCell>
               <TableCell className='text-nowrap'>
@@ -236,7 +236,7 @@ export default OrdersPage;
 //          order.id.toString().includes(searchTerm) || 
 //          customOrderId.includes(searchTerm) ||
 //          order.user.displayName.toLowerCase().includes(searchTerm.toLowerCase())) &&
-//         (statusFilter === 'ALL' || order.productionStatus === statusFilter) &&
+//         (statusFilter === 'ALL' || order.orderStatus === statusFilter) &&
 //         (paymentFilter === 'ALL' || order.paymentStatus === paymentFilter)
 //       );
 //     });
@@ -310,7 +310,7 @@ export default OrdersPage;
 //             {filteredOrders.slice((currentPage - 1) * 20, currentPage * 20).map(order => (
 //               <TableRow key={order.id}>
 //                 <TableCell>{formatOrderId(order)}</TableCell>
-//                 <TableCell>{order.productionStatus}</TableCell>
+//                 <TableCell>{order.orderStatus}</TableCell>
 //                 <TableCell>{order.paymentStatus}</TableCell>
 //                 <TableCell>${Number(order.totalPrice).toFixed(2)}</TableCell>
 //                 <TableCell>

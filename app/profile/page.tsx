@@ -154,7 +154,7 @@ export default async function ProfilePage({
                 <h3 className="text-lg font-semibold mb-2">Order #{order.id}</h3>
                 <p className="text-sm text-gray-600 mb-2">Date: {new Date(order.createdDate).toLocaleDateString()}</p>
                 <p className="text-sm text-gray-600 mb-2">Payment Status: {order.paymentStatus}</p>
-                <p className="text-sm text-gray-600 mb-4">Production Status: {order.productionStatus}</p>
+                <p className="text-sm text-gray-600 mb-4">Production Status: {order.orderStatus}</p>
                 <h4 className="font-medium mb-2">Items:</h4>
                 <ul className="space-y-2">
                   {order.orderItems.map((item) => (

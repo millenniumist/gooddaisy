@@ -15,7 +15,7 @@ const Page = () => {
   useEffect(() => {
     liff
       .init({
-        liffId: process.env.NEXT_PUBLIC_LIFF_ID,
+        liffId: process.env.NEXT_PUBLIC_LIFF_ID || "",
       })
       .then(() => {
         handleLogin();
@@ -29,7 +29,7 @@ const Page = () => {
   const handleLogin = async () => {
     try {
       const userProfile = await liff.getProfile();
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_URL}api/line/`, { userProfile,  userDefaultPassword: process.env.NEXT_PUBLIC_USER_DEFAULT_PASSWORD});
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_URL}api/line/`, { userProfile,  userDefaultPassword: process.env.FRONT_USER_DEFAULT_PASSWORD});
       setUser(response.data.user);
       setToken(response.data.token);
       setIsLoggedIn(true);

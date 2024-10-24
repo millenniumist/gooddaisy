@@ -41,7 +41,7 @@ export async function POST(request: Request) {
         data: {
           userId: Number(userId),
           paymentStatus: 'UNPAID',
-          productionStatus: 'PENDING',
+          orderStatus: 'PENDING',
           totalPrice: cartItems.reduce((total, item) => total + item.price, 0),
           orderItems: {
             connect: cartItems.map(item => ({ id: item.id }))
