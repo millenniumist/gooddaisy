@@ -37,10 +37,11 @@ export async function GET(request: Request) {
         return `${orderIndex}-${monthYear}`;
       };
       const browser = await puppeteer.launch({
-        args: chromium.args,
-        defaultViewport: chromium.defaultViewport,
-        executablePath: process.env.CHROME_EXECUTABLE_PATH || await chromium.executablePath('/tmp/chromium'),
-        headless: "chrome",
+        args: ['--hide-scrollbars', '--disable-web-security'],
+        executablePath: process.env.NODE_ENV === 'development' 
+          ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'  // Local Chrome path
+          : await chromium.executablePath('/tmp/chromium'),
+        headless: "new",
         ignoreHTTPSErrors: true,
       });
       
