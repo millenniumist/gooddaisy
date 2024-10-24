@@ -109,6 +109,7 @@ export default function CartPage() {
     }
   };
   console.log(cartItems)
+  console.log(productList)
   return (
     <Card className="w-full max-w-3xl mx-auto">
       <CardHeader>

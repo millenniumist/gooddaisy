@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
-import chromium from '@sparticuz/chromium';
+import chromium from 'chrome-aws-lambda';
 import puppeteer from 'puppeteer-core';
 import prisma from '@/config/prisma';
 import { subMonths, format } from 'date-fns';
+
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -36,26 +37,25 @@ export async function GET(request: Request) {
         const orderIndex = ordersInSameMonth.findIndex(o => o.id === order.id) + 1;
         return `${orderIndex}-${monthYear}`;
       };
-      // const browser = await puppeteer.launch({
-      //   args: ['--hide-scrollbars', '--disable-web-security'],
-      //   executablePath: process.env.NODE_ENV === 'development' 
-      //     ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'  // Local Chrome path
-      //     : await chromium.executablePath('/tmp/chromium'),
-      //   headless: "new",
-      //   ignoreHTTPSErrors: true,
-      // });
       const browser = await puppeteer.launch({
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
-        executablePath: process.env.NODE_ENV === 'development' 
-          ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
-          : await chromium.executablePath('/tmp/chromium'),
-        headless: true, // Changed from "new" to true for better compatibility
-        defaultViewport: { width: 1920, height: 1080 }
+        args:chromium.args,
+        defaultViewport: chromium.defaultViewport,
+        executablePath: await chromium.executablePath,
+        headless: true,
+        // ignoreHTTPSErrors: true,
       });
+      // const browser = await puppeteer.launch({
+      //   args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      //   executablePath: process.env.NODE_ENV === 'development' 
+      //     ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
+      //     : await chromium.executablePath('/tmp/chromium'),
+      //   headless: true, // Changed from "new" to true for better compatibility
+      //   defaultViewport: { width: 1920, height: 1080 }
+      // });
       
       
 
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise(resolve => setTimeout(resolve, 400));
       const page = await browser.newPage();
 
       try {
@@ -153,3 +153,5 @@ export async function GET(request: Request) {
     }
   }
 }
+
+
