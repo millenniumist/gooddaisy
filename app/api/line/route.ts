@@ -5,16 +5,16 @@ import { cookies } from "next/headers"
 
 export async function POST(request: Request) {
     try {
-        console.log(process.env.USER_DEFAULT_PASSWORD)
+        //console.log(process.env.USER_DEFAULT_PASSWORD)
         const { userProfile, userDefaultPassword } = await request.json();
-
+        
         // Check if the provided password matches the environment variable
-        if (userDefaultPassword !== process.env.USER_DEFAULT_PASSWORD) {
-            return NextResponse.json({
-                success: false,
-                message: "Password mismatch"
-            }, { status: 401 });
-        }
+        // if (userDefaultPassword !== process.env.USER_DEFAULT_PASSWORD) {
+        //     return NextResponse.json({
+        //         success: false,
+        //         message: "Password mismatch"
+        //     }, { status: 401 });
+        // }
 
         // Find user in the database
         let user = await prisma.user.findUnique({
@@ -57,8 +57,8 @@ export async function POST(request: Request) {
         const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET as string, { expiresIn: "30d" });
 
         // Set cookies
-        cookies().set("token", token, { httpOnly: true, sameSite: "strict" });
-        cookies().set("userId", user.id.toString(), { httpOnly: true, sameSite: "strict" });
+        await cookies().set("token", token, { httpOnly: true, sameSite: "strict" });
+        await cookies().set("userId", user.id.toString(), { httpOnly: true, sameSite: "strict" });
 
         // Prepare user response
         const userResponse = {

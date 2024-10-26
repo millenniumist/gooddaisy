@@ -18,11 +18,12 @@ export default function AdminLoginForm() {
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     try {
+      //console.log(process.env.FRONT_USER_DEFAULT_PASSWORD)
       const res = await axios.post(`${process.env.NEXT_PUBLIC_URL}api/login`, {
         username,
-        password
+        password, userDefaultPassword: process.env.FRONT_USER_DEFAULT_PASSWORD
       })
-      console.log(process.env.NEXT_PUBLIC_URL)
+      //console.log(process.env.NEXT_PUBLIC_URL)
       setToken(res.data.token)
       // document.cookie = `token=${res.data.token}`
       // document.cookie = `userId=${res.data.newUser.id}`

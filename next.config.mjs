@@ -14,9 +14,7 @@ const nextConfig = {
       properties: ["^data-new-gr-c-s-check-loaded$", "^data-gr-ext-installed$"],
     },
   },
-  experimental: {
-    serverComponentsExternalPackages: ["puppeteer-core"],
-  },
+    serverExternalPackages: ["puppeteer-core"],
   eslint: {
     ignoreDuringBuilds: true,
   },

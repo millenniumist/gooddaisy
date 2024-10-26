@@ -28,7 +28,7 @@ export async function GET(
 
 export async function POST(req: Request) {
   const { colorRefinement, addOnItem, message, productId, price, name, userId } = await req.json()
-  // console.log(colorRefinement, addOnItem, message, productId, price, name)
+  //console.log(colorRefinement, addOnItem, message, productId, price, name)
   try {
     const newOrderItem = await prisma.orderItem.create({
       data: {
@@ -47,7 +47,7 @@ export async function POST(req: Request) {
       headers: { 'Content-Type': 'application/json' },
     })
   } catch (error) {
-    console.log(error)
+    //console.log(error)
     return new Response(JSON.stringify({ error: 'Failed to create order item' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
@@ -87,7 +87,7 @@ export async function DELETE(
 
     return NextResponse.json({ deletedProduct });
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     return NextResponse.json({ error: 'Failed to delete product' }, { status: 500 });
   }
 }

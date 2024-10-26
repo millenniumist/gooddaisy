@@ -65,7 +65,7 @@ export async function DELETE() {
   try {
     const cookieStore = cookies();
     const userId = cookieStore.get('userId');
-    console.log("Delete is working",userId)
+    //console.log("Delete is working",userId)
     if (!userId) {
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
     }

@@ -26,7 +26,7 @@ export async function GET(request: Request) {
         });
         return NextResponse.json(totalPrice);
     } catch (error) {
-        console.log(error);
+        //console.log(error);
         return NextResponse.json({ error: "An error occurred" }, { status: 500 });
     }
 }
@@ -75,7 +75,7 @@ export async function POST(request: Request) {
    
         return NextResponse.json({message:`Updated orderId ${order.id}`});
     } catch (error) {
-        console.log(error);
+        //console.log(error);
         return NextResponse.json({ error: "An error occurred" }, { status: 500 });
     }
 }

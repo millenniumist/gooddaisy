@@ -6,7 +6,9 @@ import { cookies } from "next/headers";
 
 export async function POST(request: Request) {
     try {
-        const { username, password } = await request.json();
+        //console.log(process.env.USER_DEFAULT_PASSWORD)
+        const { username, password, userDefaultPassword } = await request.json();
+        //console.log("received front pass:",userDefaultPassword)
         const user = await prisma.user.findUnique({
             where: {
                 userId: username
@@ -27,8 +29,8 @@ export async function POST(request: Request) {
             process.env.JWT_SECRET || '',
             { expiresIn: '30d' }
         );
-        cookies().set("token", token, { httpOnly: true, sameSite: "strict" })
-        cookies().set("userId", user.id.toString(), { httpOnly: true, sameSite: "strict" })
+        await cookies().set("token", token, { httpOnly: true, sameSite: "strict" })
+        await cookies().set("userId", user.id.toString(), { httpOnly: true, sameSite: "strict" })
 
 
         const newUser = {

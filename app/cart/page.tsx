@@ -39,7 +39,7 @@ export default function CartPage() {
   const {  user } = useMainStorage();
   
   const getData = async () => {
-    console.log(user.id)
+    //console.log(user.id)
     if (user?.id) {
       try {
         const response = await axios.get<{ cartItems: CartItem[] }>(
@@ -51,7 +51,7 @@ export default function CartPage() {
         setLoading(false); // Set loading to false after data is fetched
       }
     } else {
-      console.log("User ID not available");
+      //console.log("User ID not available");
       setLoading(false); // Set loading to false if user ID is not available
     }
   };
@@ -73,7 +73,7 @@ export default function CartPage() {
 
       router.push("/cart/address");
     } catch (error) {
-      console.log(error);
+      //console.log(error);
     } finally {
       setCheckoutLoading(false); // End checkout loading
     }
@@ -88,7 +88,7 @@ export default function CartPage() {
       if(cartItems.filter((item)=>!item.product.subProduct).length>1){
         await axios.delete(`${process.env.NEXT_PUBLIC_URL}api/cart/${id}`);
         setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
-        console.log("still has main")
+        //console.log("still has main")
         return
       }
       else{
@@ -108,8 +108,8 @@ export default function CartPage() {
       console.error("Error fetching product list:", error);
     }
   };
-  console.log(cartItems)
-  console.log(productList)
+  //console.log(cartItems)
+  //console.log(productList)
   return (
     <Card className="w-full max-w-3xl mx-auto">
       <CardHeader>

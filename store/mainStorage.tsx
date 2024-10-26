@@ -23,26 +23,26 @@ const store1 = (set: any) => ({
   token: "",
   setToken: (value: string) => {
     set((state: Store) => ({ token: value }));
-    console.log("Token set:", value);
+    //console.log("Token set:", value);
   },
   isAdmin: false,
   isLoggedIn: false,
   setIsLoggedIn: (value: boolean) => {
     set((state: Store) => ({ isLoggedIn: value }));
-    console.log("IsLoggedIn set:", value);
+    //console.log("IsLoggedIn set:", value);
   },
   setIsAdmin: (value: boolean) => {
     set((state: Store) => ({ isAdmin: value }));
-    console.log("isAdmin set:", value);
+    //console.log("isAdmin set:", value);
   },
   setUser: (value: any) => {
     set((state: Store) => ({ user: value }));
-    console.log("User set:", value);
+    //console.log("User set:", value);
   },
   checkOutAlready: false,
   setCheckOutAlready: (value: boolean) => {
     set((state: Store) => ({ checkOutAlready: value }));
-    console.log("CheckOutAlready set:", value);
+    //console.log("CheckOutAlready set:", value);
   },
   setLogout: () => {
     set({ user: null, token: "", isLoggedIn: false, isAdmin: false, checkOutAlready: false });
@@ -51,7 +51,7 @@ const store1 = (set: any) => ({
     });
     sessionStorage.clear();
     localStorage.clear();
-    console.log("Logged out");
+    //console.log("Logged out");
   },
 });
 
@@ -59,7 +59,7 @@ const store2 = (set: any) => ({
   state: "",
   setState: (value: string) => {
     set((state: Store) => ({ state: value }));
-    console.log("State set:", value);
+    //console.log("State set:", value);
   },
 });
 

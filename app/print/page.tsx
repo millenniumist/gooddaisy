@@ -208,7 +208,7 @@ export default OrdersPage;
 //   const handlePrint = useReactToPrint({
 //     content: () => componentRef.current,
 //     documentTitle: 'Orders Print',
-//     onAfterPrint: () => console.log('Printed successfully')
+//     onAfterPrint: () => //console.log('Printed successfully')
 //   });
 
 //   useEffect(() => {

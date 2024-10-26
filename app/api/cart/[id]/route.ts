@@ -3,8 +3,8 @@ import { NextResponse } from "next/server";
 
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   try {
-    const id = Number(params.id);
-    console.log(id)
+    const id = await Number(params.id);
+    //console.log(id)
     const deleteItem = await prisma.orderItem.delete({ where: { id: id } });
     return NextResponse.json({ deleteItem }, { status: 200 });
   } catch (error) {
@@ -14,7 +14,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
 }
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
-  const userId = params.id;
+  const userId = await params.id;
   if (!userId) {
     return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
   }

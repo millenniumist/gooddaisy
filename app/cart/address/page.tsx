@@ -40,7 +40,7 @@ const AddressPage = () => {
     fetchAddressInfo();
   }, []);
   const handleCheckout = async() => {
-    console.log("working")
+    //console.log("working")
     await axios.post(`${process.env.NEXT_PUBLIC_URL}api/cart/`, {
       userId: user.id,
     });

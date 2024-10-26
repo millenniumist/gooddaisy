@@ -21,18 +21,18 @@ export default function Home() {
 
   const hdlLineLogin = () => {
     try {
-    console.log('hdlLineLogin')
+    //console.log('hdlLineLogin')
       if (liff.isInClient()) {
         liff.getProfile().then((profile) => {
         }).catch((err) => {
-          console.log('Error getting profile', err);
+          //console.log('Error getting profile', err);
         });
       } else {
         // Running in external browser
         liff.login();
       }
     } catch (error) {
-      console.log(error) 
+      //console.log(error) 
     }
   }
 

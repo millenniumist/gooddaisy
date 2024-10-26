@@ -52,7 +52,7 @@ export default function AddProduct() {
         subProduct
       };
       const response = await axios.post(`${process.env.NEXT_PUBLIC_URL}api/product`, productData);
-      console.log("Product added successfully:", response.data);
+      //console.log("Product added successfully:", response.data);
       router.refresh()
       router.push("/");
     } catch (error) {
