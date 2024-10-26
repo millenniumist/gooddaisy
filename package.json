@@ -54,6 +54,7 @@
     "loadash": "^1.0.0",
     "lucide-react": "^0.447.0",
     "next": "^15.0.1",
+    "next-auth": "^4.24.10",
     "next-cloudinary": "^6.14.2",
     "nodemailer": "^6.9.15",
     "pdfkit": "^0.15.0",
