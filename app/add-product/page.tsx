@@ -1,6 +1,6 @@
 "use client";
 
-import { CldUploadWidget } from 'next-cloudinary';
+import { CldUploadWidget } from "next-cloudinary";
 import { useState } from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function AddProduct() {
   const [name, setName] = useState("");
@@ -22,14 +23,16 @@ export default function AddProduct() {
   const [allowAddOnItem, setAllowAddOnItem] = useState(true);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [subProduct, setSubProduct] = useState(false);
+  const [description, setDescription] = useState("");
+
   const router = useRouter();
 
   const handleUploadSuccess = (result: any) => {
-    setUploadedImages(prev => [...prev, result.info.secure_url]);
+    setUploadedImages((prev) => [...prev, result.info.secure_url]);
   };
 
   const removeImage = (index: number) => {
-    setUploadedImages(prev => prev.filter((_, i) => i !== index));
+    setUploadedImages((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -41,6 +44,7 @@ export default function AddProduct() {
     try {
       const productData = {
         name,
+        description,
         price,
         colorRefinement,
         message,
@@ -49,11 +53,11 @@ export default function AddProduct() {
         allowMessage,
         allowAddOnItem,
         images: uploadedImages,
-        subProduct
+        subProduct,
       };
       const response = await axios.post(`${process.env.NEXT_PUBLIC_URL}api/product`, productData);
       //console.log("Product added successfully:", response.data);
-      router.refresh()
+      router.refresh();
       router.push("/");
     } catch (error) {
       console.error("Error adding product:", error);
@@ -69,38 +73,41 @@ export default function AddProduct() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-      <Label htmlFor="name">Product Name</Label>
-      <Input
-        id="name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder="Enter product name"
-        required
-      />
-    </div>
-    
-    <div>
-      <Label htmlFor="price">Price</Label>
-      <Input
-        id="price"
-        type="number"
-        value={price}
-        onChange={(e) => setPrice((e.target.value))}
-        placeholder="Enter price"
-        required
-      />
-    </div>
-    <div className="flex items-center space-x-2">
-  <Switch
-    id="subProduct"
-    checked={subProduct}
-    onCheckedChange={setSubProduct}
-  />
-  <Label htmlFor="subProduct">Sub Product</Label>
-</div>
+            <div>
+              <Label htmlFor="name">Product Name</Label>
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter product name"
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Enter product description"
+              />
+            </div>
+            <div>
+              <Label htmlFor="price">Price</Label>
+              <Input
+                id="price"
+                type="number"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                placeholder="Enter price"
+                required
+              />
+            </div>
+            <div className="flex items-center space-x-2">
+              <Switch id="subProduct" checked={subProduct} onCheckedChange={setSubProduct} />
+              <Label htmlFor="subProduct">Sub Product</Label>
+            </div>
             <div className="space-y-4">
-
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <Switch
@@ -122,7 +129,7 @@ export default function AddProduct() {
                   </div>
                 )}
               </div>
-  
+
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <Switch
@@ -144,7 +151,7 @@ export default function AddProduct() {
                   </div>
                 )}
               </div>
-  
+
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <Switch
@@ -167,7 +174,7 @@ export default function AddProduct() {
                 )}
               </div>
             </div>
-           
+
             <div className="space-y-2">
               <Label>Images</Label>
               <CldUploadWidget uploadPreset="ml_default" onSuccess={handleUploadSuccess}>
@@ -180,7 +187,13 @@ export default function AddProduct() {
               <div className="grid grid-cols-2 gap-4 mt-4">
                 {uploadedImages.map((url, index) => (
                   <div key={index} className="relative group">
-                    <Image src={url} alt={`Uploaded ${index + 1}`} width={200} height={200} className="rounded-md" />
+                    <Image
+                      src={url}
+                      alt={`Uploaded ${index + 1}`}
+                      width={200}
+                      height={200}
+                      className="rounded-md"
+                    />
                     <Button
                       type="button"
                       variant="destructive"

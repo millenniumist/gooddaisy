@@ -89,6 +89,8 @@ model OrderItem {
 model Product {
   id     Int     @id @default(autoincrement())
   name   String
+  description String?
+  dimensions String?
   price  Float 
   images Image[] // Relation to Images
   subProduct Boolean @default(false)

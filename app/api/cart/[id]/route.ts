@@ -1,11 +1,12 @@
 import prisma from "@/config/prisma";
 import { NextResponse } from "next/server";
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, context: { params: { id: string } }) {
   try {
-    const id = await Number(params.id);
-    //console.log(id)
-    const deleteItem = await prisma.orderItem.delete({ where: { id: id } });
+    const { id } = await context.params;
+    const deleteItem = await prisma.orderItem.delete({ 
+      where: { id: Number(id) } 
+    });
     return NextResponse.json({ deleteItem }, { status: 200 });
   } catch (error) {
     console.error('Failed to delete order:', error);
@@ -13,18 +14,20 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
   }
 }
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
-  const userId = await params.id;
-  if (!userId) {
-    return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
-  }
-
+export async function GET(request: Request, context: { params: { id: string } }) {
   try {
+    const { id } = await context.params;
+    const parsedUserId = Number(id);
+
+    if (!parsedUserId) {
+      return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
+    }
+
     const cartItems = await prisma.orderItem.findMany({
       where: {
-        userId: Number(userId),
+        userId: parsedUserId,
         status: 'CART',
-        orderId:  null,
+        orderId: null,
       },
       include: {
         product: {
@@ -33,9 +36,8 @@ export async function GET(request: Request, { params }: { params: { id: string }
           }
         }
       }
-    }
+    });
 
-    );
     if (!cartItems) {
       return NextResponse.json({ error: 'Cart items not found' }, { status: 200 });
     }

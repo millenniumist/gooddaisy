@@ -21,7 +21,12 @@ export default function AdminLoginForm() {
       //console.log(process.env.FRONT_USER_DEFAULT_PASSWORD)
       const res = await axios.post(`${process.env.NEXT_PUBLIC_URL}api/login`, {
         username,
-        password, userDefaultPassword: process.env.FRONT_USER_DEFAULT_PASSWORD
+        password
+      }, {
+        headers: {
+          'X-App-Secret': process.env.NEXT_PUBLIC_USER_DEFAULT_PASSWORD,
+          'X-App-Origin': 'admin-frontend'
+        }
       })
       //console.log(process.env.NEXT_PUBLIC_URL)
       setToken(res.data.token)

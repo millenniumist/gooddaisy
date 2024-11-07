@@ -6,8 +6,13 @@ import { cookies } from "next/headers";
 
 export async function POST(request: Request) {
     try {
-        //console.log(process.env.USER_DEFAULT_PASSWORD)
-        const { username, password, userDefaultPassword } = await request.json();
+        const appSecret = request.headers.get('X-App-Secret');
+        const appOrigin = request.headers.get('X-App-Origin');
+        console.log("Login headers:",appSecret, appOrigin)
+        if (appSecret !== process.env.USER_DEFAULT_PASSWORD || appOrigin !== 'admin-frontend') {
+            return NextResponse.json({ error: "Unauthorized request origin" }, { status: 403 });
+        }
+        const { username, password } = await request.json();
         //console.log("received front pass:",userDefaultPassword)
         const user = await prisma.user.findUnique({
             where: {
@@ -29,8 +34,9 @@ export async function POST(request: Request) {
             process.env.JWT_SECRET || '',
             { expiresIn: '30d' }
         );
-        await cookies().set("token", token, { httpOnly: true, sameSite: "strict" })
-        await cookies().set("userId", user.id.toString(), { httpOnly: true, sameSite: "strict" })
+        const cookieStore = await cookies();
+        cookieStore.set("token", token, { httpOnly: true, sameSite: "strict" });
+        cookieStore.set("userId", user.id.toString(), { httpOnly: true, sameSite: "strict" });
 
 
         const newUser = {

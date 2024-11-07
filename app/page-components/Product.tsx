@@ -1,5 +1,6 @@
-import Image from "next/image";
+import NextImage from "next/image";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import type { Product, Image } from "@prisma/client";
 import {
   Carousel,
   CarouselContent,
@@ -7,15 +8,11 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-
-interface ProductProps {
-  id: number;
-  name: string;
-  price: number;
-  images: { url: string }[];
+interface ProductProps extends Product {
+  images: Image[];
 }
 
-export default function Product({ id, name, price, images }: ProductProps) {
+export default function Product({ id, name, price, images, description }: ProductProps) {
   return (
     <Card key={id} className="rounded-xl border bg-card text-card-foreground shadow" >
       <CardHeader>
@@ -26,7 +23,7 @@ export default function Product({ id, name, price, images }: ProductProps) {
           <CarouselContent>
             {images.map((image, index) => (
               <CarouselItem key={index}>
-                <Image
+                <NextImage
                   src={image.url}
                   alt={`${name} - Image ${index + 1}`}
                   width={300}
@@ -36,8 +33,12 @@ export default function Product({ id, name, price, images }: ProductProps) {
               </CarouselItem>
             ))}
           </CarouselContent>
-          <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2" />
-          <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2" />
+          {images.length > 1 && (
+            <>
+              <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2" />
+              <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2" />
+            </>
+          )}
         </Carousel>
       </CardContent>
     </Card>

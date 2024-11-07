@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,8 +12,9 @@ import { useRouter } from "next/navigation";
 import { useMainStorage } from "@/store/mainStorage";
 import Skeleton from "react-loading-skeleton";
 import 'react-loading-skeleton/dist/skeleton.css';
+import { Flower, Palette, MessageSquare, Package } from "lucide-react";
 
-export default function ProductCustomization({ params }: { params: { productId: number } }) {
+export default function ProductCustomization({ params }: { params: { productId: string } }) {
   const [colorRefinement, setColorRefinement] = useState(false);
   const [attachedItem, setAttachedItem] = useState(false);
   const [customText, setCustomText] = useState("");
@@ -25,11 +26,12 @@ export default function ProductCustomization({ params }: { params: { productId: 
   const [loading, setLoading] = useState(true);
   const [addingToCart, setAddingToCart] = useState(false);
   const [checkingOut, setCheckingOut] = useState(false);
+  const productId = use(params).productId
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_URL}api/product/${params.productId}`);
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_URL}api/product/${productId}`);
         setProduct(response.data);
         setTotalPrice(Number(response.data.price));
       } catch (error) {
@@ -40,7 +42,7 @@ export default function ProductCustomization({ params }: { params: { productId: 
     };
 
     fetchProduct();
-  }, [params.productId]);
+  }, [productId]);
 
   const handleAddToCart = async () => {
     setAddingToCart(true);
@@ -49,12 +51,12 @@ export default function ProductCustomization({ params }: { params: { productId: 
         colorRefinement: product.allowColorRefinement ? colorRefinement : false,
         addOnItem: product.allowAddOnItem ? attachedItem : false,
         message: product.allowMessage ? customText : "",
-        productId: Number(params.productId),
+        productId: Number(productId),
         price: Number(totalPrice),
         name: product.name,
         userId: user.id
       };
-      await axios.post(`${process.env.NEXT_PUBLIC_URL}api/product/${params.productId}`, data);
+      await axios.post(`${process.env.NEXT_PUBLIC_URL}api/product/${productId}`, data);
       setAddedToCart(true);
     } catch (error) {
       console.error("Error adding to cart:", error);
@@ -74,12 +76,12 @@ export default function ProductCustomization({ params }: { params: { productId: 
         colorRefinement: colorRefinement,
         addOnItem: attachedItem,
         message: customText,
-        productId: Number(params.productId),
+        productId: Number(productId),
         price: Number(totalPrice),
         name: product.name,
         userId: user.id
       };
-      await axios.post(`${process.env.NEXT_PUBLIC_URL}api/product/${params.productId}`, data);
+      await axios.post(`${process.env.NEXT_PUBLIC_URL}api/product/${productId}`, data);
       router.push("/cart");
     } catch (error) {
       console.error("Error during checkout:", error);
@@ -111,59 +113,69 @@ export default function ProductCustomization({ params }: { params: { productId: 
   if (!product) return <div>Product not found</div>;
 
   return (
-    <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-6 text-center">Customize Your Product</h1>
-      <Product
-        id={product.id}
-        name={product.name}
-        price={product.price}
-        images={product.images.map((image: any, index: number) => ({ key: index, url: image.url }))}
-      />
-      <Card>
-        <CardHeader>
-          <CardTitle>Product Customization</CardTitle>
+    <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
+      <h1 className="text-3xl font-bold mb-6 text-center text-primary">Customize Your Preserved Flower Arrangement</h1>
+      <p className="text-center mb-8 text-muted-foreground">{product.description}</p>
+      <div className="bg-gradient-to-r from-pink-100 to-purple-100 p-6 rounded-lg shadow-lg mb-8">
+        <Product 
+          id={product.id}
+          name={product.name}
+          price={product.price}
+          images={product.images.map((image: any, index: number) => ({ key: index, url: image.url }))}
+        />
+      </div>
+      <Card className="mt-8 border-2 border-primary/20 shadow-xl">
+        <CardHeader className="bg-gradient-to-r from-pink-50 to-purple-50">
+          <CardTitle className="text-2xl text-primary">Product Customization</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 p-6">
           {product.allowColorRefinement && (
-            <div>
-              <h2 className="text-xl font-semibold mb-2">Color Refinement: <span className="text-sm"> {`(+฿${product.colorRefinement})`}</span></h2>
+            <div className="bg-white p-4 rounded-lg shadow-md transition-all duration-300 hover:shadow-lg">
+              <h2 className="text-xl font-semibold mb-2 flex items-center text-primary">
+                <Palette className="mr-2" /> Color Refinement <span className="text-sm ml-2 text-muted-foreground">{`(+฿${product.colorRefinement})`}</span>
+              </h2>
               <div className="flex items-center space-x-2">
                 <Switch
                   id="color-refinement"
                   checked={colorRefinement}
                   onCheckedChange={handleColorRefinementChange}
                 />
-                <Label htmlFor="color-refinement">Enable Color Refinement</Label>
+                <Label htmlFor="color-refinement" className="text-muted-foreground">Enable Color Refinement</Label>
               </div>
             </div>
           )}
 
           {product.allowAddOnItem && (
-            <div>
-              <h2 className="text-xl font-semibold mb-2">Attach Item</h2>
+            <div className="bg-white p-4 rounded-lg shadow-md transition-all duration-300 hover:shadow-lg">
+              <h2 className="text-xl font-semibold mb-2 flex items-center text-primary">
+                <Package className="mr-2" /> Attach Item
+              </h2>
               <div className="flex items-center space-x-2">
                 <Switch id="attach-item" checked={attachedItem} onCheckedChange={handleItemAttach} />
-                <Label htmlFor="attach-item">Attach Item</Label>
+                <Label htmlFor="attach-item" className="text-muted-foreground">Attach Item</Label>
               </div>
             </div>
           )}
 
           {product.allowMessage && (
-            <div>
-              <h2 className="text-xl font-semibold mb-2">Custom Text</h2>
+            <div className="bg-white p-4 rounded-lg shadow-md transition-all duration-300 hover:shadow-lg">
+              <h2 className="text-xl font-semibold mb-2 flex items-center text-primary">
+                <MessageSquare className="mr-2" /> Custom Text
+              </h2>
               <Input
                 type="text"
                 placeholder="Enter your custom text"
                 value={customText}
                 onChange={(e) => setCustomText(e.target.value)}
+                className="border-primary/20 focus:border-primary"
               />
             </div>
           )}
         </CardContent>
-        <CardFooter>
-          <div className="flex w-full gap-2">
+        <CardFooter className="bg-gradient-to-r from-pink-50 to-purple-50 p-6">
+          <div className="flex w-full gap-4">
             <Button 
-              className="bg-slate-500 min-h-12 flex-grow-[1]" 
+              className="bg-secondary hover:bg-secondary/90 text-secondary-foreground min-h-12 flex-grow transition-all duration-300"
               onClick={handleAddToCart} 
               disabled={addingToCart || addedToCart}
             >
@@ -171,11 +183,11 @@ export default function ProductCustomization({ params }: { params: { productId: 
             </Button>
             <Button  
               onClick={handleCheckout} 
-              className="flex flex-col min-h-12 flex-grow-[2]"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground flex flex-col min-h-12 flex-grow transition-all duration-300"
               disabled={checkingOut}
             >
               <p>{checkingOut ? "Processing..." : "Check Out"}</p>
-              <p>฿{totalPrice}</p>
+              <p className="text-sm">฿{totalPrice.toLocaleString()}</p>
             </Button>
           </div>
         </CardFooter>

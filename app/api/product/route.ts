@@ -4,6 +4,7 @@ export async function POST(request: Request) {
   try {
     const { 
       name, 
+      description,
       price, 
       colorRefinement, 
       message, 
@@ -18,6 +19,7 @@ export async function POST(request: Request) {
     const product = await prisma.product.create({
       data: {
         name,
+        description,
         price: Number(price),
         colorRefinement: Number(colorRefinement),
         message: Number(message),
