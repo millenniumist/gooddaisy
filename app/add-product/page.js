@@ -14,28 +14,28 @@ import { Textarea } from "@/components/ui/textarea";
 
 export default function AddProduct() {
   const [name, setName] = useState("");
-  const [price, setPrice] = useState<string>("");
+  const [price, setPrice] = useState("");
   const [colorRefinement, setColorRefinement] = useState(200);
   const [message, setMessage] = useState(0);
   const [addOnItem, setAddOnItem] = useState(0);
   const [allowColorRefinement, setAllowColorRefinement] = useState(true);
   const [allowMessage, setAllowMessage] = useState(true);
   const [allowAddOnItem, setAllowAddOnItem] = useState(true);
-  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [uploadedImages, setUploadedImages] = useState([]);
   const [subProduct, setSubProduct] = useState(false);
   const [description, setDescription] = useState("");
 
   const router = useRouter();
 
-  const handleUploadSuccess = (result: any) => {
+  const handleUploadSuccess = (result) => {
     setUploadedImages((prev) => [...prev, result.info.secure_url]);
   };
 
-  const removeImage = (index: number) => {
+  const removeImage = (index) => {
     setUploadedImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!/^[a-zA-Z0-9\s]+$/.test(name.trim())) {
       alert("Product name cannot be empty and should only contain letters, numbers, and spaces.");
@@ -56,7 +56,6 @@ export default function AddProduct() {
         subProduct,
       };
       const response = await axios.post(`${process.env.NEXT_PUBLIC_URL}api/product`, productData);
-      //console.log("Product added successfully:", response.data);
       router.refresh();
       router.push("/");
     } catch (error) {

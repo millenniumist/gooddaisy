@@ -22,22 +22,8 @@ import {
 } from "@/components/ui/accordion";
 import { Toaster } from "@/components/ui/toaster";
 import { ToastWrapper } from "@/components/ui/ToastWrapper";
-import {
-  Order,
-  User,
-  OrderItem,
-  Product,
-  ProductionStatus,
-  PaymentStatus,
-  OrderStatus,
-} from "@prisma/client";
 
-interface ExtendedOrder extends Order {
-  user: User;
-  orderItems: (OrderItem & { product: Product })[];
-}
-
-function formatOrderId(order: ExtendedOrder, orders: ExtendedOrder[]) {
+function formatOrderId(order, orders) {
   const createdDate = new Date(order.createdDate);
   const monthYear = format(createdDate, "M-yy");
 
@@ -50,8 +36,8 @@ function formatOrderId(order: ExtendedOrder, orders: ExtendedOrder[]) {
 }
 
 export default function OrdersManagementPage() {
-  const [orders, setOrders] = useState<ExtendedOrder[]>([]);
-  const [filteredOrders, setFilteredOrders] = useState<ExtendedOrder[]>([]);
+  const [orders, setOrders] = useState([]);
+  const [filteredOrders, setFilteredOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -66,7 +52,7 @@ export default function OrdersManagementPage() {
     fetchOrders();
   }, []);
 
-  const handleSearch = debounce((term: string) => {
+  const handleSearch = debounce((term) => {
     setSearchTerm(term);
     const filtered = orders.filter((order) =>
       formatOrderId(order, orders).toLowerCase().includes(term.toLowerCase())
@@ -75,7 +61,7 @@ export default function OrdersManagementPage() {
     setCurrentPage(1);
   }, 300);
 
-  const handleOrderUpdate = async (formData: FormData) => {
+  const handleOrderUpdate = async (formData) => {
     const response = await fetch("/api/orders/update", {
       method: "POST",
       body: formData,
@@ -87,7 +73,7 @@ export default function OrdersManagementPage() {
     return data;
   };
 
-  const handleOrderItemUpdate = async (formData: FormData) => {
+  const handleOrderItemUpdate = async (formData) => {
     const response = await fetch("/api/orders/items/update", {
       method: "POST",
       body: formData,
@@ -161,13 +147,7 @@ export default function OrdersManagementPage() {
   );
 }
 
-function OrderDetails({
-  order,
-  onSubmit,
-}: {
-  order: ExtendedOrder;
-  onSubmit: (formData: FormData) => Promise<any>;
-}) {
+function OrderDetails({ order, onSubmit }) {
   return (
     <ToastWrapper onSubmit={onSubmit}>
       <input type="hidden" name="orderId" value={order.id} />
@@ -192,15 +172,7 @@ function OrderDetails({
   );
 }
 
-function OrderItems({
-  orderItems,
-  orderId,
-  onSubmit,
-}: {
-  orderItems: (OrderItem & { product: Product })[];
-  orderId: number;
-  onSubmit: (formData: FormData) => Promise<any>;
-}) {
+function OrderItems({ orderItems, orderId, onSubmit }) {
   return (
     <>
       <h3 className="text-lg font-semibold mt-4 mb-2">Order Items:</h3>
@@ -211,15 +183,7 @@ function OrderItems({
   );
 }
 
-function OrderItemForm({
-  item,
-  orderId,
-  onSubmit,
-}: {
-  item: OrderItem & { product: Product };
-  orderId: number;
-  onSubmit: (formData: FormData) => Promise<any>;
-}) {
+function OrderItemForm({ item, orderId, onSubmit }) {
   return (
     <ToastWrapper onSubmit={onSubmit}>
       <input type="hidden" name="itemId" value={item.id} />
@@ -258,17 +222,7 @@ function OrderItemForm({
   );
 }
 
-function StatusSelect({
-  name,
-  label,
-  defaultValue,
-  options,
-}: {
-  name: string;
-  label: string;
-  defaultValue: string;
-  options: typeof ProductionStatus | typeof PaymentStatus | typeof OrderStatus;
-}) {
+function StatusSelect({ name, label, defaultValue, options }) {
   return (
     <div className="mb-2">
       <label className="block">{label}:</label>
@@ -288,15 +242,7 @@ function StatusSelect({
   );
 }
 
-function TextAreaField({
-  name,
-  label,
-  defaultValue,
-}: {
-  name: string;
-  label: string;
-  defaultValue: string;
-}) {
+function TextAreaField({ name, label, defaultValue }) {
   return (
     <div className="mb-2">
       <label className="block">{label}:</label>
@@ -305,17 +251,7 @@ function TextAreaField({
   );
 }
 
-function CheckboxField({
-  id,
-  name,
-  label,
-  defaultChecked,
-}: {
-  id: string;
-  name: string;
-  label: string;
-  defaultChecked: boolean;
-}) {
+function CheckboxField({ id, name, label, defaultChecked }) {
   return (
     <div className="flex items-center mb-2">
       <Checkbox id={id} name={name} defaultChecked={defaultChecked} />
@@ -326,17 +262,7 @@ function CheckboxField({
   );
 }
 
-function InputField({
-  name,
-  label,
-  defaultValue,
-  helperText,
-}: {
-  name: string;
-  label: string;
-  defaultValue: string;
-  helperText?: string;
-}) {
+function InputField({ name, label, defaultValue, helperText }) {
   return (
     <div className="mb-2">
       <label className="block">{label}:</label>

@@ -34,7 +34,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "prisma/seed.js"
-, "app/page-components/map-components/MainProductList.tsx"  ],
+, "app/cart/page.jsx"  ],
   "exclude": [
     "node_modules"
   ]

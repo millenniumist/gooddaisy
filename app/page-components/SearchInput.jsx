@@ -11,7 +11,7 @@ export default function SearchInput() {
   const router = useRouter()
 
   const handleSearch = useCallback(
-    debounce((term: string) => {
+    debounce((term) => {
       const params = new URLSearchParams(searchParams)
       if (term) {
         params.set('search', term)

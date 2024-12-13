@@ -7,11 +7,11 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { InfoIcon, Flower } from "lucide-react";
 import NextImage from "next/image";
 import Link from "next/link";
-import { Product, Image } from "@prisma/client";
 import { useMainStorage } from '@/store/mainStorage';
+
 import axios from 'axios';
 
-export default function SubProductList({ productList }: { productList: (Product & { images: Image[] })[] }) {
+export default function SubProductList({ productList }) {
   const [cartItemsLength, setCartItemsLength] = useState(0);
   const [productInCart, setProductInCart] = useState([]);
   const { user } = useMainStorage();

@@ -6,19 +6,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import Product from "@/app/page-components/Product";
+
 import axios from "axios";  
 import { useRouter } from "next/navigation";
 import { useMainStorage } from "@/store/mainStorage";
 import Skeleton from "react-loading-skeleton";
 import 'react-loading-skeleton/dist/skeleton.css';
 import { Flower, Palette, MessageSquare, Package } from "lucide-react";
+import Product from "../../page-components/Product";
 
-export default function ProductCustomization({ params }: { params: { productId: string } }) {
+export default function ProductCustomization({ params }) {
   const [colorRefinement, setColorRefinement] = useState(false);
   const [attachedItem, setAttachedItem] = useState(false);
   const [customText, setCustomText] = useState("");
-  const [product, setProduct] = useState<any>(null);
+  const [product, setProduct] = useState(null);
   const [totalPrice, setTotalPrice] = useState(0);
   const [addedToCart, setAddedToCart] = useState(false);
   const { user, isLoggedIn } = useMainStorage();
@@ -26,7 +27,13 @@ export default function ProductCustomization({ params }: { params: { productId: 
   const [loading, setLoading] = useState(true);
   const [addingToCart, setAddingToCart] = useState(false);
   const [checkingOut, setCheckingOut] = useState(false);
-  const productId = use(params).productId
+  const [localCart, setLocalCart] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return JSON.parse(localStorage.getItem('gooddaisyCart')) || [];
+    }
+    return [];
+  });
+  const productId = use(params).productId;
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -46,59 +53,72 @@ export default function ProductCustomization({ params }: { params: { productId: 
 
   const handleAddToCart = async () => {
     setAddingToCart(true);
-    try {
-      const data = {
-        colorRefinement: product.allowColorRefinement ? colorRefinement : false,
-        addOnItem: product.allowAddOnItem ? attachedItem : false,
-        message: product.allowMessage ? customText : "",
-        productId: Number(productId),
-        price: Number(totalPrice),
+    const cartItem = {
+      id: Date.now(),
+      product: {
+        id: product.id,
         name: product.name,
-        userId: user.id
-      };
-      await axios.post(`${process.env.NEXT_PUBLIC_URL}api/product/${productId}`, data);
-      setAddedToCart(true);
-    } catch (error) {
-      console.error("Error adding to cart:", error);
-    } finally {
-      setAddingToCart(false);
-    }
-  };
-
-  const handleCheckout = async () => {
-    setCheckingOut(true);
-    try {
-      if(addedToCart) {
-        router.push("/cart");
-        return;
+        images: product.images.map(img => ({
+          url: img.url
+        })),
+        subProduct: product.subProduct || false
+      },
+      colorRefinement: product.allowColorRefinement ? colorRefinement : false,
+      addOnItem: product.allowAddOnItem ? attachedItem : false,
+      message: product.allowMessage ? customText : "",
+      productId: Number(productId),
+      price: Number(totalPrice),
+    };
+  
+    if (isLoggedIn) {
+      try {
+        await axios.post(`${process.env.NEXT_PUBLIC_URL}api/product/${productId}`, {
+          ...cartItem,
+          userId: user.id
+        });
+      } catch (error) {
+        console.error("Error adding to cart:", error);
       }
-      const data = {
-        colorRefinement: colorRefinement,
-        addOnItem: attachedItem,
-        message: customText,
-        productId: Number(productId),
-        price: Number(totalPrice),
-        name: product.name,
-        userId: user.id
-      };
-      await axios.post(`${process.env.NEXT_PUBLIC_URL}api/product/${productId}`, data);
-      router.push("/cart");
-    } catch (error) {
-      console.error("Error during checkout:", error);
-    } finally {
-      setCheckingOut(false);
+    } else {
+      const updatedCart = [...localCart, cartItem];
+      localStorage.setItem('gooddaisyCart', JSON.stringify(updatedCart));
+      setLocalCart(updatedCart);
     }
+    
+    setAddedToCart(true);
+    setAddingToCart(false);
+  };
+  
+
+  //  handleCheckout function
+const handleCheckout = async () => {
+  if (!isLoggedIn) {
+    router.push("/login");
+    return;
   }
 
-  const updateTotalPrice = (addition: number) => setTotalPrice((prevTotal) => Number((prevTotal + addition).toFixed(2)));
+  setCheckingOut(true);
+  try {
+    if (!addedToCart) {
+      await handleAddToCart();
+    }
+    router.push("/cart");
+  } catch (error) {
+    console.error("Error during checkout:", error);
+  } finally {
+    setCheckingOut(false);
+  }
+};
 
-  const handleColorRefinementChange = (isChecked: boolean) => {
+  const updateTotalPrice = (addition) => setTotalPrice((prevTotal) => Number((prevTotal + addition).toFixed(2)));
+
+  const handleColorRefinementChange = () => {
     const newColorRefinement = !colorRefinement;
     updateTotalPrice(newColorRefinement ? Number(product.colorRefinement) : -Number(product.colorRefinement));
     setColorRefinement(newColorRefinement);
   };
 
-  const handleItemAttach = (checked: boolean) => setAttachedItem(checked);
+  const handleItemAttach = (checked) => setAttachedItem(checked);
 
   if (loading) {
     return (
@@ -121,7 +141,7 @@ export default function ProductCustomization({ params }: { params: { productId: 
           id={product.id}
           name={product.name}
           price={product.price}
-          images={product.images.map((image: any, index: number) => ({ key: index, url: image.url }))}
+          images={product.images.map((image, index) => ({ key: index, url: image.url }))}
         />
       </div>
       <Card className="mt-8 border-2 border-primary/20 shadow-xl">

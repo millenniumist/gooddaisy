@@ -1,16 +1,12 @@
 import prisma from "@/config/prisma";
 import MainProductList from "./page-components/map-components/MainProductList";
 import SubProductList from "./page-components/map-components/SubProductList";
-import { Product } from "@prisma/client";
-
-interface ProductShowcaseProps {
-  productList: (Product & { images: any[] })[];
-}
 
 export default async function ProductShowcase() {
-  const productList: ProductShowcaseProps["productList"] = await prisma.product.findMany({
+  const productList = await prisma.product.findMany({
     include: { images: true },
   });
+
   return (
     <div className="container mx-auto py-16 px-4 ">
       <section>

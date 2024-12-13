@@ -6,25 +6,19 @@ import { Menu, X } from "lucide-react";
 import { useMainStorage } from "@/store/mainStorage";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-interface NavItem {
-  label: string;
-  href: string;
-  onClick?: () => void;
-}
-
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const navRef = useRef<HTMLDivElement>(null);
+  const navRef = useRef(null);
   const { user, isLoggedIn, checkOutAlready, setLogout, isAdmin } = useMainStorage();
-  const [navItems, setNavItems] = useState<NavItem[]>([
+  const [navItems, setNavItems] = useState([
     { label: "Home", href: "/" },
     { label: "Cart", href: "/cart" },
     { label: "Contact Us", href: "/contact" },
   ]);
-  const [authItem, setAuthItem] = useState<NavItem | null>(null);
+  const [authItem, setAuthItem] = useState(null);
 
   useEffect(() => {
-    const updatedNavItems: NavItem[] = [
+    const updatedNavItems = [
       { label: "Home", href: "/" },
       { label: "Cart", href: "/cart" },
       { label: "Contact Us", href: "/contact" },
@@ -34,7 +28,7 @@ const Navbar = () => {
       isAdmin ? { label: "Print Order", href: "/print" } : null,
       isAdmin ? { label: "Add Product", href: "/add-product" } : null,
       isAdmin ? { label: "Delete Product", href: "/del-product" } : null,
-    ].filter((item): item is NavItem => item !== null);
+    ].filter(item => item !== null);
 
     setNavItems(updatedNavItems);
 
@@ -59,8 +53,8 @@ const Navbar = () => {
     };
   }, []);
 
-  const handleClickOutside = (event: MouseEvent) => {
-    if (navRef.current && !navRef.current.contains(event.target as Node)) {
+  const handleClickOutside = (event) => {
+    if (navRef.current && !navRef.current.contains(event.target)) {
       setIsMenuOpen(false);
     }
   };

@@ -5,16 +5,16 @@ import { useEffect, useState } from "react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import axios from "axios"
-import { useMainStorage } from "@/store/mainStorage"
 import { Input } from "@/components/ui/input"
 import { useRouter } from 'next/navigation'
 import { Loader2 } from "lucide-react"
+import { useMainStorage } from "@store/mainStorage"
 
 export default function CheckoutPage() {
   const router = useRouter()
   const [timeLeft, setTimeLeft] = useState(900)
   const [total, setTotal] = useState(0)
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null)
+  const [uploadedImage, setUploadedImage] = useState(null)
   const [isUploading, setIsUploading] = useState(false)
   const { setCheckOutAlready } = useMainStorage()
 
@@ -52,7 +52,7 @@ export default function CheckoutPage() {
     }
   }
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (event) => {
     const file = event.target.files?.[0]
     if (file) {
       setIsUploading(true)
@@ -73,7 +73,7 @@ export default function CheckoutPage() {
     }
   }
 
-  const formatTime = (seconds: number) => {
+  const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60)
     const remainingSeconds = seconds % 60
     return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`

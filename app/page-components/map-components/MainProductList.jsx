@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Product, Image } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -7,11 +6,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { InfoIcon, Flower } from "lucide-react";
 import NextImage from "next/image";
 
-interface MainProductListProps {
-  productList: (Product & { images: Image[] })[];
-}
-
-export default function MainProductList({ productList }: MainProductListProps) {
+export default function MainProductList({ productList }) {
   const sortedProducts = productList
     .filter((product) => !product.subProduct)
     .sort((a, b) => a.price - b.price);
@@ -25,7 +20,7 @@ export default function MainProductList({ productList }: MainProductListProps) {
   );
 }
 
-function ProductItem({ product }: { product: Product & { images: Image[] } }) {
+function ProductItem({ product }) {
   return (
     <Card className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden">
       <CardHeader>

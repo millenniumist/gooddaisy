@@ -14,14 +14,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-interface Product {
-  id: number;
-  name: string;
-}
-
 export default function DeleteProductPage() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [products, setProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
@@ -38,18 +33,16 @@ export default function DeleteProductPage() {
     }
   };
 
-  const handleDelete = async (formData: FormData) => {
+  const handleDelete = async (formData) => {
     const productId = formData.get('productId');
     if (!productId) return { error: 'Product ID is required' };
 
-    // Find the selected product
     const product = products.find(p => p.id.toString() === productId.toString());
     if (product) {
       setSelectedProduct(product);
       setIsDialogOpen(true);
     }
     
-    // Return null to prevent form submission
     return null;
   };
 

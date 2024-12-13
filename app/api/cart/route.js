@@ -3,9 +3,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/config/prisma';
 import { cookies } from 'next/headers';
 
-
-
-export async function POST(request: Request) {
+export async function POST(request) {
   try {
     const { userId } = await request.json();
     
@@ -60,12 +58,11 @@ export async function POST(request: Request) {
   }
 }
 
-
 export async function DELETE() {
   try {
     const cookieStore = cookies();
     const userId = cookieStore.get('userId');
-    //console.log("Delete is working",userId)
+    
     if (!userId) {
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
     }
@@ -77,8 +74,8 @@ export async function DELETE() {
       }
     });
     return NextResponse.json({ deleteItem }, { status: 200 });
-} catch (error) {
-  console.error('Failed to delete order:', error);
-  return NextResponse.json({ error: 'Failed to delete order' }, { status: 500 });
-}
+  } catch (error) {
+    console.error('Failed to delete order:', error);
+    return NextResponse.json({ error: 'Failed to delete order' }, { status: 500 });
+  }
 }

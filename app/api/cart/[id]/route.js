@@ -1,7 +1,7 @@
 import prisma from "@/config/prisma";
 import { NextResponse } from "next/server";
 
-export async function DELETE(request: Request, context: { params: { id: string } }) {
+export async function DELETE(request, context) {
   try {
     const { id } = await context.params;
     const deleteItem = await prisma.orderItem.delete({ 
@@ -14,7 +14,7 @@ export async function DELETE(request: Request, context: { params: { id: string }
   }
 }
 
-export async function GET(request: Request, context: { params: { id: string } }) {
+export async function GET(request, context) {
   try {
     const { id } = await context.params;
     const parsedUserId = Number(id);

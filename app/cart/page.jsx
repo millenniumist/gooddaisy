@@ -16,87 +16,103 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useMainStorage } from "@/store/mainStorage";
 import SubProductList from "../page-components/map-components/SubProductList";
-import Skeleton from "react-loading-skeleton"; // Import Skeleton
-import 'react-loading-skeleton/dist/skeleton.css'; // Import Skeleton CSS
-
-interface CartItem {
-  id: number;
-  product: {
-    name: string;
-    images?: { url: string }[];
-    subProduct: boolean;
-  };
-  colorRefinement?: boolean;
-  message?: string;
-  addOnItem?: boolean;
-  price: number;
-}
+import Skeleton from "react-loading-skeleton";
+import 'react-loading-skeleton/dist/skeleton.css';
 
 export default function CartPage() {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [loading, setLoading] = useState(true); // State for loading data
-  const [checkoutLoading, setCheckoutLoading] = useState(false); // State for checkout loading
-  const {  user } = useMainStorage();
+  const [cartItems, setCartItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const { user, isLoggedIn } = useMainStorage();
+  const router = useRouter();
+  const [editMode, setEditMode] = useState(false);
+  const [productList, setProductList] = useState([]);
+  const [localCart, setLocalCart] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return JSON.parse(localStorage.getItem('gooddaisyCart')) || [];
+    }
+    return [];
+  });
   
   const getData = async () => {
-    //console.log(user.id)
-    if (user?.id) {
+    if (isLoggedIn && user?.id) {
       try {
-        const response = await axios.get<{ cartItems: CartItem[] }>(
+        const response = await axios.get(
           `${process.env.NEXT_PUBLIC_URL}api/cart/${user.id}`);
         setCartItems(response.data.cartItems);
       } catch (error) {
         console.error("Error fetching cart items:", error);
-      } finally {
-        setLoading(false); // Set loading to false after data is fetched
       }
     } else {
-      //console.log("User ID not available");
-      setLoading(false); // Set loading to false if user ID is not available
+      const localCart = localStorage.getItem('gooddaisyCart');
+      if (localCart) {
+        // Transform local storage data to match API structure
+        const parsedCart = JSON.parse(localCart).map(item => ({
+          ...item,
+          product: {
+            name: item.name,
+            images: item.images || [],
+            subProduct: item.subProduct || false
+          }
+        }));
+        setCartItems(parsedCart);
+      }
     }
+    setLoading(false);
   };
+  
 
   useEffect(() => {
-    if (user?.id) {
-      getData();
-      fetchProductList();
-    }
-  }, [user?.id]);
+    getData();
+    fetchProductList();
+  }, [user?.id, isLoggedIn]);
 
-  const router = useRouter();
-  const [editMode, setEditMode] = useState(false);
-  const [productList, setProductList] = useState([]);
-  
-  const checkout = async () => {
-    setCheckoutLoading(true); // Start checkout loading
-    try {
-
-      router.push("/cart/address");
-    } catch (error) {
-      //console.log(error);
-    } finally {
-      setCheckoutLoading(false); // End checkout loading
+// Update checkout to handle local cart
+const checkout = async () => {
+  setCheckoutLoading(true);
+  try {
+    if (!isLoggedIn) {
+      // Store cart items in session storage before redirecting
+      sessionStorage.setItem('pendingCart', localStorage.getItem('gooddaisyCart'));
+      router.push("/login");
+      return;
     }
-  };
+    router.push("/cart/address");
+  } finally {
+    setCheckoutLoading(false);
+  }
+};
 
   const calculateTotal = () => {
     return cartItems.reduce((total, item) => total + item.price, 0).toFixed(2);
   };
 
-  const handleDelete = async (id: number) => {
-    try {
-      if(cartItems.filter((item)=>!item.product.subProduct).length>1){
-        await axios.delete(`${process.env.NEXT_PUBLIC_URL}api/cart/${id}`);
-        setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
-        //console.log("still has main")
-        return
+  const handleDelete = async (id) => {
+    if (isLoggedIn) {
+      try {
+        if(cartItems.filter((item)=>!item.product.subProduct).length>1){
+          await axios.delete(`${process.env.NEXT_PUBLIC_URL}api/cart/${id}`);
+          setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
+          return;
+        } else {
+          await axios.delete(`${process.env.NEXT_PUBLIC_URL}api/cart/`);
+          setCartItems([]);
+        }
+      } catch (error) {
+        console.error("Error deleting item:", error);
       }
-      else{
-        await axios.delete(`${process.env.NEXT_PUBLIC_URL}api/cart/`);
-        setCartItems([]);
-      }
-    } catch (error) {
-      console.error("Error deleting item:", error);
+    } else {
+      const updatedCart = localCart.filter(item => item.id !== id);
+      localStorage.setItem('gooddaisyCart', JSON.stringify(updatedCart));
+      setLocalCart(updatedCart);
+      setCartItems(updatedCart.map(item => ({
+        ...item,
+        product: {
+          name: item.product.name,
+          images: item.product.images,
+          subProduct: item.product.subProduct
+        }
+      })));
     }
   };
 
@@ -108,8 +124,7 @@ export default function CartPage() {
       console.error("Error fetching product list:", error);
     }
   };
-  //console.log(cartItems)
-  //console.log(productList)
+
   return (
     <Card className="w-full max-w-3xl mx-auto">
       <CardHeader>
@@ -117,7 +132,6 @@ export default function CartPage() {
       </CardHeader>
       <CardContent>
         {loading ? (
-          // Display skeleton loader while loading
           <Skeleton count={5} height={40} />
         ) : (
           <Table>
@@ -189,7 +203,7 @@ export default function CartPage() {
       {cartItems.length !== 0 && (
         <>
           <CardTitle className="p-4">You're eligible to buy these special product!</CardTitle>
-          <SubProductList productList={productList}  />
+          <SubProductList productList={productList} />
         </>
       )}
     </Card>

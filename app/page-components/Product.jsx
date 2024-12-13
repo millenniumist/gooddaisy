@@ -1,6 +1,5 @@
 import NextImage from "next/image";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import type { Product, Image } from "@prisma/client";
 import {
   Carousel,
   CarouselContent,
@@ -8,11 +7,8 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-interface ProductProps extends Product {
-  images: Image[];
-}
 
-export default function Product({ id, name, price, images, description }: ProductProps) {
+export default function Product({ id, name, price, images, description }) {
   return (
     <Card key={id} className="rounded-xl border bg-card text-card-foreground shadow" >
       <CardHeader>

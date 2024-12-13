@@ -3,11 +3,9 @@ import { NextResponse } from "next/server"
 import jwt from "jsonwebtoken"
 import { cookies } from "next/headers"
 
-export async function POST(request: Request) {
+export async function POST(request) {
     try {
-        //console.log(process.env.USER_DEFAULT_PASSWORD)
         const { userProfile, userDefaultPassword } = await request.json();
-        
 
         // Find user in the database
         let user = await prisma.user.findUnique({
@@ -47,7 +45,7 @@ export async function POST(request: Request) {
         }
 
         // Generate JWT token
-        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET as string, { expiresIn: "30d" });
+        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: "30d" });
 
         // Set cookies
         const cookieStore = await cookies();

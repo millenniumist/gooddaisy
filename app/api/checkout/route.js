@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/config/prisma';
 import { cookies } from 'next/headers';
-import { NextRequest } from 'next/server';
 
-export async function GET(request: Request) {
+export async function GET(request) {
     try {
         const cookieStore = cookies();
         const userId = cookieStore.get('userId')?.value;
@@ -26,12 +25,11 @@ export async function GET(request: Request) {
         });
         return NextResponse.json(totalPrice);
     } catch (error) {
-        //console.log(error);
         return NextResponse.json({ error: "An error occurred" }, { status: 500 });
     }
 }
 
-export async function POST(request: Request) {
+export async function POST(request) {
     try {
         const cookieStore = cookies();
         const userId = cookieStore.get('userId')?.value;
@@ -75,7 +73,6 @@ export async function POST(request: Request) {
    
         return NextResponse.json({message:`Updated orderId ${order.id}`});
     } catch (error) {
-        //console.log(error);
         return NextResponse.json({ error: "An error occurred" }, { status: 500 });
     }
 }
