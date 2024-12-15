@@ -1,15 +1,14 @@
 import prisma from '@/config/prisma'
 import { NextResponse } from 'next/server'
-import { ProductionStatus } from '@prisma/client'
 
-export async function POST(request: Request) {
+export async function POST(request) {
   const formData = await request.formData()
   const itemId = Number(formData.get('itemId'))
   const orderId = Number(formData.get('orderId'))
-  const status = formData.get('status') as ProductionStatus
-  const note = formData.get('note') as string
+  const status = formData.get('status')
+  const note = formData.get('note')
   const colorRefinement = formData.get('colorRefinement') === 'on'
-  const message = formData.get('message') as string
+  const message = formData.get('message')
   const addOnItem = formData.get('addOnItem') === 'on'
 
   const orderItem = await prisma.orderItem.findUnique({
@@ -40,7 +39,7 @@ export async function POST(request: Request) {
   return NextResponse.json({ message: 'Order item updated successfully', item: updatedItem })
 }
 
-function calculateNewPrice(orderItem: any, colorRefinement: boolean, message: string, addOnItem: boolean) {
+function calculateNewPrice(orderItem, colorRefinement, message, addOnItem) {
   let newPrice = orderItem.product.price
   if (colorRefinement) {
     newPrice += (orderItem.product.colorRefinement ?? 0)
@@ -54,7 +53,7 @@ function calculateNewPrice(orderItem: any, colorRefinement: boolean, message: st
   return newPrice
 }
 
-async function updateOrderTotalPrice(orderId: number) {
+async function updateOrderTotalPrice(orderId) {
   const updatedOrder = await prisma.order.findUnique({
     where: { id: orderId },
     include: { orderItems: true },

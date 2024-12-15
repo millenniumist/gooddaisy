@@ -1,7 +1,7 @@
 import prisma from '@/config/prisma'
 import { NextResponse } from 'next/server'
 
-export async function GET(request: Request) {
+export async function GET(request) {
   const url = new URL(request.url);
   const startDate = url.searchParams.get('startDate');
 

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/config/prisma';
-export async function POST(request: Request) {
+
+export async function POST(request) {
   try {
     const { 
       name, 
@@ -29,7 +30,7 @@ export async function POST(request: Request) {
         allowAddOnItem,
         subProduct,
         images: {
-          create: images.map((url: string) => ({
+          create: images.map(url => ({
             url,
             altText: `Image for ${name}`
           }))
@@ -47,7 +48,7 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET(request: Request) {
+export async function GET(request) {
   try {
     const products = await prisma.product.findMany({
       include: {
@@ -60,4 +61,3 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Error fetching products' }, { status: 500 });
   }
 }
-

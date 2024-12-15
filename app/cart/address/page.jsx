@@ -19,7 +19,7 @@ const AddressPage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
-  const {setCheckOutAlready,user,isLoggedIn} = useMainStorage()
+  const {setCheckOutAlready, user, isLoggedIn} = useMainStorage()
 
   useEffect(() => {
     const fetchAddressInfo = async () => {
@@ -57,7 +57,6 @@ const AddressPage = () => {
       setInitialLoading(false);
     };
     
-
     fetchAddressInfo();
   }, [isLoggedIn]);
 
@@ -75,6 +74,7 @@ const AddressPage = () => {
     setCheckOutAlready(true);
     router.push('/checkout');
   };
+
   const validateInputs = () => {
     if (!name.trim() || !phone.trim() || !address.trim()) {
       setError('All fields are required');
@@ -97,7 +97,7 @@ const AddressPage = () => {
     return true;
   };
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     if (!validateInputs()) return;
     

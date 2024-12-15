@@ -7,7 +7,7 @@ import * as jose from "jose";
 import { cookies } from "next/headers";
 import prisma from "@/config/prisma";
 
-async function getUser(id: number) {
+async function getUser(id) {
   return await prisma.user.findUnique({
     where: { id },
     include: {
@@ -29,17 +29,17 @@ async function getUser(id: number) {
   });
 }
 
-async function updateAddress(formData: FormData) {
+async function updateAddress(formData) {
   "use server";
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value || "";
   const secret = new TextEncoder().encode(process.env.JWT_SECRET);
   const { payload } = await jose.jwtVerify(token, secret);
-  const id = payload.userId as number;
+  const id = payload.userId;
 
-  const name = formData.get("name") as string;
-  const address = formData.get("address") as string;
-  const phone = formData.get("phone") as string;
+  const name = formData.get("name");
+  const address = formData.get("address");
+  const phone = formData.get("phone");
 
   const combinedAddress = `${name}|${phone}|${address}`;
 
@@ -52,16 +52,12 @@ async function updateAddress(formData: FormData) {
   redirect("/profile");
 }
 
-export default async function ProfilePage({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
+export default async function ProfilePage({ searchParams }) {
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value || "";
   const secret = new TextEncoder().encode(process.env.JWT_SECRET);
   const { payload } = await jose.jwtVerify(token, secret);
-  const id = payload.userId as number;
+  const id = payload.userId;
 
   const user = await getUser(id);
   const isEditing = searchParams.edit === "true";

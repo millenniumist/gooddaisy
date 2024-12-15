@@ -4,8 +4,7 @@ import puppeteer from "puppeteer-core";
 import prisma from '@/config/prisma';
 import { subMonths, format } from 'date-fns';
 
-
-export async function GET(request: Request) {
+export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const orderIds = searchParams.get('orderId');
 
@@ -37,32 +36,15 @@ export async function GET(request: Request) {
         const orderIndex = ordersInSameMonth.findIndex(o => o.id === order.id) + 1;
         return `${orderIndex}-${monthYear}`;
       };
+
       const chromiumPack = "https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar"
       const browser = await puppeteer.launch({
-        args:chromium.args,
+        args: chromium.args,
         defaultViewport: chromium.defaultViewport,
         executablePath: await chromium.executablePath(chromiumPack),
         headless: true,
         ignoreHTTPSErrors: true,
       });
-      // const browser = await puppeteer.launch({
-      //   args: ['--no-sandbox', '--disable-setuid-sandbox'],
-      //   executablePath: process.env.NODE_ENV === 'development' 
-      //     ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
-      //     : await chromium.executablePath('/tmp/chromium'),
-      //   headless: true, // Changed from "new" to true for better compatibility
-      //   defaultViewport: { width: 1920, height: 1080 }
-      // });
-
-// "@sparticuz/chromium-min": "121.0.0",
-//     "next": "14.1.0",
-//     "puppeteer-core": "^21.9.0",
-
-      // const browser = await puppeteer.launch({ headless: true, executablePath: process.env.NODE_ENV === 'development' 
-      //       ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
-      //       : "/home/sbx_user1051/.cache/puppeteer" });
-
-
 
       await new Promise(resolve => setTimeout(resolve, 400));
       const page = await browser.newPage();
@@ -162,5 +144,3 @@ export async function GET(request: Request) {
     }
   }
 }
-
-
