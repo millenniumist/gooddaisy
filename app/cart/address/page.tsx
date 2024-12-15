@@ -19,34 +19,62 @@ const AddressPage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
-  const {setCheckOutAlready,user} = useMainStorage()
+  const {setCheckOutAlready,user,isLoggedIn} = useMainStorage()
 
   useEffect(() => {
     const fetchAddressInfo = async () => {
-      try {
-        const response = await fetch('/api/cart/address');
-        const data = await response.json();
-        const [fetchedName, fetchedPhone, fetchedAddress] = (data.address || '').split('|');
-        setName(fetchedName || '');
-        setPhone(fetchedPhone || '');
-        setAddress(fetchedAddress || '');
-      } catch (error) {
-        console.error('Failed to fetch address info:', error);
-      } finally {
-        setInitialLoading(false);
+      if (isLoggedIn) {
+        try {
+          const response = await fetch('/api/cart/address');
+          const data = await response.json();
+          const [fetchedName, fetchedPhone, fetchedAddress] = (data.address || '').split('|');
+          setName(fetchedName || '');
+          setPhone(fetchedPhone || '');
+          setAddress(fetchedAddress || '');
+          
+          if (!fetchedName && !fetchedPhone && !fetchedAddress) {
+            setIsEditing(true);
+          }
+        } catch (error) {
+          console.error('Failed to fetch address info:', error);
+          setIsEditing(true);
+        }
+      } else {
+        const savedAddress = localStorage.getItem('gooddaisyAddress');
+        if (savedAddress) {
+          const [fetchedName, fetchedPhone, fetchedAddress] = savedAddress.split('|');
+          setName(fetchedName || '');
+          setPhone(fetchedPhone || '');
+          setAddress(fetchedAddress || '');
+          
+          if (!fetchedName && !fetchedPhone && !fetchedAddress) {
+            setIsEditing(true);
+          }
+        } else {
+          setIsEditing(true);
+        }
       }
+      setInitialLoading(false);
     };
+    
 
     fetchAddressInfo();
-  }, []);
-  const handleCheckout = async() => {
-    //console.log("working")
+  }, [isLoggedIn]);
+
+  const handleCheckout = async () => {
+    if (!isLoggedIn) {
+      const combinedAddress = `${name}|${phone}|${address}`;
+      localStorage.setItem('gooddaisyAddress', combinedAddress);
+      router.push('/login');
+      return;
+    }
+
     await axios.post(`${process.env.NEXT_PUBLIC_URL}api/cart/`, {
       userId: user.id,
     });
     setCheckOutAlready(true);
-    router.push('/checkout')
-  }
+    router.push('/checkout');
+  };
   const validateInputs = () => {
     if (!name.trim() || !phone.trim() || !address.trim()) {
       setError('All fields are required');
@@ -74,22 +102,24 @@ const AddressPage = () => {
     if (!validateInputs()) return;
     
     setLoading(true);
-
     const combinedAddress = `${name}|${phone}|${address}`;
 
     try {
-      const response = await fetch('/api/cart/address', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ address: combinedAddress }),
-      });
+      if (isLoggedIn) {
+        const response = await fetch('/api/cart/address', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ address: combinedAddress }),
+        });
 
-      if (response.ok) {
-        setIsEditing(false);
+        if (response.ok) {
+          setIsEditing(false);
+        }
       } else {
-        console.error('Failed to update address');
+        localStorage.setItem('gooddaisyAddress', combinedAddress);
+        setIsEditing(false);
       }
     } catch (error) {
       console.error('Error updating address:', error);

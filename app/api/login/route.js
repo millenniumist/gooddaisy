@@ -1,18 +1,18 @@
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const prisma = require('@/config/prisma');
+import { NextResponse } from 'next/server';
+import jwt from 'jsonwebtoken';
+import prisma from '@/config/prisma';
 
-const loginHandler = async (req, res) => {
+export async function POST(request) {
     try {
-        const appSecret = req.headers['x-app-secret'];
-        const appOrigin = req.headers['x-app-origin'];
-        console.log("Login headers:", appSecret, appOrigin);
+        const body = await request.json();
+        const appSecret = request.headers.get('x-app-secret');
+        const appOrigin = request.headers.get('x-app-origin');
 
         if (appSecret !== process.env.USER_DEFAULT_PASSWORD || appOrigin !== 'admin-frontend') {
-            return res.status(403).json({ error: "Unauthorized request origin" });
+            return NextResponse.json({ error: "Unauthorized request origin" }, { status: 403 });
         }
 
-        const { username, password } = req.body;
+        const { username, password } = body;
         const user = await prisma.user.findUnique({
             where: {
                 userId: username
@@ -20,12 +20,12 @@ const loginHandler = async (req, res) => {
         });
         
         if (!user) {
-            return res.status(404).json({ error: "User not found" });
+            return NextResponse.json({ error: "User not found" }, { status: 404 });
         }
 
         const isPasswordValid = user.password === password;
         if (!isPasswordValid) {
-            return res.status(401).json({ error: "Invalid password" });
+            return NextResponse.json({ error: "Invalid password" }, { status: 401 });
         }
 
         const token = jwt.sign(
@@ -34,20 +34,29 @@ const loginHandler = async (req, res) => {
             { expiresIn: '30d' }
         );
 
-        res.cookie('token', token, { httpOnly: true, sameSite: 'strict' });
-        res.cookie('userId', user.id.toString(), { httpOnly: true, sameSite: 'strict' });
+        const response = NextResponse.json({
+            newUser: {
+                id: user.id,
+                userId: user.userId,
+                displayName: user.displayName,
+            },
+            token
+        });
 
-        const newUser = {
-            id: user.id,
-            userId: user.userId,
-            displayName: user.displayName,
-        };
+        response.cookies.set('token', token, { 
+            httpOnly: true, 
+            sameSite: 'strict'
+        });
+        
+        response.cookies.set('userId', user.id.toString(), { 
+            httpOnly: true, 
+            sameSite: 'strict'
+        });
 
-        return res.json({ newUser, token });
+        return response;
+
     } catch (error) {
         console.error("Login error:", error);
-        return res.status(500).json({ error: "An error occurred during login" });
+        return NextResponse.json({ error: "An error occurred during login" }, { status: 500 });
     }
-};
-
-module.exports = loginHandler;
+}

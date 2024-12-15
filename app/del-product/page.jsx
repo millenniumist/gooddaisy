@@ -13,13 +13,20 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useRouter } from "next/router";
 
 export default function DeleteProductPage() {
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const isAdmin = useMainStorage(state => state.isAdmin)
+  const router = useRouter()
 
   useEffect(() => {
+    if(!isAdmin) {
+      router.push('/login/admin')
+      return;
+    }
     fetchProducts();
   }, []);
 

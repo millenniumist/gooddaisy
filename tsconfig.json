@@ -34,7 +34,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "prisma/seed.js"
-, "app/cart/page.jsx"  ],
+, "app/cart/page.jsx", "store/mainStorage.jsx", "app/print/page.jsx", "app/print/PrintContent.jsx", "app/login/admin/AdminLoginForm.jsx", "app/login/admin/page.jsx"  ],
   "exclude": [
     "node_modules"
   ]

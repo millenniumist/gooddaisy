@@ -1,5 +1,7 @@
 "use client";
 
+import { useRouter } from 'next/navigation';
+import { useMainStorage } from '@/store/mainStorage';
 import { useEffect, useState } from "react";
 import { format, subMonths } from "date-fns";
 import debounce from "lodash/debounce";
@@ -36,12 +38,17 @@ function formatOrderId(order, orders) {
 }
 
 export default function OrdersManagementPage() {
+  const router = useRouter();
+  const isAdmin = useMainStorage((state) => state.isAdmin);
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-
   useEffect(() => {
+    if (!isAdmin) {
+      router.push('/login/admin');
+      return;
+    }
     const fetchOrders = async () => {
       const sixMonthsAgo = subMonths(new Date(), 6);
       const response = await fetch(`/api/orders?startDate=${sixMonthsAgo.toISOString()}`);
@@ -50,7 +57,7 @@ export default function OrdersManagementPage() {
       setFilteredOrders(data);
     };
     fetchOrders();
-  }, []);
+  }, [isAdmin, router]);
 
   const handleSearch = debounce((term) => {
     setSearchTerm(term);

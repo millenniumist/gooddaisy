@@ -1,12 +1,7 @@
 import { format } from 'date-fns';
-import { Order } from '@prisma/client';
 
-type PrintContentProps = {
-  orders: any[];
-}
-
-const PrintContent = ({ orders }: PrintContentProps) => {
-  const formatOrderId = (order: any) => {
+const PrintContent = ({ orders }) => {
+  const formatOrderId = (order) => {
     const createdDate = new Date(order.createdDate);
     const monthYear = format(createdDate, 'M-yy');
     const ordersInSameMonth = orders.filter(o => 
@@ -18,7 +13,7 @@ const PrintContent = ({ orders }: PrintContentProps) => {
 
   return (
     <div style={{ padding: '20px' }}>
-      {orders.map((order: any) => (
+      {orders.map((order) => (
         <div key={order.id} style={{ marginBottom: '30px' }}>
           <h1 style={{ fontSize: '24px', fontWeight: 'bold' }}>Order #{formatOrderId(order)}</h1>
           <p>Customer: {order.user.displayName}</p>
@@ -39,7 +34,7 @@ const PrintContent = ({ orders }: PrintContentProps) => {
               </tr>
             </thead>
             <tbody>
-              {order.orderItems.map((item: any) => (
+              {order.orderItems.map((item) => (
                 <tr key={item.id}>
                   <td style={{ border: '1px solid #ddd', padding: '8px' }}>{item.product.name}</td>
                   <td style={{ border: '1px solid #ddd', padding: '8px' }}>${item.price.toFixed(2)}</td>

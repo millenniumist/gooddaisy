@@ -47,10 +47,11 @@ export default function ProductCustomization({ params }) {
         setLoading(false);
       }
     };
-
+    
     fetchProduct();
   }, [productId]);
-
+  console.log(product)
+  
   const handleAddToCart = async () => {
     setAddingToCart(true);
     const cartItem = {

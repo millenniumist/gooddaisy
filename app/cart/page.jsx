@@ -50,18 +50,19 @@ export default function CartPage() {
         const parsedCart = JSON.parse(localCart).map(item => ({
           ...item,
           product: {
-            name: item.name,
-            images: item.images || [],
-            subProduct: item.subProduct || false
+            ...item.product,
+            images: item.product.images || [],
+            subProduct: item.product.subProduct || false
           }
         }));
+        
         setCartItems(parsedCart);
       }
     }
     setLoading(false);
   };
   
-
+console.log(cartItems)
   useEffect(() => {
     getData();
     fetchProductList();
@@ -71,12 +72,11 @@ export default function CartPage() {
 const checkout = async () => {
   setCheckoutLoading(true);
   try {
-    if (!isLoggedIn) {
-      // Store cart items in session storage before redirecting
-      sessionStorage.setItem('pendingCart', localStorage.getItem('gooddaisyCart'));
-      router.push("/login");
-      return;
-    }
+    // if (!isLoggedIn) {
+    //   sessionStorage.setItem('pendingCart', localStorage.getItem('gooddaisyCart'));
+    //   router.push("/login");
+    //   return;
+    // }
     router.push("/cart/address");
   } finally {
     setCheckoutLoading(false);
@@ -147,7 +147,9 @@ const checkout = async () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {cartItems.map((item, index) => (
+              {cartItems.map((item, index) => {
+                console.log(item)
+              return (
                 <TableRow key={index}>
                   <TableCell>
                     {!editMode ? (
@@ -187,7 +189,7 @@ const checkout = async () => {
                   <TableCell className="text-center">${item.price.toFixed(2)}</TableCell>
                   <TableCell className="text-center">${item.price.toFixed(2)}</TableCell>
                 </TableRow>
-              ))}
+              )})}
             </TableBody>
           </Table>
         )}

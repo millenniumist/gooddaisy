@@ -15,10 +15,9 @@ export default function AdminLoginForm() {
   const router = useRouter()
   const { setToken, setUser, setIsAdmin, setIsLoggedIn } = useMainStorage()
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (e) => {
     e.preventDefault()
     try {
-      //console.log(process.env.FRONT_USER_DEFAULT_PASSWORD)
       const res = await axios.post(`${process.env.NEXT_PUBLIC_URL}api/login`, {
         username,
         password
@@ -28,16 +27,13 @@ export default function AdminLoginForm() {
           'X-App-Origin': 'admin-frontend'
         }
       })
-      //console.log(process.env.NEXT_PUBLIC_URL)
+      
       setToken(res.data.token)
-      // document.cookie = `token=${res.data.token}`
-      // document.cookie = `userId=${res.data.newUser.id}`
       setUser(res.data.newUser)
       setIsAdmin(true)
       setIsLoggedIn(true)
-      // if (res.data.token) {
-        window.location.href = "/"
-      // }
+      window.location.href = "/"
+      
     } catch (error) {
       console.error("Login failed:", error)
     }

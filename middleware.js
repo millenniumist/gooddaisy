@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import { NextRequest } from 'next/server'
 import * as jose from 'jose'
 
 export async function middleware(request) {
@@ -22,5 +21,5 @@ export async function middleware(request) {
 }
 
 export const config = {
-    matcher: ['/checkout','/add-product','/del-product','/print','/orders'],
+    matcher: ['/checkout'],
 }

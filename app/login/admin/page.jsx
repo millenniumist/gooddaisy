@@ -1,8 +1,7 @@
-import { Metadata } from 'next'
 import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import AdminLoginForm from './AdminLoginForm'
 
-export const metadata: Metadata = {
+export const metadata = {
   title: 'Admin Login',
   description: 'Login page for administrators',
 }

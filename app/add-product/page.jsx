@@ -1,7 +1,8 @@
 "use client";
 
+import { useMainStorage } from '@/store/mainStorage';
 import { CldUploadWidget } from "next-cloudinary";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,8 +25,17 @@ export default function AddProduct() {
   const [uploadedImages, setUploadedImages] = useState([]);
   const [subProduct, setSubProduct] = useState(false);
   const [description, setDescription] = useState("");
-
+  const isAdmin = useMainStorage((state) => state.isAdmin);
   const router = useRouter();
+  
+  useEffect(() => {
+    if (!isAdmin) {
+      router.push('/login/admin');
+      return;
+    }
+    fetchProducts();
+  }, [isAdmin, router]);
+
 
   const handleUploadSuccess = (result) => {
     setUploadedImages((prev) => [...prev, result.info.secure_url]);
