@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { icons, creteIcon } from "lucide";
+import { icons, creteIcon } from "lucide-react";
 
 export default function ContactPage() {
   const socialLinks = {

@@ -8,7 +8,7 @@ import axios from "axios"
 import { Input } from "@/components/ui/input"
 import { useRouter } from 'next/navigation'
 import { Loader2 } from "lucide-react"
-import { useMainStorage } from "@store/mainStorage"
+import { useMainStorage } from "@/store/mainStorage"
 
 export default function CheckoutPage() {
   const router = useRouter()
