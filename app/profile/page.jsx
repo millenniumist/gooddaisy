@@ -60,7 +60,7 @@ export default async function ProfilePage({ searchParams }) {
   const id = payload.userId;
 
   const user = await getUser(id);
-  const isEditing = searchParams.edit === "true";
+  const isEditing = (await searchParams)?.edit === "true";
 
   const [name = "", phone = "", address = ""] = user?.address?.split("|") || ["", "", ""];
 

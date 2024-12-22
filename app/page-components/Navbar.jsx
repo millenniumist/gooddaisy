@@ -44,7 +44,7 @@ const Navbar = () => {
           }
         : { label: "Login", href: "/login" }
     );
-  }, [isLoggedIn, checkOutAlready, setLogout, isAdmin]);
+  }, [isLoggedIn, checkOutAlready, setLogout, isAdmin, user]);
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);

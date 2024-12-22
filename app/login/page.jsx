@@ -21,20 +21,17 @@ export default function Home() {
 
   const hdlLineLogin = () => {
     try {
-    //console.log('hdlLineLogin')
       if (liff.isInClient()) {
-        liff.getProfile().then((profile) => {
-        }).catch((err) => {
-          //console.log('Error getting profile', err);
-        });
+        window.location.href = "https://liff.line.me/2006438396-eR8XlXBv";
       } else {
         // Running in external browser
         liff.login();
       }
     } catch (error) {
-      //console.log(error) 
+      // Error handling if needed
     }
   }
+  
 
 
 
