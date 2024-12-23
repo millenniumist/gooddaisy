@@ -14,7 +14,8 @@ export async function POST(request) {
         console.log("Webhook payload:", body);
 
         // Handle webhook verification
-        if (body.events && body.events.length === 0) {
+        if (body.destination && body.events.length === 0) {
+            console.log("Webhook verification request received");
             return NextResponse.json({ success: true }, { status: 200 });
         }
 
