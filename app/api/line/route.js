@@ -12,12 +12,15 @@ export async function POST(request) {
     try {
         const body = await request.json();
         console.log("Webhook payload:", body);
+        console.log("body.events:", body.events);
+        console.log("body.events.length:", body.events?.length);
 
-        // Handle webhook verification
-        if (body.destination && body.events.length === 0) {
-            console.log("Webhook verification request received");
+        if (body.events && body.events.length === 0) {
+            console.log("Verification condition matched - returning 200");
             return NextResponse.json({ success: true }, { status: 200 });
         }
+        console.log("Code reached after verification check");
+
 
           // Check if this is a user profile request
           if (!body.userProfile) {
