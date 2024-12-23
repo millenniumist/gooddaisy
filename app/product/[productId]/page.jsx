@@ -1,6 +1,6 @@
 "use client";
-
-import { useState, useEffect, use } from "react";
+import * as React from 'react'
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,7 +33,7 @@ export default function ProductCustomization({ params }) {
     }
     return [];
   });
-  const productId = use(params).productId;
+  const {productId} = React.use(params)
 
   useEffect(() => {
     const fetchProduct = async () => {

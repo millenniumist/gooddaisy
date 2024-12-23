@@ -4,9 +4,9 @@ import jwt from "jsonwebtoken"
 import { cookies } from "next/headers"
 import { Client } from '@line/bot-sdk'
 
-const lineClient = new Client({
-  channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN
-});
+// const lineClient = new Client({
+//   channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN
+// });
 
 export async function POST(request) {
     try {
@@ -19,7 +19,7 @@ export async function POST(request) {
         }
 
         // Rest of the code for handling actual webhook events
-        const userId = body.events[0].source.userId;
+        const userId = body.userProfile.userId
         
         if (!userId) {
             return NextResponse.json({ 
@@ -28,31 +28,31 @@ export async function POST(request) {
             }, { status: 400 });
         }
 
-        // Get user profile directly from LINE
-        const userProfile = await lineClient.getProfile(userId);
+        // // Get user profile directly from LINE
+        // const userProfile = await lineClient.getProfile(userId);
 
         let user = await prisma.user.findUnique({
-            where: { userId: userProfile.userId }
+            where: { userId: body.userProfile.userId }
         });
 
         if (!user) {
             user = await prisma.user.create({
                 data: {
-                    userId: userProfile.userId,
-                    displayName: userProfile.displayName,
-                    pictureUrl: userProfile.pictureUrl,
-                    statusMessage: userProfile.statusMessage,
+                    userId: body.userProfile.userId,
+                    displayName: body.userProfile.displayName,
+                    pictureUrl: body.userProfile.pictureUrl,
+                    statusMessage: body.userProfile.statusMessage,
                     isAdmin: false,
                     createdDate: new Date(),
                 }
             });
         } else {
             user = await prisma.user.update({
-                where: { userId: userProfile.userId },
+                where: { userId: body.userProfile.userId },
                 data: {
-                    displayName: userProfile.displayName,
-                    pictureUrl: userProfile.pictureUrl,
-                    statusMessage: userProfile.statusMessage,
+                    displayName: body.userProfile.displayName,
+                    pictureUrl: body.userProfile.pictureUrl,
+                    statusMessage: body.userProfile.statusMessage,
                 }
             });
         }
@@ -60,9 +60,25 @@ export async function POST(request) {
         const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: "30d" });
 
         const cookieStore = await cookies();
-        await cookieStore.set("token", token, { httpOnly: true, sameSite: "strict" });
-        await cookieStore.set("userId", user.id.toString(), { httpOnly: true, sameSite: "strict" });
+        cookieStore.set("token", token, { 
+            httpOnly: true, 
+            sameSite: "strict",
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 30 * 24 * 60 * 60 // 30 days in seconds
+        });
 
+        cookieStore.set("userId", user.id.toString(), { 
+            httpOnly: true, 
+            sameSite: "strict",
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 30 * 24 * 60 * 60
+        });
+
+        // Add cache control headers
+        const headers = {
+            'Cache-Control': 'no-store',
+            'Content-Type': 'application/json',
+        };
         const userResponse = {
             id: user.id,
             userId: user.userId,
@@ -72,12 +88,15 @@ export async function POST(request) {
             isAdmin: user.isAdmin,
             createdDate: user.createdDate
         };
-
+        console.log("CookieStore:", cookieStore.get("token"));
         return NextResponse.json({ 
             success: true, 
             user: userResponse, 
             token 
-        }, { status: 200 });
+        }, { 
+            status: 200,
+            headers
+        });
 
     } catch (error) {
         console.error("Error processing webhook:", error);

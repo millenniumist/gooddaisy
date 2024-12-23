@@ -60,7 +60,7 @@ export async function POST(request) {
 
 export async function DELETE() {
   try {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const userId = cookieStore.get('userId');
     
     if (!userId) {

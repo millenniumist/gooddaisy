@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
+import { liffService } from "@/services/liff"
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
@@ -9,13 +10,51 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navRef = useRef(null);
-  const { user, isLoggedIn, checkOutAlready, setLogout, isAdmin } = useMainStorage();
+  const { user, isLoggedIn, checkOutAlready, setLogout, isAdmin, setUser, setIsLoggedIn, setIsAdmin } = useMainStorage();
   const [navItems, setNavItems] = useState([
     { label: "Home", href: "/" },
     { label: "Cart", href: "/cart" },
     { label: "Contact Us", href: "/contact" },
   ]);
   const [authItem, setAuthItem] = useState(null);
+
+  const handleLogin = async () => {
+    try {
+      const liff = await liffService.initializeLiff();
+      if (!liff.isLoggedIn()) {
+        liff.login();
+        return;
+      }
+      
+      const profile = await liff.getProfile();
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL}api/line/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userProfile: profile
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setUser(data.user);
+        setIsLoggedIn(true);
+        setIsAdmin(data.user.isAdmin);
+        
+        if (liff.isInClient()) {
+          liff.closeWindow();
+        }
+      }
+    } catch (error) {
+      console.error('LIFF login error:', error);
+    }
+};
+
+
+
 
   useEffect(() => {
     const updatedNavItems = [
@@ -42,7 +81,11 @@ const Navbar = () => {
               window.location.href = "/login";
             },
           }
-        : { label: "Login", href: "/login" }
+        : { 
+            label: "Login", 
+            href: "#",
+            onClick: handleLogin
+          }
     );
   }, [isLoggedIn, checkOutAlready, setLogout, isAdmin, user]);
 
@@ -83,9 +126,9 @@ const Navbar = () => {
           </Link>
         ))}
         {authItem && (
-          <Link href={authItem.href} onClick={authItem.onClick}>
-            <Button variant="ghost">{authItem.label}</Button>
-          </Link>
+          <Button variant="ghost" onClick={authItem.onClick}>
+            {authItem.label}
+          </Button>
         )}
       </div>
       <div className="md:hidden">
@@ -124,18 +167,16 @@ const Navbar = () => {
           ))}
           <hr className="my-4" />
           {authItem && (
-            <Link href={authItem.href}>
-              <Button
-                variant="ghost"
-                className="w-full justify-start"
-                onClick={() => {
-                  setIsMenuOpen(false);
-                  authItem.onClick && authItem.onClick();
-                }}
-              >
-                {authItem.label}
-              </Button>
-            </Link>
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => {
+                setIsMenuOpen(false);
+                authItem.onClick && authItem.onClick();
+              }}
+            >
+              {authItem.label}
+            </Button>
           )}
         </nav>
       </div>

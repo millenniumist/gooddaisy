@@ -8,7 +8,8 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-export async function GET(request, { params }) {
+export async function GET(request, props) {
+  const params = await props.params;
   const product = await prisma.product.findUnique({
     where: {
       id: Number(params.productId),
@@ -53,7 +54,8 @@ export async function POST(req) {
   }
 }
 
-export async function DELETE(req, { params }) {
+export async function DELETE(req, props) {
+  const params = await props.params;
   try {
     const productId = Number(params.productId);
     

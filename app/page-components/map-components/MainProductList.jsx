@@ -9,16 +9,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { InfoIcon, Flower } from "lucide-react";
 import NextImage from "next/image";
 
-export default function MainProductList({ productList, userData }) {
-  const { setUser, setIsLoggedIn, setIsAdmin } = useMainStorage();
-  useEffect(() => {
-    if (userData) {
-      setUser(userData);
-      setIsLoggedIn(true);
-      setIsAdmin(userData.isAdmin);
-    }
-  }, [userData]);
-
+export default function MainProductList({ productList}) {
   const sortedProducts = productList
     .filter((product) => !product.subProduct)
     .sort((a, b) => a.price - b.price);
