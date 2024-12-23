@@ -3,7 +3,7 @@ import prisma from "@/config/prisma";
 import { cookies } from "next/headers";
 
 export async function GET() {
-  const userId = cookies().get("userId")?.value;
+  const userId = (await cookies()).get("userId")?.value;
 
   if (!userId) {
     return NextResponse.json({ error: "User not authenticated" }, { status: 401 });
@@ -27,7 +27,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const userId = cookies().get("userId")?.value;
+  const userId = (await cookies()).get("userId")?.value;
 
   if (!userId) {
     return NextResponse.json({ error: "User not authenticated" }, { status: 401 });
