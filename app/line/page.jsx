@@ -20,21 +20,19 @@ const Page = () => {
       }
 
       const userProfile = await liff.getProfile();
-      // Only proceed if we have valid userProfile data
-      if (userProfile && userProfile.userId) {
-        const response = await axios.post(`${process.env.NEXT_PUBLIC_URL}api/line/`, { 
-          userProfile,  
-          userDefaultPassword: process.env.FRONT_USER_DEFAULT_PASSWORD
-        });
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_URL}api/line/`, { 
+        userProfile,  
+        userDefaultPassword: process.env.FRONT_USER_DEFAULT_PASSWORD
+      });
 
-        if (response.data.success) {
-          setUser(response.data.user);
-          setToken(response.data.token);
-          setIsLoggedIn(true);
-          router.push('/');
-        }
-      } else {
-        setLoading(false);
+      setUser(response.data.user);
+      setToken(response.data.token);
+      setIsLoggedIn(true);
+
+
+      if (response.data.success) {
+        // Redirect to home page directly instead of using LIFF URL
+        router.push('/');
       }
     } catch (error) {
       console.error('Error during login:', error);
