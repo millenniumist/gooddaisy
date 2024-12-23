@@ -15,7 +15,7 @@ export async function POST(request) {
         console.log("body.events:", body.events);
         console.log("body.events.length:", body.events?.length);
 
-        if (body.events && body.events.length === 0) {
+        if (!body || !body.events || body.events.length === 0) {
             console.log("Verification condition matched - returning 200");
             return NextResponse.json({ success: true }, { status: 200 });
         }
@@ -111,10 +111,11 @@ export async function POST(request) {
         });
 
     } catch (error) {
+        // Even on error, return 200 to acknowledge LINE's webhook
         console.error("Error processing webhook:", error);
         return NextResponse.json({ 
-            success: false, 
-            error: "Error processing webhook" 
-        }, { status: 500 });
+            success: true,
+            message: "Webhook received"
+        }, { status: 200 });
     }
 }
