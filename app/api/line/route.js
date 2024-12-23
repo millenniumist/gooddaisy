@@ -18,6 +18,14 @@ export async function POST(request) {
             return NextResponse.json({ success: true }, { status: 200 });
         }
 
+          // Check if this is a user profile request
+          if (!body.userProfile) {
+            return NextResponse.json({ 
+                success: true, 
+                message: "Received non-user profile event" 
+            }, { status: 200 });
+        }
+
         // Rest of the code for handling actual webhook events
         const userId = body.userProfile.userId
         
