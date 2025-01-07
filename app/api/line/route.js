@@ -11,57 +11,63 @@ import { Client } from '@line/bot-sdk'
 export async function POST(request) {
     try {
         const body = await request.json();
-        console.log("Webhook payload:", body);
-
-        // Handle webhook verification
-        if (body.destination && body.events.length === 0) {
-            console.log("Webhook verification request received");
-            return NextResponse.json({ success: true }, { status: 200 });
+        // Try webhook first
+        if (body.events || body.destination) {
+            console.log("Webhook payload:", body);
+            
+            if (body.destination && body.events.length === 0) {
+                console.log("Webhook verification request received");
+                return NextResponse.json({ success: true }, { status: 200 });
+            }
         }
 
-          // Check if this is a user profile request
-          if (!body.userProfile) {
-            return NextResponse.json({ 
-                success: true, 
-                message: "Received non-user profile event" 
-            }, { status: 200 });
+        // If no webhook data, try LINE Login profile
+        let userProfile;
+        if (!body.userProfile) {
+            // Get access token from request header or body
+            const accessToken = request.headers.get('authorization')?.split(' ')[1] || body.accessToken;
+            
+            if (!accessToken) {
+                return NextResponse.json({
+                    success: false,
+                    message: "LINE Login required",
+                    loginUrl: `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${process.env.NEXT_PUBLIC_LINE_CHANNEL_ID}&redirect_uri=${process.env.LINE_REDIRECT_URI}&state=12345&scope=profile`
+                }, { status: 401 });
+            }
+
+            // Get profile using access token
+            userProfile = await fetch('https://api.line.me/v2/profile', {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            }).then(res => res.json());
+        } else {
+            userProfile = body.userProfile;
         }
 
-        // Rest of the code for handling actual webhook events
-        const userId = body.userProfile.userId
-        
-        if (!userId) {
-            return NextResponse.json({ 
-                success: false, 
-                error: "No user ID provided" 
-            }, { status: 400 });
-        }
-
-        // // Get user profile directly from LINE
-        // const userProfile = await lineClient.getProfile(userId);
-
+        // Process user data
         let user = await prisma.user.findUnique({
-            where: { userId: body.userProfile.userId }
+            where: { userId: userProfile.userId }
         });
 
         if (!user) {
             user = await prisma.user.create({
                 data: {
-                    userId: body.userProfile.userId,
-                    displayName: body.userProfile.displayName,
-                    pictureUrl: body.userProfile.pictureUrl,
-                    statusMessage: body.userProfile.statusMessage,
+                    userId: userProfile.userId,
+                    displayName: userProfile.displayName,
+                    pictureUrl: userProfile.pictureUrl,
+                    statusMessage: userProfile.statusMessage,
                     isAdmin: false,
                     createdDate: new Date(),
                 }
             });
         } else {
             user = await prisma.user.update({
-                where: { userId: body.userProfile.userId },
+                where: { userId: userProfile.userId },
                 data: {
-                    displayName: body.userProfile.displayName,
-                    pictureUrl: body.userProfile.pictureUrl,
-                    statusMessage: body.userProfile.statusMessage,
+                    displayName: userProfile.displayName,
+                    pictureUrl: userProfile.pictureUrl,
+                    statusMessage: userProfile.statusMessage,
                 }
             });
         }
