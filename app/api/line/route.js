@@ -121,3 +121,40 @@ export async function POST(request) {
         }, { status: 500 });
     }
 }
+
+export async function GET(request) {
+    const searchParams = request.nextUrl.searchParams;
+    const code = searchParams.get('code');
+    
+    if (!code) {
+        return NextResponse.json({ 
+            success: false, 
+            message: "Authorization code required" 
+        }, { status: 400 });
+    }
+
+    try {
+        // Exchange code for access token
+        const tokenResponse = await fetch('https://api.line.me/oauth2/v2.1/token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({
+                grant_type: 'authorization_code',
+                code: code,
+                redirect_uri: process.env.LINE_REDIRECT_URI,
+                client_id: process.env.NEXT_PUBLIC_LINE_CHANNEL_ID,
+                client_secret: process.env.LINE_CHANNEL_SECRET
+            })
+        }).then(res => res.json());
+
+        // Redirect to your frontend with the access token
+        return NextResponse.redirect(new URL(`/?token=${tokenResponse.access_token}`, request.url));
+    } catch (error) {
+        return NextResponse.json({ 
+            success: false, 
+            error: "Error processing authorization code" 
+        }, { status: 500 });
+    }
+}
