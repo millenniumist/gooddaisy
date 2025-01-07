@@ -40,6 +40,26 @@ const Navbar = () => {
       const data = await response.json();
       
       if (data.success) {
+        // Get local cart items
+        const localCart = JSON.parse(localStorage.getItem('gooddaisyCart') || '[]');
+        
+        if (localCart.length > 0) {
+          // Transfer cart items to database
+          await fetch(`${process.env.NEXT_PUBLIC_URL}api/cart/transfer`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              userId: data.user.id,
+              cartItems: localCart
+            }),
+          });
+          
+          // Clear localStorage after successful transfer
+          localStorage.removeItem('gooddaisyCart');
+        }
+  
         setUser(data.user);
         setIsLoggedIn(true);
         setIsAdmin(data.user.isAdmin);
@@ -51,7 +71,39 @@ const Navbar = () => {
     } catch (error) {
       console.error('LIFF login error:', error);
     }
-};
+  };
+  
+  useEffect(() => {
+    const handleUrlParams = async () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        const profile = urlParams.get('profile');
+        
+        if (token && profile) {
+            const parsedProfile = JSON.parse(decodeURIComponent(profile));
+            const response = await fetch(`${process.env.NEXT_PUBLIC_URL}api/line/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userProfile: parsedProfile
+                }),
+            });
+            
+            const data = await response.json();
+            if (data.success) {
+                setUser(data.user);
+                setIsLoggedIn(true);
+                setIsAdmin(data.user.isAdmin);
+                // Clean up URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+    };
+
+    handleUrlParams();
+}, []);
 
 
 

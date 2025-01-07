@@ -34,7 +34,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "prisma/seed.js"
-, "app/cart/page.jsx", "store/mainStorage.jsx", "app/print/page.jsx", "app/print/PrintContent.jsx", "app/login/admin/AdminLoginForm.jsx", "app/login/admin/page.jsx", "app/api/product/route.js", "app/api/orders/items/update/route.js", "app/api/orders/update/route.js", "app/api/orders/route.js", "app/api/print-orders/route.js", "app/api/product/[productId]/route.js", "app/cart/address/loading.jsx", "app/cart/address/page.jsx", "app/profile/page.jsx"  ],
+, "app/cart/page.jsx", "store/mainStorage.jsx", "app/print/page.jsx", "app/print/PrintContent.jsx", "app/login/admin/AdminLoginForm.jsx", "app/login/admin/page.jsx", "app/api/product/route.js", "app/api/orders/items/update/route.js", "app/api/orders/update/route.js", "app/api/orders/route.js", "app/api/print-orders/route.js", "app/api/product/[productId]/route.js", "app/cart/address/loading.jsx", "app/cart/address/page.jsx", "app/profile/page.jsx", "app/api/cart/address/route.js"  ],
   "exclude": [
     "node_modules"
   ]
