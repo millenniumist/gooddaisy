@@ -19,13 +19,13 @@ export default async function ProductShowcase() {
         <h1 className="text-4xl font-extrabold text-center mb-12 text-gray-800">
           Select Your Flower Preservation Mold
         </h1>
-        {/* <MainProductList productList={productList}  /> */}
+        <MainProductList productList={productList}  />
       </section>
       <section>
         <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">
           Enhance Your Experience
         </h2>
-        {/* <SubProductList productList={productList}  /> */}
+        <SubProductList productList={productList}  />
       </section>
     </div>
   );
