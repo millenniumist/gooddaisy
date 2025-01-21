@@ -4,7 +4,6 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,7 +13,6 @@ datasource db {
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
-        
 
 // Define the data model for the Flower Preservation Store
 // Prisma Schema for Flower Preservation Store
@@ -22,33 +20,75 @@ datasource db {
 model User {
   id            Int         @id @default(autoincrement())
   userId        String      @unique // Unique ID from LINE authentication
-  password      String?      
+  password      String?
   isAdmin       Boolean     @default(false) // Flag to indicate if the user is an admin
   displayName   String // User's display name from LINE
   pictureUrl    String? // Profile picture URL from LINE
   statusMessage String? // User's status message from LINE (optional)
   createdDate   DateTime    @default(now()) // Date of user creation
   address       String? // User's contact address
+  emailVerified DateTime?
   orders        Order[] // Relation to Orders
   orderItem     OrderItem[]
+  Account       Account[]
+  Session       Session[]
+}
+
+// Add these models while keeping your existing ones
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            Int
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       Int
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
 }
 
 model Order {
-  id               Int              @id @default(autoincrement())
-  customId         String?
-  orderStatus OrderStatus @default(INPROCESS)
-  paymentStatus    PaymentStatus    @default(UNPAID)
-  createdDate      DateTime         @default(now())
-  userId           Int
-  totalPrice       Float          @default(0) 
-  user             User             @relation(fields: [userId], references: [id])
-  orderItems       OrderItem[]
+  id            Int           @id @default(autoincrement())
+  customId      String?
+  orderStatus   OrderStatus   @default(INPROCESS)
+  paymentStatus PaymentStatus @default(UNPAID)
+  createdDate   DateTime      @default(now())
+  userId        Int
+  totalPrice    Float         @default(0)
+  user          User          @relation(fields: [userId], references: [id])
+  orderItems    OrderItem[]
 }
+
 enum OrderStatus {
   PENDING
   INPROCESS
   SHIPPED
 }
+
 enum ProductionStatus {
   CART
   PENDING
@@ -87,21 +127,21 @@ model OrderItem {
 }
 
 model Product {
-  id     Int     @id @default(autoincrement())
-  name   String
+  id          Int     @id @default(autoincrement())
+  name        String
   description String?
-  dimensions String?
-  price  Float 
-  images Image[] // Relation to Images
-  subProduct Boolean @default(false)
+  dimensions  String?
+  price       Float
+  images      Image[] // Relation to Images
+  subProduct  Boolean @default(false)
 
-  allowColorRefinement Boolean  @default(true)
-  allowMessage         Boolean  @default(true)
-  allowAddOnItem       Boolean  @default(true)
+  allowColorRefinement Boolean @default(true)
+  allowMessage         Boolean @default(true)
+  allowAddOnItem       Boolean @default(true)
   // Addons
-  colorRefinement      Float? @default(200) 
-  message              Float? @default(0) 
-  addOnItem            Float? @default(0) 
+  colorRefinement      Float?  @default(200)
+  message              Float?  @default(0)
+  addOnItem            Float?  @default(0)
 
   orderItems OrderItem[] // Relation to OrderItems
 }

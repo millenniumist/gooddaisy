@@ -134,7 +134,7 @@ export async function GET(request) {
     }
 
     try {
-        // Exchange code for access token
+        console.log("Exchanging code:", code);
         const tokenResponse = await fetch('https://api.line.me/oauth2/v2.1/token', {
             method: 'POST',
             headers: {
@@ -147,11 +147,23 @@ export async function GET(request) {
                 client_id: process.env.NEXT_PUBLIC_LINE_CHANNEL_ID,
                 client_secret: process.env.LINE_CHANNEL_SECRET
             })
-        }).then(res => res.json());
+        });
 
-        // Redirect to your frontend with the access token
-        return NextResponse.redirect(new URL(`/?token=${tokenResponse.access_token}`, request.url));
+        const tokenData = await tokenResponse.json();
+        console.log("Token response:", tokenData);
+
+        // Check if we have an access token before redirecting
+        if (tokenData.access_token) {
+            return NextResponse.redirect(new URL(`/?token=${tokenData.access_token}`, request.url));
+        } else {
+            return NextResponse.json({ 
+                success: false, 
+                error: "No access token received",
+                details: tokenData
+            }, { status: 400 });
+        }
     } catch (error) {
+        console.error("Token exchange error:", error);
         return NextResponse.json({ 
             success: false, 
             error: "Error processing authorization code" 
