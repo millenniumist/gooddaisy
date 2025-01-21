@@ -14,6 +14,7 @@
     "seed": "node prisma/seed.js"
   },
   "dependencies": {
+    "@auth/prisma-adapter": "^2.7.4",
     "@babel/core": "^7.26.0",
     "@babel/preset-react": "^7.26.3",
     "@line/bot-sdk": "^9.5.0",
@@ -59,7 +60,7 @@
     "loadash": "^1.0.0",
     "lucide-react": "^0.447.0",
     "next": "^15.0.1",
-    "next-auth": "^4.24.10",
+    "next-auth": "^4.24.11",
     "next-cloudinary": "^6.14.2",
     "nodemailer": "^6.9.15",
     "pdfkit": "^0.15.0",

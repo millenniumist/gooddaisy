@@ -69,6 +69,7 @@ export default function ProductCustomization({ params }) {
       message: product.allowMessage ? customText : "",
       productId: Number(productId),
       price: Number(totalPrice),
+      name: product.name 
     };
   
     if (isLoggedIn) {

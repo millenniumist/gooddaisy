@@ -1,39 +1,18 @@
-"use client"; // Required to make components interactive
+"use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useSession, signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import axios from "axios";
-import liff from '@line/liff';
-import { useMainStorage } from "@/store/mainStorage";
 import Link from "next/link";
 
 export default function Home() {
-
-  useEffect(() => {
-    liff.init({
-      liffId: process.env.NEXT_PUBLIC_LIFF_ID,
-    })
-  }, [])
-
-  const hdlLineLogin = () => {
+  const handleLogin = async () => {
     try {
-      if (liff.isInClient()) {
-        window.location.href = "https://liff.line.me/2006438396-eR8XlXBv";
-      } else {
-        // Running in external browser
-        liff.login();
-      }
+      await signIn("line", { callbackUrl: "/" });
     } catch (error) {
-      // Error handling if needed
+      console.error("Login error:", error);
     }
-  }
-  
-
-
+  };
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24 bg-gray-100">
@@ -43,13 +22,17 @@ export default function Home() {
           <CardDescription className="text-center">Sign in to your account</CardDescription>
         </CardHeader>
         <CardFooter>
-          <Button className="w-full bg-[#06c755] hover:bg-[#05a647]" type="button" onClick={hdlLineLogin}>
+          <Button 
+            className="w-full bg-[#06c755] hover:bg-[#05a647]" 
+            type="button" 
+            onClick={handleLogin}
+          >
             Line Authentication
           </Button>
         </CardFooter>
         <CardFooter>
           <Link href="login/admin" className="text-xs font-thin">Admin login here</Link> 
-          </CardFooter>
+        </CardFooter>
       </Card>
     </main>
   );
