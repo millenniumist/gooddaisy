@@ -17,7 +17,7 @@ import { useRouter } from "next/navigation";
 import { useMainStorage } from "@/store/mainStorage";
 import SubProductList from "../page-components/map-components/SubProductList";
 import Skeleton from "react-loading-skeleton";
-import 'react-loading-skeleton/dist/skeleton.css';
+import "react-loading-skeleton/dist/skeleton.css";
 
 export default function CartPage() {
   const [cartItems, setCartItems] = useState([]);
@@ -28,60 +28,61 @@ export default function CartPage() {
   const [editMode, setEditMode] = useState(false);
   const [productList, setProductList] = useState([]);
   const [localCart, setLocalCart] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return JSON.parse(localStorage.getItem('gooddaisyCart')) || [];
+    if (typeof window !== "undefined") {
+      return JSON.parse(localStorage.getItem("gooddaisyCart")) || [];
     }
     return [];
   });
-  
+
   const getData = async () => {
     if (isLoggedIn && user?.id) {
       try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_URL}api/cart/${user.id}`);
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_URL}api/cart/${user.id}`);
         setCartItems(response.data.cartItems);
       } catch (error) {
         console.error("Error fetching cart items:", error);
       }
     } else {
-      const localCart = localStorage.getItem('gooddaisyCart');
+      const localCart = localStorage.getItem("gooddaisyCart");
       if (localCart) {
         // Transform local storage data to match API structure
-        const parsedCart = JSON.parse(localCart).map(item => ({
+        const parsedCart = JSON.parse(localCart).map((item) => ({
           ...item,
           product: {
             ...item.product,
             images: item.product.images || [],
-            subProduct: item.product.subProduct || false
-          }
+            subProduct: item.product.subProduct || false,
+            variant: item.variant || null
+
+          },
         }));
-        
+
         setCartItems(parsedCart);
       }
     }
     setLoading(false);
   };
-  
-console.log(cartItems)
+
+  console.log(cartItems);
   useEffect(() => {
     getData();
     fetchProductList();
   }, [user?.id, isLoggedIn]);
 
-// Update checkout to handle local cart
-const checkout = async () => {
-  setCheckoutLoading(true);
-  try {
-    // if (!isLoggedIn) {
-    //   sessionStorage.setItem('pendingCart', localStorage.getItem('gooddaisyCart'));
-    //   router.push("/login");
-    //   return;
-    // }
-    router.push("/cart/address");
-  } finally {
-    setCheckoutLoading(false);
-  }
-};
+  // Update checkout to handle local cart
+  const checkout = async () => {
+    setCheckoutLoading(true);
+    try {
+      // if (!isLoggedIn) {
+      //   sessionStorage.setItem('pendingCart', localStorage.getItem('gooddaisyCart'));
+      //   router.push("/login");
+      //   return;
+      // }
+      router.push("/cart/address");
+    } finally {
+      setCheckoutLoading(false);
+    }
+  };
 
   const calculateTotal = () => {
     return cartItems.reduce((total, item) => total + item.price, 0).toFixed(2);
@@ -90,7 +91,7 @@ const checkout = async () => {
   const handleDelete = async (id) => {
     if (isLoggedIn) {
       try {
-        if(cartItems.filter((item)=>!item.product.subProduct).length>1){
+        if (cartItems.filter((item) => !item.product.subProduct).length > 1) {
           await axios.delete(`${process.env.NEXT_PUBLIC_URL}api/cart/${id}`);
           setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
           return;
@@ -102,17 +103,19 @@ const checkout = async () => {
         console.error("Error deleting item:", error);
       }
     } else {
-      const updatedCart = localCart.filter(item => item.id !== id);
-      localStorage.setItem('gooddaisyCart', JSON.stringify(updatedCart));
+      const updatedCart = localCart.filter((item) => item.id !== id);
+      localStorage.setItem("gooddaisyCart", JSON.stringify(updatedCart));
       setLocalCart(updatedCart);
-      setCartItems(updatedCart.map(item => ({
-        ...item,
-        product: {
-          name: item.product.name,
-          images: item.product.images,
-          subProduct: item.product.subProduct
-        }
-      })));
+      setCartItems(
+        updatedCart.map((item) => ({
+          ...item,
+          product: {
+            name: item.product.name,
+            images: item.product.images,
+            subProduct: item.product.subProduct,
+          },
+        }))
+      );
     }
   };
 
@@ -147,9 +150,7 @@ const checkout = async () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {cartItems.map((item, index) => {
-                console.log(item)
-              return (
+              {cartItems.map((item, index) => (
                 <TableRow key={index}>
                   <TableCell>
                     {!editMode ? (
@@ -172,8 +173,13 @@ const checkout = async () => {
                     )}
                     {
                       <div>
-                        <p> {item.product.name}</p>
+                        <p>{item.product.name}</p>
                         <ul className="px-4">
+                          {item.variant && (
+                            <li className="text-xs list-disc">
+                              Option: {item.variant.toUpperCase()}
+                            </li>
+                          )}
                           {item.colorRefinement && (
                             <li className="text-xs list-disc">Color Refinement</li>
                           )}
@@ -189,7 +195,7 @@ const checkout = async () => {
                   <TableCell className="text-center">${item.price.toFixed(2)}</TableCell>
                   <TableCell className="text-center">${item.price.toFixed(2)}</TableCell>
                 </TableRow>
-              )})}
+              ))}
             </TableBody>
           </Table>
         )}

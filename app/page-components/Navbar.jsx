@@ -70,6 +70,7 @@ const Navbar = () => {
           }),
         }).then(() => {
           localStorage.removeItem("gooddaisyCart");
+          window.location.reload();
         });
       }
     }

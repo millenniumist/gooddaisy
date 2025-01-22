@@ -16,6 +16,7 @@ export async function GET(request, props) {
     },
     include: {
       images: true,
+      variants: true, // Include variants in the response
     },
   });
 
@@ -26,19 +27,21 @@ export async function GET(request, props) {
   return NextResponse.json(product);
 }
 
+
 export async function POST(req) {
-  const { colorRefinement, addOnItem, message, productId, price, name, userId } = await req.json()
+  const { colorRefinement, addOnItem, message, productId, price, name, userId, variant, variantPrice } = await req.json()
 
   try {
     const newOrderItem = await prisma.orderItem.create({
       data: {
         name,
-        price,
+        price: variantPrice || price,
         colorRefinement,
         message,
         addOnItem,
         productId: parseInt(productId),
         userId: parseInt(userId),
+        variant,
       },
     })
 
@@ -53,6 +56,7 @@ export async function POST(req) {
     })
   }
 }
+
 
 export async function DELETE(req, props) {
   const params = await props.params;

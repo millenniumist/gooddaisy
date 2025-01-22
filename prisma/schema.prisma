@@ -111,6 +111,7 @@ model OrderItem {
   status ProductionStatus @default(CART) // Can be pending, dried, etc.
   price  Float
   note   String?
+  variant String?        // New field for variant
 
   // Addons
   colorRefinement Boolean @default(false)
@@ -127,23 +128,32 @@ model OrderItem {
 }
 
 model Product {
-  id          Int     @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   name        String
   description String?
   dimensions  String?
   price       Float
-  images      Image[] // Relation to Images
-  subProduct  Boolean @default(false)
+  images      Image[]
+  subProduct  Boolean   @default(false)
+  hasVariants Boolean   @default(false) // New field to indicate if product has variants
+  variants    Variant[] // Optional relation to Variants
 
   allowColorRefinement Boolean @default(true)
   allowMessage         Boolean @default(true)
-  allowAddOnItem       Boolean @default(true)
-  // Addons
-  colorRefinement      Float?  @default(200)
-  message              Float?  @default(0)
-  addOnItem            Float?  @default(0)
+  allowAddOnItem      Boolean @default(true)
+  colorRefinement     Float?   @default(200)
+  message             Float?   @default(0)
+  addOnItem           Float?   @default(0)
 
-  orderItems OrderItem[] // Relation to OrderItems
+  orderItems OrderItem[]
+}
+
+model Variant {
+  id        Int     @id @default(autoincrement())
+  name      String  // This will store the alphabet (a,b,c,d,e,f,g)
+  price     Float?  // Optional different price for variant
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 model Image {

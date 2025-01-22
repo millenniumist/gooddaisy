@@ -17,7 +17,8 @@ export async function POST(req) {
         colorRefinement: item.colorRefinement || false,
         message: item.message || null,
         addOnItem: item.addOnItem || false,
-        note: item.note || null
+        note: item.note || null,
+        variant: item.variant || null
       }))
     })
 
