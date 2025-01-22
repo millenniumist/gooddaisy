@@ -25,6 +25,7 @@ const PrintContent = ({ orders }) => {
             <thead>
               <tr>
                 <th style={{ border: '1px solid #ddd', padding: '8px', backgroundColor: '#f5f5f5' }}>Product</th>
+                <th style={{ border: '1px solid #ddd', padding: '8px', backgroundColor: '#f5f5f5' }}>Option</th>
                 <th style={{ border: '1px solid #ddd', padding: '8px', backgroundColor: '#f5f5f5' }}>Price</th>
                 <th style={{ border: '1px solid #ddd', padding: '8px', backgroundColor: '#f5f5f5' }}>Status</th>
                 <th style={{ border: '1px solid #ddd', padding: '8px', backgroundColor: '#f5f5f5' }}>Color</th>
@@ -37,6 +38,7 @@ const PrintContent = ({ orders }) => {
               {order.orderItems.map((item) => (
                 <tr key={item.id}>
                   <td style={{ border: '1px solid #ddd', padding: '8px' }}>{item.product.name}</td>
+                  <td style={{ border: '1px solid #ddd', padding: '8px' }}>{item.variant ? item.variant.toUpperCase() : 'N/A'}</td>
                   <td style={{ border: '1px solid #ddd', padding: '8px' }}>${item.price.toFixed(2)}</td>
                   <td style={{ border: '1px solid #ddd', padding: '8px' }}>{item.status}</td>
                   <td style={{ border: '1px solid #ddd', padding: '8px' }}>{item.colorRefinement ? 'Yes' : 'No'}</td>
@@ -56,3 +58,4 @@ const PrintContent = ({ orders }) => {
 };
 
 export default PrintContent;
+

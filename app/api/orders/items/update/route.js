@@ -10,6 +10,7 @@ export async function POST(request) {
   const colorRefinement = formData.get('colorRefinement') === 'on'
   const message = formData.get('message')
   const addOnItem = formData.get('addOnItem') === 'on'
+  const variant = formData.get('variant')
 
   const orderItem = await prisma.orderItem.findUnique({
     where: { id: itemId },
@@ -30,6 +31,7 @@ export async function POST(request) {
       colorRefinement,
       message,
       addOnItem,
+      variant,
       price: newPrice,
     },
   })
@@ -38,6 +40,7 @@ export async function POST(request) {
 
   return NextResponse.json({ message: 'Order item updated successfully', item: updatedItem })
 }
+
 
 function calculateNewPrice(orderItem, colorRefinement, message, addOnItem) {
   let newPrice = orderItem.product.price

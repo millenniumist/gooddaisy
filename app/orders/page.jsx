@@ -196,6 +196,7 @@ function OrderItemForm({ item, orderId, onSubmit }) {
       <input type="hidden" name="itemId" value={item.id} />
       <input type="hidden" name="orderId" value={orderId} />
       <p>Product: {item.product.name}</p>
+      {item.variant && <p>Option: {item.variant.toUpperCase()}</p>}
       <p>Price: ${item.price.toFixed(2)}</p>
       <StatusSelect
         name="status"
@@ -228,6 +229,7 @@ function OrderItemForm({ item, orderId, onSubmit }) {
     </ToastWrapper>
   );
 }
+
 
 function StatusSelect({ name, label, defaultValue, options }) {
   return (
