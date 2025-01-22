@@ -10,10 +10,10 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-export async function POST(request: Request) {
+export async function POST(request) {
   try {
     const formData = await request.formData();
-    const file = formData.get('file') as File;
+    const file = formData.get('file');
 
     if (!file) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
@@ -37,30 +37,37 @@ export async function POST(request: Request) {
 
     const orderIndex = ordersInCurrentMonth + 1;
     const fileName = `${orderIndex}-${monthYear}`;
+    const user = await prisma.user.findFirst({
+      where: {
+        orders: {
+          some: {
+            customId: fileName
+          }
+        }
+      },
+      select: {
+        displayName: true,
+        statusMessage: true
+      }
+    });
 
     const result = await cloudinary.uploader.upload(dataURI, {
       public_id: fileName,
       folder: 'orders',
     });
 
-    // Create a Nodemailer transporter
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
       },
-      // tls: {
-      //   // Do not fail on invalid certificates
-      //   rejectUnauthorized: false
-      // }
     });
 
-    // Define the email options
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: process.env.EMAIL_USER,
-      subject: 'New Order Slip Uploaded',
+      subject: `New Order Slip: ${user.displayName} ${user.statusMessage ? `- ${user.statusMessage}` : ''}`,
       text: `New order slip uploaded: ${fileName}`,
       html: `<p>New order slip uploaded: ${fileName}</p><img src="${result.secure_url}" />`,
       attachments: [
@@ -71,9 +78,7 @@ export async function POST(request: Request) {
         }
       ]
     };
-    
 
-    // Send the email
     await transporter.sendMail(mailOptions);
 
     return NextResponse.json({ 
