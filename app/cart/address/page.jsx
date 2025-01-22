@@ -72,7 +72,7 @@ const AddressPage = () => {
       userId: user.id,
     });
     setCheckOutAlready(true);
-    router.push('/checkout');
+    router.push('/instruction');
   };
 
   const validateInputs = () => {

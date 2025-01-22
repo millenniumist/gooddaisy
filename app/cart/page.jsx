@@ -73,11 +73,6 @@ export default function CartPage() {
   const checkout = async () => {
     setCheckoutLoading(true);
     try {
-      // if (!isLoggedIn) {
-      //   sessionStorage.setItem('pendingCart', localStorage.getItem('gooddaisyCart'));
-      //   router.push("/login");
-      //   return;
-      // }
       router.push("/cart/address");
     } finally {
       setCheckoutLoading(false);
