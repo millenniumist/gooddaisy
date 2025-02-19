@@ -19,6 +19,7 @@ const OrdersPage = () => {
   const [paymentFilter, setPaymentFilter] = useState('ALL');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
 
 
   const printAllFilteredOrders = async () => {
