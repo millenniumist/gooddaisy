@@ -23,15 +23,10 @@ export default function DeleteProductPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const isAdmin = useMainStorage(state => state.isAdmin)
   const router = useRouter()
+  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    if(!isAdmin) {
-      router.push('/login/admin')
-      return;
-    }
-    fetchProducts();
-  }, []);
 
+  
   const fetchProducts = async () => {
     try {
       const response = await fetch('/api/product');
@@ -41,6 +36,20 @@ export default function DeleteProductPage() {
       console.error('Error fetching products:', error);
     }
   };
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+      if (!isAdmin) {
+        router.push('/login/admin');
+      }
+    }, 100);
+    fetchProducts();
+    return () => clearTimeout(timer);
+  }, [isAdmin, router]);
+  
+  if (isLoading) {
+    return <div>Loading...</div>; 
+  }
 
   const handleDelete = async (formData) => {
     const productId = formData.get('productId');

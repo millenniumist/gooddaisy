@@ -27,14 +27,25 @@ export default function AddProduct() {
   const [description, setDescription] = useState("");
   const isAdmin = useMainStorage((state) => state.isAdmin);
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
-    if (!isAdmin) {
-      router.push('/login/admin');
-      return;
-    }
-    fetchProducts();
+    // Add small delay to allow state hydration
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+      if (!isAdmin) {
+        router.push('/login/admin');
+      }
+    }, 100);
+    
+    return () => clearTimeout(timer);
   }, [isAdmin, router]);
+  
+  // Add loading state check in your render
+  if (isLoading) {
+    return <div>Loading...</div>; 
+  }
+  
 
 
   const handleUploadSuccess = (result) => {

@@ -30,12 +30,21 @@ const OrdersPage = () => {
   };
 
   useEffect(() => {
-    if (!isAdmin) {
-      router.push('/login/admin');
-      return;
-    }
-    fetchOrders();
+    // Add small delay to allow state hydration
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+      if (!isAdmin) {
+        router.push('/login/admin');
+      }
+    }, 100);
+    
+    return () => clearTimeout(timer);
   }, [isAdmin, router]);
+  
+  // Add loading state check in your render
+  if (isLoading) {
+    return <div>Loading...</div>; 
+  }
 
   useEffect(() => {
     filterOrders();

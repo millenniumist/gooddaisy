@@ -25,7 +25,7 @@ const store1 = (set) => ({
   },
   setLogout: () => {
     set({ user: null, token: "", isLoggedIn: false, isAdmin: false, checkOutAlready: false });
-    Object.keys(Cookies.get()).forEach(cookieName => {
+    Object.keys(Cookies.get()).forEach((cookieName) => {
       Cookies.remove(cookieName);
     });
     sessionStorage.clear();
@@ -41,7 +41,7 @@ const store2 = (set) => ({
 });
 
 export const useMainStorage = create(
-  persist((set) => ({ ...store1(set), state: "", setState: store2(set).setState }), {
+  persist((set) => ({ ...store1(set), state: "", setState: store2(set).setState, skipHydrate: true }), {
     name: "mainStorage",
     storage: createJSONStorage(() => sessionStorage),
   })

@@ -44,19 +44,24 @@ export default function OrdersManagementPage() {
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
-    if (!isAdmin) {
-      router.push('/login/admin');
-      return;
-    }
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+      if (!isAdmin) {
+        router.push('/login/admin');
+      }
+    }, 100);
     const fetchOrders = async () => {
       const sixMonthsAgo = subMonths(new Date(), 6);
       const response = await fetch(`/api/orders?startDate=${sixMonthsAgo.toISOString()}`);
       const data = await response.json();
-      setOrders(data);
-      setFilteredOrders(data);
+      setOrders(data.orders);
+      setFilteredOrders(data.orders);
     };
     fetchOrders();
+    return () => clearTimeout(timer);
   }, [isAdmin, router]);
 
   const handleSearch = debounce((term) => {
@@ -98,7 +103,9 @@ const paginatedOrders = Array.isArray(filteredOrders)
   : [];
 
 const totalPages = Math.ceil((Array.isArray(filteredOrders) ? filteredOrders.length : 0) / 50);
-
+if (isLoading) {
+  return <div>Loading...</div>; 
+}
 
   return (
     <div className="p-4">

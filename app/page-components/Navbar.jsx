@@ -26,7 +26,7 @@ const Navbar = () => {
     { label: "Cart", href: "/cart" },
     { label: "Contact Us", href: "/contact" },
   ]);
-
+console.log(user)
   const handleLogin = async () => {
     try {
       await signIn("line");
@@ -122,10 +122,10 @@ const Navbar = () => {
             <AvatarImage src={session?.user?.pictureUrl} alt="User avatar" />
             <AvatarFallback>{session?.user?.displayName?.[0] || "G"}</AvatarFallback>
           </Avatar>
-          <h2>Welcome {session?.user?.displayName || "Guest"}</h2>
+          <h2>Welcome {session?.user?.displayName || user?.displayName || "Guest"}</h2>
         </div>
       </Link>
-      <div className="hidden md:flex space-x-4">
+      <div className="hidden custom:flex space-x-4">
         {navItems.map((item) => (
           <Link key={item.label} href={item.href} onClick={item.onClick}>
             <Button variant="ghost">{item.label}</Button>
@@ -137,14 +137,14 @@ const Navbar = () => {
           </Button>
         )}
       </div>
-      <div className="md:hidden">
+      <div className="custom:hidden">
         <Button variant="outline" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)}>
           {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </Button>
       </div>
       <div
         ref={navRef}
-        className={`fixed inset-y-0 right-0 z-50 w-64 bg-white shadow-lg p-4 transition-all transform ease-in-out duration-300 md:hidden ${
+        className={`fixed inset-y-0 right-0 z-50 w-64 bg-white shadow-lg p-4 transition-all transform ease-in-out duration-300 custom:hidden ${
           isMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
