@@ -5,12 +5,6 @@ import prisma from '@/config/prisma';
 export async function POST(request) {
     try {
         const body = await request.json();
-        const appSecret = request.headers.get('x-app-secret');
-        const appOrigin = request.headers.get('x-app-origin');
-
-        if (appSecret !== process.env.USER_DEFAULT_PASSWORD || appOrigin !== 'admin-frontend') {
-            return NextResponse.json({ error: "Unauthorized request origin" }, { status: 403 });
-        }
 
         const { username, password } = body;
         const user = await prisma.user.findUnique({
