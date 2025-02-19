@@ -92,12 +92,13 @@ export default function OrdersManagementPage() {
     return data;
   };
 
-  const paginatedOrders = filteredOrders.slice(
-    (currentPage - 1) * 50,
-    currentPage * 50
-  );
+// Add array check before pagination
+const paginatedOrders = Array.isArray(filteredOrders) 
+  ? filteredOrders.slice((currentPage - 1) * 50, currentPage * 50)
+  : [];
 
-  const totalPages = Math.ceil(filteredOrders.length / 50);
+const totalPages = Math.ceil((Array.isArray(filteredOrders) ? filteredOrders.length : 0) / 50);
+
 
   return (
     <div className="p-4">
