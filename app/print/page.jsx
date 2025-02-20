@@ -1,29 +1,41 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Button } from "@/components/ui/button"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { format, subMonths } from 'date-fns';
-import { useRouter } from 'next/navigation';
-import { useMainStorage } from '@/store/mainStorage';
+import { useState, useEffect } from "react";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { format, subMonths } from "date-fns";
+import { useRouter } from "next/navigation";
+import { useMainStorage } from "@/store/mainStorage";
 
 const OrdersPage = () => {
   const router = useRouter();
   const isAdmin = useMainStorage((state) => state.isAdmin);
   const [allOrders, setAllOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('ALL');
-  const [paymentFilter, setPaymentFilter] = useState('ALL');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [paymentFilter, setPaymentFilter] = useState("ALL");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
 
-
   const printAllFilteredOrders = async () => {
-    const orderIds = filteredOrders.map(order => order.id).join(',');
+    const orderIds = filteredOrders.map((order) => order.id).join(",");
     const response = await fetch(`/api/print-orders?orderId=${orderIds}`);
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
@@ -35,46 +47,50 @@ const OrdersPage = () => {
     const timer = setTimeout(() => {
       setIsLoading(false);
       if (!isAdmin) {
-        router.push('/login/admin');
+        router.push("/login/admin");
       }
     }, 100);
-    
+
     return () => clearTimeout(timer);
   }, [isAdmin, router]);
-  
-  // Add loading state check in your render
-  if (isLoading) {
-    return <div>Loading...</div>; 
-  }
 
   useEffect(() => {
+    const fetchOrders = async () => {
+      const response = await fetch(`/api/print-orders?orderId=all`);
+      const data = await response.json();
+      setAllOrders(data.orders);
+    };
+    fetchOrders();
+  }, []); // Call fetchOrders when component mounts
+
+  useEffect(() => {
+    const filterOrders = () => {
+      const MonthsAgo = subMonths(new Date(), 6);
+      const filtered = allOrders.filter((order) => {
+        const orderDate = new Date(order.createdDate);
+        const customOrderId = formatOrderId(order);
+        return (
+          orderDate >= MonthsAgo &&
+          (searchTerm === "" ||
+            order.id.toString().includes(searchTerm) ||
+            customOrderId.includes(searchTerm) ||
+            order.user.displayName.toLowerCase().includes(searchTerm.toLowerCase())) &&
+          (statusFilter === "ALL" || order.orderStatus === statusFilter) &&
+          (paymentFilter === "ALL" || order.paymentStatus === paymentFilter)
+        );
+      });
+  
+      setFilteredOrders(filtered);
+      setTotalPages(Math.ceil(filtered.length / 20));
+    };
     filterOrders();
   }, [allOrders, searchTerm, statusFilter, paymentFilter]);
 
-  const fetchOrders = async () => {
-    const response = await fetch(`/api/print-orders?orderId=all`);
-    const data = await response.json();
-    setAllOrders(data.orders);
-  };
+  // Add loading state check after useEffect hooks
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
-  const filterOrders = () => {
-    const MonthsAgo = subMonths(new Date(), 6);
-    const filtered = allOrders.filter(order => {
-      const orderDate = new Date(order.createdDate);
-      const customOrderId = formatOrderId(order);
-      return (
-        orderDate >= MonthsAgo &&
-        (searchTerm === '' || 
-         order.id.toString().includes(searchTerm) || 
-         customOrderId.includes(searchTerm) ||
-         order.user.displayName.toLowerCase().includes(searchTerm.toLowerCase())) &&
-        (statusFilter === 'ALL' || order.orderStatus === statusFilter) &&
-        (paymentFilter === 'ALL' || order.paymentStatus === paymentFilter)
-      );
-    });
-    setFilteredOrders(filtered);
-    setTotalPages(Math.ceil(filtered.length / 20));
-  };
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
@@ -112,11 +128,11 @@ const OrdersPage = () => {
 
   const formatOrderId = (order) => {
     const createdDate = new Date(order.createdDate);
-    const monthYear = format(createdDate, 'M-yy');
-    const ordersInSameMonth = allOrders?.filter(o => 
-      format(new Date(o.createdDate), 'M-yy') === monthYear
+    const monthYear = format(createdDate, "M-yy");
+    const ordersInSameMonth = allOrders?.filter(
+      (o) => format(new Date(o.createdDate), "M-yy") === monthYear
     );
-    const orderIndex = ordersInSameMonth.findIndex(o => o.id === order.id) + 1;
+    const orderIndex = ordersInSameMonth.findIndex((o) => o.id === order.id) + 1;
     return `${orderIndex}-${monthYear}`;
   };
 
@@ -136,8 +152,10 @@ const OrdersPage = () => {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="ALL">All Statuses</SelectItem>
-            {['PENDING', 'IN_PRODUCTION', 'COMPLETED', 'CANCELLED'].map(status => (
-              <SelectItem key={status} value={status}>{status}</SelectItem>
+            {["PENDING", "IN_PRODUCTION", "COMPLETED", "CANCELLED"].map((status) => (
+              <SelectItem key={status} value={status}>
+                {status}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -147,8 +165,10 @@ const OrdersPage = () => {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="ALL">All Payment Statuses</SelectItem>
-            {['PENDING', 'PAID', 'FAILED', 'REFUNDED'].map(status => (
-              <SelectItem key={status} value={status}>{status}</SelectItem>
+            {["PENDING", "PAID", "FAILED", "REFUNDED"].map((status) => (
+              <SelectItem key={status} value={status}>
+                {status}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -156,24 +176,24 @@ const OrdersPage = () => {
       <Button onClick={printAllFilteredOrders} className="mb-4">
         Print All Filtered Orders
       </Button>
-      <Table className='overflow-scroll'>
+      <Table className="overflow-scroll">
         <TableHeader>
           <TableRow>
-            <TableHead className='text-nowrap'>Order ID</TableHead>
-            <TableHead className='text-nowrap'>Status</TableHead>
-            <TableHead className='text-nowrap'>Payment</TableHead>
-            <TableHead className='text-nowrap'>Total Price</TableHead>
-            <TableHead className='text-nowrap'>Actions</TableHead>
+            <TableHead className="text-nowrap">Order ID</TableHead>
+            <TableHead className="text-nowrap">Status</TableHead>
+            <TableHead className="text-nowrap">Payment</TableHead>
+            <TableHead className="text-nowrap">Total Price</TableHead>
+            <TableHead className="text-nowrap">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredOrders.slice((currentPage - 1) * 20, currentPage * 20).map(order => (
+          {filteredOrders.slice((currentPage - 1) * 20, currentPage * 20).map((order) => (
             <TableRow key={order.id}>
-              <TableCell className='text-nowrap'>{formatOrderId(order)}</TableCell>
-              <TableCell className='text-nowrap'>{order.orderStatus}</TableCell>
-              <TableCell className='text-nowrap'>{order.paymentStatus}</TableCell>
-              <TableCell className='text-nowrap'>${Number(order.totalPrice).toFixed(2)}</TableCell>
-              <TableCell className='text-nowrap'>
+              <TableCell className="text-nowrap">{formatOrderId(order)}</TableCell>
+              <TableCell className="text-nowrap">{order.orderStatus}</TableCell>
+              <TableCell className="text-nowrap">{order.paymentStatus}</TableCell>
+              <TableCell className="text-nowrap">${Number(order.totalPrice).toFixed(2)}</TableCell>
+              <TableCell className="text-nowrap">
                 <Button onClick={() => printOrder(order.id)} variant="outline">
                   Print
                 </Button>
@@ -186,7 +206,9 @@ const OrdersPage = () => {
         <Button onClick={handlePrevPage} disabled={currentPage === 1}>
           Previous
         </Button>
-        <span>Page {currentPage} of {totalPages}</span>
+        <span>
+          Page {currentPage} of {totalPages}
+        </span>
         <Button onClick={handleNextPage} disabled={currentPage === totalPages}>
           Next
         </Button>
