@@ -78,10 +78,13 @@ export default function CartPage() {
       setCheckoutLoading(false);
     }
   };
-
+  
   const calculateTotal = () => {
     return cartItems.reduce((total, item) => total + item.price, 0).toFixed(2);
   };
+  
+  
+  
 
   const handleDelete = async (id) => {
     if (isLoggedIn) {
@@ -187,8 +190,8 @@ export default function CartPage() {
                     }
                   </TableCell>
                   <TableCell className="text-center">1</TableCell>
-                  <TableCell className="text-center">${item.price.toFixed(2)}</TableCell>
-                  <TableCell className="text-center">${item.price.toFixed(2)}</TableCell>
+                  <TableCell className="text-center">฿{calculateTotal(item)}</TableCell>
+                  <TableCell className="text-center">฿{calculateTotal(item)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

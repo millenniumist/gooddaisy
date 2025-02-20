@@ -53,25 +53,31 @@ export default function CheckoutPage() {
   }
 
   const handleImageUpload = async (event) => {
-    const file = event.target.files?.[0]
+    const file = event.target.files?.[0];
     if (file) {
-      setIsUploading(true)
-      const formData = new FormData()
-      formData.append('file', file)
-
+      setIsUploading(true);
+      const formData = new FormData();
+      formData.append('file', file);
+  
       try {
         const response = await axios.post(`${process.env.NEXT_PUBLIC_URL}api/upload-slip`, formData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        })
-        setUploadedImage(response.data.url)
+          headers: { 
+            'Content-Type': 'multipart/form-data'
+          },
+          // Add timeout and error handling
+          timeout: 30000,
+          validateStatus: (status) => status < 500
+        });
+        setUploadedImage(response.data.url);
       } catch (error) {
-        console.error('Error uploading image:', error)
-        alert('Failed to upload image')
+        console.error('Detailed upload error:', error.response?.data || error.message);
+        alert('Failed to upload image: ' + (error.response?.data?.error || 'Unknown error'));
       } finally {
-        setIsUploading(false)
+        setIsUploading(false);
       }
     }
-  }
+  };
+  
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60)
@@ -89,14 +95,14 @@ export default function CheckoutPage() {
         {isUploading ? (
           <div className="flex flex-col items-center gap-2">
             <Loader2 className="h-32 w-32 animate-spin text-primary" />
-            <p className="text-sm text-muted-foreground">Uploading payment slip...</p>
+            <p className="text-sm text-muted-foreground">กำลังอัพโหลดสลิป...</p>
           </div>
         ) : uploadedImage ? (
           <Image src={uploadedImage} alt="Uploaded payment proof" width={300} height={300} />
         ) : (
           <Image src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://example.com/mockup-qr-code" alt="QR Code" width={300} height={300} />
         )}
-        <p className="text-2xl font-bold mt-4">Total: ${total.toFixed(2)}</p>
+        <p className="text-2xl font-bold mt-4">ยอดรวม: ฿{total.toFixed(2)}</p>
         <Input 
           type="file" 
           accept="image/*" 
@@ -104,12 +110,17 @@ export default function CheckoutPage() {
           className="mt-4 cursor-pointer"
           disabled={isUploading}
         />
+        <p className="mt-4 text-center text-l text-muted-foreground whitespace-pre-line">
+          ขอบคุณสำหรับออเดอร์ค่ะ
+          
+          กดส่งข้อมูลเรียบร้อยแล้ว รบกวนแจ้งทางแชทอีกครั้งและรอทางร้านแจ้งยอดมัดจำ หลังชำระแล้วทางร้านจะแจ้งเลขออเดอร์ และวิธี+ที่อยู่การจัดส่งให้ค่ะ^^
+        </p>
         <Button 
           onClick={confirmPayment} 
           className="mt-4"
           disabled={isUploading || !uploadedImage}
         >
-          Confirm Payment
+          ยืนยันการชำระเงิน
         </Button>
       </CardContent>
     </Card>

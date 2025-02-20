@@ -1,7 +1,7 @@
 "use client";
-import { OrderStatus, PaymentStatus, ProductionStatus } from '@prisma/client';
-import { useRouter } from 'next/navigation';
-import { useMainStorage } from '@/store/mainStorage';
+import { OrderStatus, PaymentStatus, ProductionStatus } from "@prisma/client";
+import { useRouter } from "next/navigation";
+import { useMainStorage } from "@/store/mainStorage";
 import { useEffect, useState } from "react";
 import { format, subMonths } from "date-fns";
 import debounce from "lodash/debounce";
@@ -50,16 +50,21 @@ export default function OrdersManagementPage() {
     const timer = setTimeout(() => {
       setIsLoading(false);
       if (!isAdmin) {
-        router.push('/login/admin');
+        router.push("/login/admin");
       }
     }, 100);
     const fetchOrders = async () => {
       const sixMonthsAgo = subMonths(new Date(), 6);
       const response = await fetch(`/api/orders?startDate=${sixMonthsAgo.toISOString()}`);
       const data = await response.json();
-      setOrders(data.orders);
-      setFilteredOrders(data.orders);
+      // Sort orders by createdDate in descending order (latest first)
+      const sortedOrders = data.orders.sort(
+        (a, b) => new Date(b.createdDate) - new Date(a.createdDate)
+      );
+      setOrders(sortedOrders);
+      setFilteredOrders(sortedOrders);
     };
+
     fetchOrders();
     return () => clearTimeout(timer);
   }, [isAdmin, router]);
@@ -80,8 +85,8 @@ export default function OrdersManagementPage() {
     });
     const data = await response.json();
     const updatedOrders = await fetch("/api/orders").then((res) => res.json());
-    setOrders(updatedOrders);
-    setFilteredOrders(updatedOrders);
+    setOrders(updatedOrders.orders); // Add .orders here
+    setFilteredOrders(updatedOrders.orders); // Add .orders here
     return data;
   };
 
@@ -92,20 +97,33 @@ export default function OrdersManagementPage() {
     });
     const data = await response.json();
     const updatedOrders = await fetch("/api/orders").then((res) => res.json());
-    setOrders(updatedOrders);
-    setFilteredOrders(updatedOrders);
+    setOrders(updatedOrders.orders); // Add .orders here
+    setFilteredOrders(updatedOrders.orders); // Add .orders here
     return data;
   };
 
-// Add array check before pagination
-const paginatedOrders = Array.isArray(filteredOrders) 
-  ? filteredOrders.slice((currentPage - 1) * 50, currentPage * 50)
-  : [];
+  function getPaymentStatusColor(status) {
+    switch (status) {
+      case "PENDING":
+        return "bg-yellow-50";
+      case "HALF_PAID":
+        return "bg-blue-50";
+      case "FULL_PAID":
+        return "bg-green-50";
+      default:
+        return "";
+    }
+  }
 
-const totalPages = Math.ceil((Array.isArray(filteredOrders) ? filteredOrders.length : 0) / 50);
-if (isLoading) {
-  return <div>Loading...</div>; 
-}
+  // Add array check before pagination
+  const paginatedOrders = Array.isArray(filteredOrders)
+    ? filteredOrders.slice((currentPage - 1) * 50, currentPage * 50)
+    : [];
+
+  const totalPages = Math.ceil((Array.isArray(filteredOrders) ? filteredOrders.length : 0) / 50);
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="p-4">
@@ -117,16 +135,16 @@ if (isLoading) {
           onChange={(e) => handleSearch(e.target.value)}
           className="max-w-sm"
         />
-        <span className="text-sm text-gray-500">
-          Showing {filteredOrders.length} orders
-        </span>
+        <span className="text-sm text-gray-500">Showing {filteredOrders.length} orders</span>
       </div>
       <Accordion type="single" collapsible className="w-full">
         {paginatedOrders.map((order) => (
-          <AccordionItem key={order.id} value={`order-${order.id}`}>
-            <AccordionTrigger>
-              Order #{formatOrderId(order, filteredOrders)}
-            </AccordionTrigger>
+          <AccordionItem
+            key={order.id}
+            value={`order-${order.id}`}
+            className={getPaymentStatusColor(order.paymentStatus)}
+          >
+            <AccordionTrigger>Order #{formatOrderId(order, filteredOrders)}</AccordionTrigger>
             <AccordionContent>
               <OrderDetails order={order} onSubmit={handleOrderUpdate} />
               <OrderItems
@@ -149,9 +167,7 @@ if (isLoading) {
           Page {currentPage} of {totalPages}
         </span>
         <Button
-          onClick={() =>
-            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-          }
+          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
           disabled={currentPage === totalPages}
         >
           Next
@@ -237,7 +253,6 @@ function OrderItemForm({ item, orderId, onSubmit }) {
     </ToastWrapper>
   );
 }
-
 
 function StatusSelect({ name, label, defaultValue, options }) {
   return (

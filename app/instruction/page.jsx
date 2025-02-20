@@ -1,5 +1,6 @@
 'use client'
-
+import { useMainStorage } from '@/store/mainStorage';
+import axios from 'axios';
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { useRouter } from "next/navigation"
@@ -9,6 +10,21 @@ export default function InstructionPage() {
   const router = useRouter()
   const [monthlyOrders, setMonthlyOrders] = useState(0)
   const ORDER_LIMIT = process.env.NEXT_PUBLIC_MONTHLY_ORDER_LIMIT || 20
+  const { setCheckOutAlready, user, isLoggedIn } = useMainStorage()
+
+  // Add handleCheckout function
+  const handleCheckout = async () => {
+    if (!isLoggedIn) {
+      router.push('/login');
+      return;
+    }
+
+    await axios.post(`${process.env.NEXT_PUBLIC_URL}api/cart/`, {
+      userId: user.id,
+    });
+    setCheckOutAlready(true);
+    router.push('/checkout');
+  };
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -97,7 +113,7 @@ export default function InstructionPage() {
         <CardFooter>
           <Button 
             className="w-full"
-            onClick={() => router.push('/checkout')}
+            onClick={handleCheckout}
           >
             Accept & Continue to Checkout
           </Button>

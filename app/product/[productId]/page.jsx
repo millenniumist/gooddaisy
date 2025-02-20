@@ -6,6 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { ChevronDown } from "lucide-react"
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
 import {
   Select,
   SelectContent,
@@ -35,6 +41,9 @@ export default function ProductCustomization({ params }) {
   const [checkingOut, setCheckingOut] = useState(false);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [variantError, setVariantError] = useState(false);
+  const [isCustomTextEnabled, setIsCustomTextEnabled] = useState(false);
+  console.log(product);
+
   const [localCart, setLocalCart] = useState(() => {
     if (typeof window !== "undefined") {
       return JSON.parse(localStorage.getItem("gooddaisyCart")) || [];
@@ -77,7 +86,7 @@ export default function ProductCustomization({ params }) {
       product: {
         id: product.id,
         name: product.name,
-        images: product.images.map(img => ({
+        images: product.images.map((img) => ({
           url: img.url,
         })),
         subProduct: product.subProduct || false,
@@ -88,9 +97,9 @@ export default function ProductCustomization({ params }) {
       message: product.allowMessage ? customText : "",
       productId: Number(productId),
       price: Number(totalPrice),
-      name: product.name
+      name: product.name,
     };
-  
+
     if (isLoggedIn) {
       try {
         await axios.post(`${process.env.NEXT_PUBLIC_URL}api/product/${productId}`, {
@@ -102,15 +111,13 @@ export default function ProductCustomization({ params }) {
       }
     } else {
       const updatedCart = [...localCart, cartItem];
-      localStorage.setItem('gooddaisyCart', JSON.stringify(updatedCart));
+      localStorage.setItem("gooddaisyCart", JSON.stringify(updatedCart));
       setLocalCart(updatedCart);
     }
-    
+
     setAddedToCart(true);
     setAddingToCart(false);
   };
-  
-  
 
   //  handleCheckout function
   const handleCheckout = async () => {
@@ -118,12 +125,12 @@ export default function ProductCustomization({ params }) {
       setVariantError(true);
       return;
     }
-  
+
     if (!isLoggedIn) {
       router.push("/login");
       return;
     }
-  
+
     setCheckingOut(true);
     try {
       if (!addedToCart) {
@@ -136,7 +143,6 @@ export default function ProductCustomization({ params }) {
       setCheckingOut(false);
     }
   };
-  
 
   const updateTotalPrice = (addition) =>
     setTotalPrice((prevTotal) => Number((prevTotal + addition).toFixed(2)));
@@ -149,7 +155,18 @@ export default function ProductCustomization({ params }) {
     setColorRefinement(newColorRefinement);
   };
 
-  const handleItemAttach = (checked) => setAttachedItem(checked);
+  const handleItemAttach = (checked) => {
+    setAttachedItem(checked);
+    // Add price logic here if needed
+    updateTotalPrice(checked ? Number(product.addOnItem || 0) : -Number(product.addOnItem || 0));
+  };
+  const handleCustomTextToggle = (checked) => {
+    setIsCustomTextEnabled(checked);
+    if (!checked) {
+      setCustomText("");
+    }
+    updateTotalPrice(checked ? Number(product.message) : -Number(product.message));
+  };
 
   if (loading) {
     return (
@@ -179,7 +196,7 @@ export default function ProductCustomization({ params }) {
       </div>
       <Card className="mt-8 border-2 border-primary/20 shadow-xl">
         <CardHeader>
-          <CardTitle className="text-2xl text-primary">Product Customization</CardTitle>
+          <CardTitle className="text-2xl text-primary">Optional Service บริการเสริม</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6 p-6">
           {product.hasVariants && product.variants.length > 0 && (
@@ -212,57 +229,124 @@ export default function ProductCustomization({ params }) {
             </div>
           )}
 
-          {product.allowColorRefinement && (
-            <div className="bg-white p-4 rounded-lg shadow-md transition-all duration-300 hover:shadow-lg">
-              <h2 className="text-xl font-semibold mb-2 flex items-center text-primary">
-                <Palette className="mr-2" /> Color Refinement{" "}
-                <span className="text-sm ml-2 text-muted-foreground">{`(+฿${product.colorRefinement})`}</span>
-              </h2>
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="color-refinement"
-                  checked={colorRefinement}
-                  onCheckedChange={handleColorRefinementChange}
-                />
-                <Label htmlFor="color-refinement" className="text-muted-foreground">
-                  Enable Color Refinement
-                </Label>
-              </div>
-            </div>
-          )}
+{product.allowColorRefinement && (
+  <div className="bg-white p-4 rounded-lg shadow-md transition-all duration-300 hover:shadow-lg">
+    <Collapsible>
+      <CollapsibleTrigger className="flex w-full justify-between items-center">
+        <h2 className="text-xl font-semibold flex items-center text-primary">
+          <Palette className="mr-2" /> ย้อมสีดอกไม้ (เฉพาะชิ้นงานหลัก)
+          <span className="text-sm ml-2 text-muted-foreground">{`(+฿${product.colorRefinement})`}</span>
+        </h2>
+        <ChevronDown className="h-4 w-4 transition-transform duration-200" />
+      </CollapsibleTrigger>
+      <CollapsibleContent className="space-y-4 mt-4">
+        <div className="flex items-center space-x-2 mb-4">
+          <Switch
+            id="color-refinement"
+            checked={colorRefinement}
+            onCheckedChange={handleColorRefinementChange}
+          />
+          <Label htmlFor="color-refinement" className="text-muted-foreground">
+            เพิ่มการย้อมสี
+          </Label>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          การย้อมสี เป็นการย้อมสีดอกไม้ที่สีเปลี่ยนหลังจากอบแห้ง
+          (ไม่ได้ย้อมทุกดอกทุกสีในชิ้นงาน ทางร้านจะพิจารณาย้อมตามความเหมาะสม)
+        </p>
+        <div>
+          <p className="font-medium text-primary mb-2">แนะนำสำหรับ:</p>
+          <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
+            <li>ช่อดอกไม้ที่เริ่มเฉา เพราะสีอาจดูไม่สดใสติดน้ำตาล</li>
+            <li>ดอกTropical หรือดอกไม้เขตร้อนที่อมน้ำมาก สีจะเปลี่ยนมากหลังแห้ง เช่น คาลล่าลิลลี่ กล้วยไม้</li>
+            <li>ช่อดอกไม้สีขาว เพราะสีจะเปลี่ยนเป็นสีเหลือง</li>
+            <li>ช่อดอกไม้สีแดงเข้ม เพราะสีจะเปลี่ยนเป็นสีดำ เช่น กุหลาบ</li>
+            <li>ดอกไม้ที่กลีบบางและสีอ่อน เพราะจะไม่เหลือเม็ดสี เช่น ทิวลิป</li>
+          </ul>
+        </div>
+        <div>
+          <p className="font-medium text-primary mb-2">ดอกไม้ที่ย้อมสีไม่ได้:</p>
+          <ul className="list-disc pl-5 text-sm text-muted-foreground">
+            <li>ดอกไม้ที่ปล่อยแห้งตามธรรมชาติ</li>
+            <li>พวงมาลัย</li>
+          </ul>
+        </div>
+      </CollapsibleContent>
+    </Collapsible>
+  </div>
+)}
 
-          {product.allowAddOnItem && (
-            <div className="bg-white p-4 rounded-lg shadow-md transition-all duration-300 hover:shadow-lg">
-              <h2 className="text-xl font-semibold mb-2 flex items-center text-primary">
-                <Package className="mr-2" /> Attach Item
-              </h2>
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="attach-item"
-                  checked={attachedItem}
-                  onCheckedChange={handleItemAttach}
-                />
-                <Label htmlFor="attach-item" className="text-muted-foreground">
-                  Attach Item
-                </Label>
-              </div>
-            </div>
-          )}
+{product.allowAddOnItem && (
+  <div className="bg-white p-4 rounded-lg shadow-md transition-all duration-300 hover:shadow-lg">
+    <Collapsible>
+      <CollapsibleTrigger className="flex w-full justify-between items-center">
+        <h2 className="text-xl font-semibold flex items-center text-primary">
+          <Package className="mr-2" /> เพิ่มรูป/การ์ด ฟรี (เฉพาะชิ้นงานหลัก)
+          <span className="text-sm ml-2 text-muted-foreground">{`(+฿${product.addOnItem || 0})`}</span>
+        </h2>
+        <ChevronDown className="h-4 w-4 transition-transform duration-200" />
+      </CollapsibleTrigger>
+      <CollapsibleContent className="space-y-4 mt-4">
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="attach-item"
+            checked={attachedItem}
+            onCheckedChange={handleItemAttach}
+          />
+          <Label htmlFor="attach-item" className="text-muted-foreground">
+            เพิ่มรูป/การ์ด
+          </Label>
+        </div>
+        <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
+          <li>ลูกค้านำรูป/การ์ดมาให้ทางร้าน</li>
+          <li>รูปวางตรงกลางและล้อมด้วยดอกไม้ เหมือนตย.รูป</li>
+          <li>ไม่รับใส่ด้านหลังชิ้นงาน</li>
+          <li>การใส่รูปจะทำให้พื้นที่การใส่ดอกไม้ลดลง ควรเลือกรูปทรงที่ใหญ่พอ ที่สามารถใส่ได้ทั้งรูปและดอกไม้</li>
+        </ul>
+      </CollapsibleContent>
+    </Collapsible>
+  </div>
+)}
 
-          {product.allowMessage && (
-            <div className="bg-white p-4 rounded-lg shadow-md transition-all duration-300 hover:shadow-lg">
-              <h2 className="text-xl font-semibold mb-2 flex items-center text-primary">
-                <MessageSquare className="mr-2" /> Custom Text
-              </h2>
-              <Input
-                type="text"
-                placeholder="Enter your custom text"
-                value={customText}
-                onChange={(e) => setCustomText(e.target.value)}
-                className="border-primary/20 focus:border-primary"
-              />
-            </div>
-          )}
+{product.allowMessage && (
+  <div className="bg-white p-4 rounded-lg shadow-md transition-all duration-300 hover:shadow-lg">
+    <Collapsible>
+      <CollapsibleTrigger className="flex w-full justify-between items-center">
+        <h2 className="text-xl font-semibold flex items-center text-primary">
+          <MessageSquare className="mr-2" /> เพิ่มข้อความ
+          <span className="text-sm ml-2 text-muted-foreground">{`(+฿${product.message || 0})`}</span>
+        </h2>
+        <ChevronDown className="h-4 w-4 transition-transform duration-200" />
+      </CollapsibleTrigger>
+      <CollapsibleContent className="space-y-4 mt-4">
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="enable-custom-text"
+            checked={isCustomTextEnabled}
+            onCheckedChange={handleCustomTextToggle}
+          />
+          <Label htmlFor="enable-custom-text" className="text-muted-foreground">
+            เพิ่มข้อความ
+          </Label>
+        </div>
+        <Input
+          type="text"
+          placeholder="กรอกข้อความที่ต้องการ"
+          value={customText}
+          onChange={(e) => setCustomText(e.target.value)}
+          className="border-primary/20 focus:border-primary"
+          disabled={!isCustomTextEnabled}
+        />
+        <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
+          <li>พิมพ์ข้อความด้านล่างรูป หรือส่งรูป/โลโก้มาทางแชท</li>
+          <li>แจ้งสีอักษร ทอง-เงิน-ขาว-ดำ *ไม่แจ้งจะติดสีทองดังรูป*</li>
+          <li>แจ้งตำแหน่งที่ติด (ด้านหน้าชิ้นงานเท่านั้น) *ไม่แจ้งจะติดด้านล่างดังรูป*</li>
+          <li>กรอบวงรีแขวนผนังเพิ่มข้อความไม่ได้</li>
+        </ul>
+      </CollapsibleContent>
+    </Collapsible>
+  </div>
+)}
         </CardContent>
         <CardFooter className=" p-6">
           <div className="flex w-full gap-4">

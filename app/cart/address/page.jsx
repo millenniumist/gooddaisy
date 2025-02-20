@@ -60,20 +60,6 @@ const AddressPage = () => {
     fetchAddressInfo();
   }, [isLoggedIn]);
 
-  const handleCheckout = async () => {
-    if (!isLoggedIn) {
-      const combinedAddress = `${name}|${phone}|${address}`;
-      localStorage.setItem('gooddaisyAddress', combinedAddress);
-      router.push('/login');
-      return;
-    }
-
-    await axios.post(`${process.env.NEXT_PUBLIC_URL}api/cart/`, {
-      userId: user.id,
-    });
-    setCheckOutAlready(true);
-    router.push('/instruction');
-  };
 
   const validateInputs = () => {
     if (!name.trim() || !phone.trim() || !address.trim()) {
@@ -177,10 +163,10 @@ const AddressPage = () => {
         )}
         <Button
           type="button"
-          onClick={handleCheckout}
-          className="w-full"
+          onClick={() => router.push('/design')}
+          className="w-full font-bold"
         >
-          Proceed to Checkout
+          Next
         </Button>
       </form>
     </div>

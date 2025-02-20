@@ -18,6 +18,9 @@ export async function POST(request) {
     if (!file) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
+    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      return NextResponse.json({ error: 'File too large' }, { status: 400 });
+    }
 
     const buffer = await file.arrayBuffer();
     const base64File = Buffer.from(buffer).toString('base64');
@@ -67,7 +70,7 @@ export async function POST(request) {
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: process.env.EMAIL_USER,
-      subject: `New Order Slip: ${user.displayName} ${user.statusMessage ? `- ${user.statusMessage}` : ''}`,
+      subject: `New Order Slip: ${user?.displayName || "Unknown"} ${user?.statusMessage ? `- ${user?.statusMessage}` : ''}`,
       text: `New order slip uploaded: ${fileName}`,
       html: `<p>New order slip uploaded: ${fileName}</p><img src="${result.secure_url}" />`,
       attachments: [

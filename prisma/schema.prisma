@@ -137,13 +137,12 @@ model Product {
   subProduct  Boolean   @default(false)
   hasVariants Boolean   @default(false) // New field to indicate if product has variants
   variants    Variant[] // Optional relation to Variants
-
   allowColorRefinement Boolean @default(true)
   allowMessage         Boolean @default(true)
   allowAddOnItem      Boolean @default(true)
   colorRefinement     Float?   @default(200)
-  message             Float?   @default(0)
-  addOnItem           Float?   @default(0)
+  message             Float?   @default(200)
+  addOnItem           Float?   @default(200)
 
   orderItems OrderItem[]
 }
