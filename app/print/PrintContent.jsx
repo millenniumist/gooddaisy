@@ -31,7 +31,6 @@ const PrintContent = ({ orders }) => {
                 <th style={{ border: '1px solid #ddd', padding: '8px', backgroundColor: '#f5f5f5' }}>Color</th>
                 <th style={{ border: '1px solid #ddd', padding: '8px', backgroundColor: '#f5f5f5' }}>Message</th>
                 <th style={{ border: '1px solid #ddd', padding: '8px', backgroundColor: '#f5f5f5' }}>Add-On</th>
-                <th style={{ border: '1px solid #ddd', padding: '8px', backgroundColor: '#f5f5f5' }}>Note</th>
               </tr>
             </thead>
             <tbody>
@@ -44,11 +43,11 @@ const PrintContent = ({ orders }) => {
                   <td style={{ border: '1px solid #ddd', padding: '8px' }}>{item.colorRefinement ? 'Yes' : 'No'}</td>
                   <td style={{ border: '1px solid #ddd', padding: '8px' }}>{item.message || 'N/A'}</td>
                   <td style={{ border: '1px solid #ddd', padding: '8px' }}>{item.addOnItem ? 'Yes' : 'No'}</td>
-                  <td style={{ border: '1px solid #ddd', padding: '8px' }}>{item.note || 'N/A'}</td>
                 </tr>
               ))}
             </tbody>
           </table>
+          <p>Note and Design: {item.note || 'N/A'}</p>
           <h3 style={{ marginTop: '20px' }}>Total Price: ${order.totalPrice.toFixed(2)}</h3>
           <div style={{ pageBreakAfter: 'always' }}></div>
         </div>
