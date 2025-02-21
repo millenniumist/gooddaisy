@@ -19,6 +19,7 @@ export async function POST(req) {
         addOnItem: item.addOnItem || false,
         note: item.note || null,
         variant: item.variant || null
+        
       }))
     })
 

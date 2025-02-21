@@ -71,6 +71,10 @@ export default function CartPage() {
 
   // Update checkout to handle local cart
   const checkout = async () => {
+    if(!isLoggedIn) {
+      router.push("/login");
+      return;
+    }
     setCheckoutLoading(true);
     try {
       router.push("/cart/address");

@@ -27,16 +27,6 @@ export async function GET(request) {
         return NextResponse.json({ error: "No orders found" }, { status: 404 });
       }
 
-      const formatOrderId = (order) => {
-        const createdDate = new Date(order.createdDate);
-        const monthYear = format(createdDate, "M-yy");
-        const ordersInSameMonth = orders.filter(
-          (o) => format(new Date(o.createdDate), "M-yy") === monthYear
-        );
-        const orderIndex = ordersInSameMonth.findIndex((o) => o.id === order.id) + 1;
-        return `${orderIndex}-${monthYear}`;
-      };
-
       const chromiumPack =
         "https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar";
       const browser = await puppeteer.launch({
@@ -52,63 +42,68 @@ export async function GET(request) {
 
       try {
         const htmlContent = `
-        <html>
-          <head>
-            <style>
-              body { font-family: Arial, sans-serif; }
-              table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-              th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-              th { background-color: #f2f2f2; }
-            </style>
-          </head>
-          <body>
-            ${orders
-              .map(
-                (order) => `
-              <h1>Order #${formatOrderId(order)}  </h1>
-              <p>Customer: ${order.user.displayName} </p>
-              <p> Address: ${order.user.address}</p>
-              <p>Payment: ${order.paymentStatus}</p>
-              <h2>Order Items</h2>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Product</th>
-                    <th>Option</th>
-                    <th>Price</th>
-                    <th>Status</th>
-                    <th>Color Refinement</th>
-                    <th>Message</th>
-                    <th>Add-On Item</th>
-                    <th>Note</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${order.orderItems
-                    .map(
-                      (item) => `
-                    <tr>
-                      <td>${item.product.name}</td>
-                      <td>${item.variant ? item.variant.toUpperCase() : "N/A"}</td>
-                      <td>${item.price.toFixed(2)}</td>
-                      <td>${item.status}</td>
-                      <td>${item.colorRefinement ? "Yes" : "No"}</td>
-                      <td>${item.message || "N/A"}</td>
-                      <td>${item.addOnItem ? "Yes" : "No"}</td>
-                      <td>${item.note || "N/A"}</td>
-                    </tr>
-                  `
-                    )
-                    .join("")}
-                </tbody>
-              </table>
-              <h3>Total Price: ${order.totalPrice.toFixed(2)}</h3>
-            `
-              )
-              .join('<div style="page-break-after: always;"></div>')}
-          </body>
-        </html>
-      `;
+<html>
+  <head>
+    <style>
+      body { font-family: Arial, sans-serif; }
+      table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+      th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+      th { background-color: #f2f2f2; }
+    </style>
+  </head>
+  <body>
+    ${orders
+      .map(
+        (order) => `
+      <table>
+        <thead>
+          <tr>
+            <th>Order Details</th>
+            <th>Product Info</th>
+            <th>Options</th>
+            <th>Status</th>
+            <th>Customization</th>
+            <th>Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${order.orderItems
+            .map(
+              (item) => `
+            <tr>
+              <td>
+                <strong>Order #:</strong> ${order?.customId || "N/A"}<br>
+                <strong>Customer:</strong> ${
+                  order.user?.displayName || order.user?.userId || "N/A"
+                }<br>
+                <strong>Address:</strong> ${order.user.address}<br>
+                <strong>Payment:</strong> ${order.paymentStatus}
+              </td>
+              <td>${item.product.name}</td>
+              <td>${item.variant ? item.variant.toUpperCase() : "N/A"}</td>
+              <td>${item.status}</td>
+              <td>
+                <strong>Color Refinement:</strong> ${item.colorRefinement ? "Yes" : "No"}<br>
+                <strong>Message:</strong> ${item.message || "N/A"}<br>
+                <strong>Add-On Item:</strong> ${item.addOnItem ? "Yes" : "No"}<br>
+                <strong>Note:</strong> ${item.note || "N/A"}
+              </td>
+              <td>
+                <strong>Item Price:</strong> ${item.price.toFixed(2)}<br>
+                <strong>Order Total:</strong> ${order.totalPrice.toFixed(2)}
+              </td>
+            </tr>
+          `
+            )
+            .join("")}
+        </tbody>
+      </table>
+    `
+      )
+      .join('<div style="page-break-after: always;"></div>')}
+  </body>
+</html>
+`;
 
         await page.setContent(htmlContent);
         const pdf = await page.pdf({ format: "A4" });

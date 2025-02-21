@@ -163,7 +163,7 @@ const AddressPage = () => {
         )}
         <Button
           type="button"
-          onClick={() => router.push('/design')}
+          onClick={() => router.push('/instruction')}
           className="w-full font-bold"
         >
           Next

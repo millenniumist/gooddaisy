@@ -29,7 +29,7 @@ export async function GET(request, props) {
 
 
 export async function POST(req) {
-  const { colorRefinement, addOnItem, message, productId, price, name, userId, variant, variantPrice } = await req.json()
+  const { colorRefinement, addOnItem, message, productId, price, name, userId, variant, variantPrice, note } = await req.json()
 
   try {
     const newOrderItem = await prisma.orderItem.create({
@@ -42,6 +42,7 @@ export async function POST(req) {
         productId: parseInt(productId),
         userId: parseInt(userId),
         variant,
+        note,
       },
     })
 
